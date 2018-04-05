@@ -237,7 +237,7 @@ public class DBMetadataExtractor {
 			
 			// catalog is ignored for now (rs.getString("TABLE_CAT"))
 			try (ResultSet rs = md.getColumns(null, seedId.getSchemaName(), seedId.getTableName(), null)) {
-				while (rs.next()) {
+				while (rs != null && rs.next()) {
 					RelationID relationId = RelationID.createRelationIdFromDatabaseRecord(rs.getString("TABLE_SCHEM"), 
 										rs.getString("TABLE_NAME"));
 					QuotedID attributeId = QuotedID.createIdFromDatabaseRecord(rs.getString("COLUMN_NAME"));
