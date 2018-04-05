@@ -792,7 +792,7 @@ public class Quest implements Serializable, RepositoryChangedListener {
 			throw ex;
 		} 
 		finally {
-			if (!(aboxMode.equals(QuestConstants.CLASSIC) && (inmemory))) {
+			if (!(aboxMode.equals(QuestConstants.CLASSIC) && (inmemory))) { //constant might need to change this!
 				/*
 				 * If we are not in classic + inmemory mode we can disconnect
 				 * the house-keeping connection, it has already been used.

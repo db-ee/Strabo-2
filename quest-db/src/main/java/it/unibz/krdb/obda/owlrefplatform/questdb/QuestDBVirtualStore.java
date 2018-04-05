@@ -332,8 +332,8 @@ private OBDADataSource getDataSourceFromConfig(QuestPreferences config) {
 		if(this.isinitalized){
 			log.warn("Double initialization of QuestDBVirtualStore");
 		} else {
-			this.isinitalized = true;
-			questInstance.setupRepository();
+			questInstance.setupRepository(); 
+			this.isinitalized = true; //constant- moved this line so that init flag is set to true after repo is set up successfully
 		}
 	}
 	

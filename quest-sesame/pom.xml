@@ -11,16 +11,21 @@
 	<packaging>jar</packaging>
 
 	<dependencies>
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
-			<scope>test</scope>
+<!--   <dependency>
+    <groupId>ch.qos.logback</groupId>
+    <artifactId>logback-classic</artifactId>
+    <version>1.1.7</version>
+	</dependency> -->
+			<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.7.7</version>				
 		</dependency>
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-core</artifactId>
-			<scope>test</scope>
-			</dependency>
+			<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.7</version>				
+		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -30,12 +35,7 @@
 			<artifactId>ontop-obdalib-core</artifactId>
 			<groupId>${project.groupId}</groupId>
 			<version>${project.version}</version>
-			<!-- <exclusions>
-				<exclusion>
-					<artifactId>slf4j-log4j12</artifactId>
-					<groupId>org.slf4j</groupId>
-				</exclusion>
-			</exclusions>  -->
+	
 		</dependency>
 		<dependency>
 			<artifactId>ontop-obdalib-owlapi3</artifactId>
@@ -155,11 +155,7 @@
 		<artifactId>commons-cli</artifactId>
 		<version>1.2</version>
 	</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
-			<version>1.7.7</version>				
-		</dependency>
+	
 		
 		<!-- Apache Commons -->
 
@@ -209,9 +205,41 @@
 				<artifactId>commons-validator</artifactId>
 				<version>1.3.1</version>
 			</dependency>
+			 <dependency>
+            <groupId>net.jpountz.lz4</groupId>
+            <artifactId>lz4</artifactId>
+            <version>1.3</version> 
+            <type>jar</type>
+        	</dependency>
+        	<dependency>
+            	<groupId>commons-math</groupId>
+            	<artifactId>commons-math</artifactId>
+             <version>1.2</version>	
+            <type>jar</type>
+       	 	</dependency>
+        	<dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+                            <version>2.2.4</version>
+            
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.9</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+		<groupId>gr.uoa.di.madgik</groupId>
+		<artifactId>madis-jdbc</artifactId>
+		<version>1.0</version>
+		<scope>system</scope>
+		<systemPath>/home/constant/ontop-spatial-tip/ontop-spatial/quest-sesame/lib/exareme-utils-0.1-SNAPSHOT.jar</systemPath>
+</dependency>
+
 			</dependencies>
-	
-	
+
 	<build>
 		<plugins>
 			<plugin>

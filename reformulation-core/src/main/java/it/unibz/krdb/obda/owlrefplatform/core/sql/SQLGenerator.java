@@ -1315,8 +1315,8 @@ public class SQLGenerator implements SQLQueryGenerator {
 				}
 			}
 			DatabaseRelationDefinition table = metadata.getDatabaseRelation(tableId);
- 			Attribute a = table.getAttribute(attributeId);
 			if (table != null) {
+	 			Attribute a = table.getAttribute(attributeId);
 				if (a.getType()==1111 || a.getType()== 2004) 
 					return true;
 				else

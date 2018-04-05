@@ -50,6 +50,8 @@ public class SQLAdapterFactory {
 				return new SQLServerSQLDialectAdapter();
 			case "madgik.adp.federatedjdbc.AdpDriver":
 				return new AdpSQLDialectAdapter();
+			case "madgik.exareme.utils.embedded.AdpEmbeddedDriver":
+				return  new AdpSQLDialectAdapter();
             case "nl.cwi.monetdb.jdbc.MonetDriver":
                 return new MonetDBSQLDialectAdapter();
             case "com.sap.db.jdbc.Driver":

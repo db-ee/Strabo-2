@@ -120,6 +120,9 @@ public class PostgreSQLDialectAdapter extends SQL99DialectAdapter {
 			strType = "VARCHAR(10485760)";
 		} else if (type == GEOMETRYSQLDATATYPE) { //if the column is a geometry column, a cast is not enough 
 			//return "ST_AsText(" + value + ")";  
+			if (value.contains("rast")){
+				value = "(ST_DumpAsPolygons(" + value + "))"; 
+			}
 			return "CONCAT('<http://www.opengis.net/def/crs/EPSG/0/4326> ' , ST_AsText(" + value + "))";  
 		} else {
 			throw new RuntimeException("Unsupported SQL type");
