@@ -60,10 +60,10 @@ public class SesameVirtualFoursquareTest extends TestCase {
 		
 		try {
 			
-			String owlfile = "/home/constant/foursquare/foursquare.owl";
+			String owlfile = "/tmp/lgd-bremen.owl";
 			
 			//for opendap its cop.obda
-			String obdafile = "/home/constant/mappings-ontop/foursquare.obda";
+			String obdafile = "/tmp/lgd-bremen.obda";
 			//String owlfile = 	"/home/timi/ontologies/helloworld/helloworld.owl";
 			repo = new SesameVirtualRepo("my_name", owlfile, obdafile, false, "TreeWitness");
 			
@@ -81,21 +81,26 @@ public class SesameVirtualFoursquareTest extends TestCase {
 						+ "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n"
 						+ "PREFIX f: <http://melodiesproject.eu/floods/> \n"
 						+ "PREFIX geo: <http://www.opengis.net/ont/geosparql#> \n"
+						+ "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>"
 						+ "PREFIX gadm: <http://melodiesproject.eu/gadm/> \n" 
 						+ "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n"
 						+ "PREFIX osm: <http://melodiesproject.eu/osm/> \n"
 						+ "PREFIX clc: <http://melodiesproject.eu/clc/> \n"
 						+ "PREFIX : <http://meraka/moss/exampleBooks.owl#>\n"
 						+ "PREFIX lai: <http://geo.linkedopendata.gr/lai/ontology#> \n"
-						+ "PREFIX four: <http://foursquare.com/> \n";
+						+ "PREFIX lgd: <http://linkedgeodata.org/ontology#> \n";
 			
 			///query repo
 			 try {
-				 String preds = prefixes +  "select distinct  ?s ?name ?d17 ?d18   where {" +
-				 						"?s <http://meraka/moss/exampleBooks.owl#debt2017> ?d17 . \n "
-				 						+ "?s <http://meraka/moss/exampleBooks.owl#debt2018> ?d18 . \n"
-				 						+ "?s <http://meraka/moss/exampleBooks.owl#name> ?name . \n" +
-				 						"} limit 10";
+				 String preds = prefixes +  "select  ?s ?s2  ?c where {" +
+				 						"?s lgd:buildingCategory ?c . \n "
+				 						+ "?s2 lgd:buildingCategory ?c . \n "
+				 						+ "?s geo:asWKT ?g1 ."
+				 						+ "?s2 geo:asWKT ?g2 ."
+				 						//+ "?s <http://meraka/moss/exampleBooks.owl#debt2018> ?d18 . \n"
+				 						//+ "?s <http://meraka/moss/exampleBooks.owl#name> ?name . \n" 
+				 						+ "FILTER(<http://www.opengis.net/def/function/geosparql/sfContains>(?g1, ?g2)). "
+				 						+ "} limit 10";
 				 
 				 
 				 String four = prefixes + "select distinct ?s ?name ?now ?category where { \n"
@@ -104,7 +109,7 @@ public class SesameVirtualFoursquareTest extends TestCase {
 				 		+ "?s four:cat ?category . \n"
 				 		+ "} ";
 				 
-			      TupleQuery tupleQuery = con.prepareTupleQuery(QueryLanguage.SPARQL, four );
+			      TupleQuery tupleQuery = con.prepareTupleQuery(QueryLanguage.SPARQL, preds );
 				  TupleQueryResultHandler handler = new SPARQLResultsTSVWriter(System.out);
 
 			      tupleQuery.evaluate(handler);

@@ -641,10 +641,10 @@ public class Quest implements Serializable, RepositoryChangedListener {
 				obdaSource = sources.iterator().next();
 
 				log.debug("Testing DB connection...");
-				connect();
+				//connect();
 
 				// setup connection pool
-				setupConnectionPool();
+				//setupConnectionPool();
 
 				// obtain mappings by replace equivalences in the source mappings
 				mappings = vocabularyValidator.replaceEquivalences(inputOBDAModel.getMappings(obdaSource.getSourceID()));
@@ -653,7 +653,8 @@ public class Quest implements Serializable, RepositoryChangedListener {
 			
 			//if the metadata was not already set
 			if (metadata == null) {
-				metadata = DBMetadataExtractor.createMetadata(localConnection);
+				metadata = DBMetadataExtractor.createDummyMetadata("strabon");
+				//metadata = DBMetadataExtractor..createMetadata(localConnection);
 				// if we have to parse the full metadata or just the table list in the mappings
 				if (obtainFullMetadata) {
 					DBMetadataExtractor.loadMetadata(metadata, localConnection, null);
@@ -671,15 +672,15 @@ public class Quest implements Serializable, RepositoryChangedListener {
 							Set<RelationID> referredTables = userConstraints.getReferredTables(metadata.getQuotedIDFactory());
 							realTables.addAll(referredTables);
 						}
-
-						DBMetadataExtractor.loadMetadata(metadata, localConnection, realTables);
+						DBMetadataExtractor.createStrabonMetadata(metadata, realTables);
+						//DBMetadataExtractor.loadMetadata(metadata, localConnection, realTables);
 					}
 					catch (JSQLParserException e) {
 						System.out.println("Error obtaining the tables" + e);
 					}
-					catch (SQLException e) {
-						System.out.println("Error obtaining the metadata " + e);
-					}
+					//catch (SQLException e) {
+					//	System.out.println("Error obtaining the metadata " + e);
+					//}
 				}
 			}
 

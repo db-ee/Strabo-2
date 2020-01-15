@@ -77,13 +77,9 @@ public class QuestOWLConnection implements AutoCloseable {
 		}
 
 	}
-
-	public QuestOWLStatement createStatement() throws OWLException {
-		try {
-			return new QuestOWLStatement(conn.createStatement(), this);
-		} catch (OBDAException e) {
-			throw new OWLException(e); 
-		}
+	
+	public QuestOWLStatement createStrabonStatement() throws OWLException {
+			return new QuestOWLStatement(conn.createStrabonStatement(), this);
 	}
 
 	public void commit() throws OWLException {

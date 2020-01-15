@@ -31,6 +31,7 @@ import it.unibz.krdb.obda.owlapi3.OWLAPI3ABoxIterator;
 import it.unibz.krdb.obda.owlapi3.OWLAPI3IndividualTranslator;
 import it.unibz.krdb.obda.owlapi3.OntopOWLException;
 import it.unibz.krdb.obda.owlrefplatform.core.QuestStatement;
+import it.unibz.krdb.obda.owlrefplatform.core.StrabonStatement;
 import it.unibz.krdb.obda.owlrefplatform.core.queryevaluation.SPARQLQueryUtility;
 import it.unibz.krdb.obda.sesame.SesameRDFIterator;
 import org.openrdf.query.QueryLanguage;
@@ -71,10 +72,10 @@ import java.util.Set;
  */
 public class QuestOWLStatement implements AutoCloseable {
 
-	private final QuestStatement st;
+	private final StrabonStatement st;
 	private final QuestOWLConnection conn;
 	
-	protected  QuestOWLStatement(QuestStatement st, QuestOWLConnection conn) {
+	protected  QuestOWLStatement(StrabonStatement st, QuestOWLConnection conn) {
 		this.conn = conn;
 		this.st = st;
 	}
@@ -136,90 +137,9 @@ public class QuestOWLStatement implements AutoCloseable {
 	}
 
 	public int insertData(File owlFile, int commitSize, int batchsize, String baseURI) throws Exception {
+		return batchsize;
 
-		Iterator<Assertion> aBoxIter = null;
-
-		if (owlFile.getName().toLowerCase().endsWith(".owl")) {
-			OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
-			OWLOntology ontology = manager.loadOntologyFromOntologyDocument(owlFile);
-			Set<OWLOntology> set = manager.getImportsClosure(ontology);
-
-			// Retrieves the ABox from the ontology file.
-
-			aBoxIter = new OWLAPI3ABoxIterator(set, st.questInstance.getVocabulary());
-			// TODO: (ROMAN) -- check whether we need to use 
-			// EquivalentTriplePredicateIterator newData = new EquivalentTriplePredicateIterator(aBoxIter, equivalenceMaps);
-
-			return st.insertData(aBoxIter, commitSize, batchsize);
-		} 
-		else if (owlFile.getName().toLowerCase().endsWith(".ttl") || owlFile.getName().toLowerCase().endsWith(".nt")) {
-
-			RDFParser rdfParser = null;
-
-			if (owlFile.getName().toLowerCase().endsWith(".nt")) {
-				rdfParser = Rio.createParser(RDFFormat.NTRIPLES);
-			} else if (owlFile.getName().toLowerCase().endsWith(".ttl")) {
-				rdfParser = Rio.createParser(RDFFormat.TURTLE);
-			}
-
-			ParserConfig config = rdfParser.getParserConfig();
-			// To emulate DatatypeHandling.IGNORE 
-			config.addNonFatalError(BasicParserSettings.FAIL_ON_UNKNOWN_DATATYPES);
-			config.addNonFatalError(BasicParserSettings.VERIFY_DATATYPE_VALUES);
-			config.addNonFatalError(BasicParserSettings.NORMALIZE_DATATYPE_VALUES);
-//
-//			rdfParser.setVerifyData(true);
-//			rdfParser.setStopAtFirstError(true);
-
-			boolean autoCommit = conn.getAutoCommit();
-			conn.setAutoCommit(false);
-
-			SesameRDFIterator rdfHandler = new SesameRDFIterator();
-			rdfParser.setRDFHandler(rdfHandler);
-
-			BufferedReader reader = new BufferedReader(new FileReader(owlFile));
-
-			try {
-
-				Thread insert = new Thread(new Insert(rdfParser, reader, baseURI));
-				Process processor = new Process(rdfHandler, this.st, commitSize, batchsize);
-				Thread process = new Thread(processor);
-
-				// start threads
-				insert.start();
-				process.start();
-
-				insert.join();
-				process.join();
-
-				return processor.getInsertCount();
-
-			} catch (RuntimeException e) {
-				// System.out.println("exception, rolling back!");
-
-				if (autoCommit) {
-					conn.rollBack();
-				}
-				throw e;
-			} catch (OBDAException e) {
-
-				if (autoCommit) {
-					conn.rollBack();
-				}
-				throw e;
-			} catch (InterruptedException e) {
-				if (autoCommit) {
-					conn.rollBack();
-				}
-
-				throw e;
-			} finally {
-				conn.setAutoCommit(autoCommit);
-			}
-
-		} else {
-			throw new IllegalArgumentException("Only .owl, .ttl and .nt files are supported for load opertions.");
-		}
+		
 
 	}
 

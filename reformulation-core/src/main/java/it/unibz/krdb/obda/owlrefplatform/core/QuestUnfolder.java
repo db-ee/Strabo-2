@@ -80,10 +80,11 @@ public class QuestUnfolder {
 		/**
 		 * Expand the meta mapping (creates a new set of mappings)
 		 */
-		MetaMappingExpander metaMappingExpander = new MetaMappingExpander(localConnection, metadata.getQuotedIDFactory());
-		Collection<OBDAMappingAxiom> expandedMappings = metaMappingExpander.expand(splittedMappings);
+		//Strabon does not need this
+		//MetaMappingExpander metaMappingExpander = new MetaMappingExpander(localConnection, metadata.getQuotedIDFactory());
+		//Collection<OBDAMappingAxiom> expandedMappings = metaMappingExpander.expand(splittedMappings);
 		
-		unfoldingProgram = Mapping2DatalogConverter.constructDatalogProgram(expandedMappings, metadata);
+		unfoldingProgram = Mapping2DatalogConverter.constructDatalogProgram(splittedMappings, metadata);
 	}
 
 

@@ -482,7 +482,7 @@ public class SparqlAlgebraToDatalogTranslator {
 		Var subj = triple.getSubjectVar();
 		Term sTerm = getOntopTerm(subj);
 		
-		if ((p != null) && p.toString().equals(RDF.TYPE.stringValue())) {
+		/*if ((p != null) && p.toString().equals(RDF.TYPE.stringValue())) {
 			Value o = obj.getValue();
 			if (o == null) {
 				// object is a variable
@@ -504,7 +504,7 @@ public class SparqlAlgebraToDatalogTranslator {
 			else  
 				throw new RuntimeException("Unsupported query syntax");
 		} 
-		else {			
+		else {*/			
 			// The predicate is NOT rdf:type
 			Term oTerm = getOntopTerm(obj); 
 			
@@ -518,7 +518,7 @@ public class SparqlAlgebraToDatalogTranslator {
 			else 
 				return ofac.getTripleAtom(sTerm, ofac.getVariable(pred.getName()), oTerm);
 		}
-	}
+	//}
 	
 	private Term getOntopTerm(Var subj) {
 		Value s = subj.getValue();

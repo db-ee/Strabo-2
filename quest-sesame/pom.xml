@@ -230,15 +230,7 @@
             <version>1.9</version>
             <type>jar</type>
         </dependency>
-        <dependency>
-		<groupId>gr.uoa.di.madgik</groupId>
-		<artifactId>madis-jdbc</artifactId>
-		<version>1.0</version>
-		<scope>system</scope>
-		<systemPath>/home/constant/ontop-spatial-tip/ontop-spatial/quest-sesame/lib/exareme-utils-0.1-SNAPSHOT.jar</systemPath>
-</dependency>
-
-			</dependencies>
+	</dependencies>
 
 	<build>
 		<plugins>

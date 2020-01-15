@@ -152,4 +152,11 @@ public class QuestConnection implements OBDAConnection {
 		}
 	}
 
+	public StrabonStatement createStrabonStatement() {
+		StrabonStatement st = new StrabonStatement(this.questinstance, this,
+				null);
+		//st.setFetchSize(400);
+		return st;
+	}
+
 }

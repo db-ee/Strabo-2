@@ -263,7 +263,7 @@ public class QuestOWL extends OWLReasonerBase implements AutoCloseable {
 				owlReasonerRuntimeException.setStackTrace(questException.getStackTrace());
 			throw owlReasonerRuntimeException;
 		}
-		return owlconn.createStatement();
+		return owlconn.createStrabonStatement();
 	}
 
 	private void prepareQuestInstance() throws Exception {
@@ -304,7 +304,7 @@ public class QuestOWL extends OWLReasonerBase implements AutoCloseable {
 
 			// Retrives the connection from Quest
 			//conn = questInstance.getConnection();
-			conn = questInstance.getNonPoolConnection();
+			//conn = questInstance.getNonPoolConnection();
 			owlconn = new QuestOWLConnection(conn);
 			// pm.reasonerTaskProgressChanged(3, 4);
 
@@ -1879,6 +1879,13 @@ public class QuestOWL extends OWLReasonerBase implements AutoCloseable {
 			}
 			return properties;
 		}
+	}
+
+	public StrabonStatement createStrabonStatement() {
+		StrabonStatement st = new StrabonStatement(this.questInstance, null,
+				null);
+		//st.setFetchSize(400);
+		return st;
 	}
 
 }
