@@ -1208,6 +1208,10 @@ public class SparqlAlgebraToDatalogTranslator {
 				}				
 			}
 			
+			if(tp == COL_TYPE.GEOMETRY) {
+				return ofac.getConstantLiteral(lit.stringValue(), COL_TYPE.GEOMETRY);
+			}
+			
 			String constantString;
 			switch (tp) {
 				case INTEGER:
