@@ -2516,14 +2516,26 @@ public class TupleExprBuilder extends ASTVisitorBase {
 			result = new Compare(leftArg, arg, CompareOp.EQ);
 		}
 		else {
-			ListMemberOperator listMemberOperator = new ListMemberOperator();
-			listMemberOperator.addArgument(leftArg);
-
-			for (int i = 0; i < listItemCount; i++) {
+			// create a set of conjunctive comparisons to represent the NOT IN
+			// operator: X NOT IN (a, b, c) -> X != a && X != b && X != c.
+			Or or = new Or();
+			Or currentOr = or;
+			for (int i = 0; i < listItemCount - 1; i++) {
 				ValueExpr arg = (ValueExpr)node.jjtGetChild(i).jjtAccept(this, null);
-				listMemberOperator.addArgument(arg);
+
+				currentOr.setLeftArg(new Compare(leftArg, arg, CompareOp.EQ));
+
+				if (i == listItemCount - 2) { // second-to-last item
+					arg = (ValueExpr)node.jjtGetChild(i + 1).jjtAccept(this, null);
+					currentOr.setRightArg(new Compare(leftArg, arg, CompareOp.EQ));
+				}
+				else {
+					Or newOr = new Or();
+					currentOr.setRightArg(newOr);
+					currentOr = newOr;
+				}
 			}
-			result = listMemberOperator;
+			result = or;
 		}
 
 		return result;

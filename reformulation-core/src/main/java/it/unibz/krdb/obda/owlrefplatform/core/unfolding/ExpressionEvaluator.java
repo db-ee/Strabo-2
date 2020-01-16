@@ -741,7 +741,7 @@ public class ExpressionEvaluator {
 			else
 				arg2 = f2.getTerm(1);
 		}else if(term.getTerm(1) instanceof ValueConstant){
-			arg1 = fac.getFunctionGeomFromWKT(term.getTerm(1));
+			arg2 = fac.getFunctionGeomFromWKT(term.getTerm(1));
 		}
 		else {
 			arg2 = term.getTerm(1);
