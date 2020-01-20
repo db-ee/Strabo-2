@@ -797,15 +797,15 @@ public class SQLGenerator implements SQLQueryGenerator {
 		while (hit.hasNext()) {
 
 			Term ht = hit.next();
-			String typeColumn = getTypeColumnForSELECT(ht, signature, hpos, sqlVariableNames);
-			String langColumn = getLangColumnForSELECT(ht, signature, hpos,	index, sqlVariableNames);
+			//String typeColumn = getTypeColumnForSELECT(ht, signature, hpos, sqlVariableNames);
+			//String langColumn = getLangColumnForSELECT(ht, signature, hpos,	index, sqlVariableNames);
 			String mainColumn = getMainColumnForSELECT(ht, signature, hpos, index, sqlVariableNames);
 
 			sb.append("\n   ");
-			sb.append(typeColumn);
-			sb.append(", ");
-			sb.append(langColumn);
-			sb.append(", ");
+			//sb.append(typeColumn);
+			//sb.append(", ");
+			//sb.append(langColumn);
+			//sb.append(", ");
 			sb.append(mainColumn);
 			if (hit.hasNext()) {
 				sb.append(", ");

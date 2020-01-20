@@ -178,6 +178,12 @@ public class QueryExecutor {
 	
 	private static void createObdaFile() throws SQLException {
 		obdaFile = new StringBuffer();
+		obdaFile.append("[PrefixDeclaration]");
+		obdaFile.append("\n");
+		obdaFile.append("geo:\thttp://www.opengis.net/ont/geosparql#");
+		obdaFile.append("\n");
+		
+		obdaFile.append("\n");
 		obdaFile.append("[SourceDeclaration]");
 		obdaFile.append("\n");
 		obdaFile.append("sourceUri\tsparql");
@@ -199,19 +205,55 @@ public class QueryExecutor {
 		int mappingId = 0;
 		
 		for (String property : predDictionary.keySet()) {
-			obdaFile.append("mappingId\tmapp");
-			obdaFile.append(mappingId);
-			mappingId++;
-			obdaFile.append("\n");
-			obdaFile.append("target\t");
-			obdaFile.append("<{s}> ");
-			obdaFile.append(property);
-			obdaFile.append(" <{o}> .\n");
-			obdaFile.append("source\t");
-			obdaFile.append("select s, o from prop");
-			obdaFile.append(predDictionary.get(property));
-			obdaFile.append("\n");
-			obdaFile.append("\n");
+			
+			
+			if(property.contains("asWKT")){
+				obdaFile.append("mappingId\tmapp");
+				obdaFile.append(mappingId);
+				mappingId++;
+				obdaFile.append("\n");
+				obdaFile.append("target\t");
+				obdaFile.append("<{s}> ");
+				obdaFile.append(property);
+				obdaFile.append(" {o}^^geo:wktLiteral .\n");
+				obdaFile.append("source\t");
+				obdaFile.append("select s, o from prop");
+				obdaFile.append(predDictionary.get(property));
+				obdaFile.append("\n");
+				obdaFile.append("\n");
+			}
+			else if (property.contains("has_code")){
+				obdaFile.append("mappingId\tmapp");
+				obdaFile.append(mappingId);
+				mappingId++;
+				obdaFile.append("\n");
+				obdaFile.append("target\t");
+				obdaFile.append("<{s}> ");
+				obdaFile.append(property);
+				obdaFile.append(" {o}^^xsd:integer .\n");
+				obdaFile.append("source\t");
+				obdaFile.append("select s, o from prop");
+				obdaFile.append(predDictionary.get(property));
+				obdaFile.append("\n");
+				obdaFile.append("\n");
+			}
+			else {
+				obdaFile.append("mappingId\tmapp");
+				obdaFile.append(mappingId);
+				mappingId++;
+				obdaFile.append("\n");
+				obdaFile.append("target\t");
+				obdaFile.append("<{s}> ");
+				obdaFile.append(property);
+				obdaFile.append(" <{o}> .\n");
+				obdaFile.append("source\t");
+				obdaFile.append("select s, o from prop");
+				obdaFile.append(predDictionary.get(property));
+				obdaFile.append("\n");
+				obdaFile.append("\n");
+				
+			}
+			
 
 		}
 		obdaFile.append("]]");
@@ -241,7 +283,7 @@ public class QueryExecutor {
 		File[] listOfFiles = folder.listFiles();
 		List<String> files = new ArrayList<String>();
 		for (int i = 0; i < listOfFiles.length; i++) {
-			if (listOfFiles[i].isFile() && listOfFiles[i].getCanonicalPath().endsWith(".q")) {
+			if (listOfFiles[i].isFile() && listOfFiles[i].getCanonicalPath().endsWith("2.q")) {
 				files.add(listOfFiles[i].getCanonicalPath());
 			}
 		}
