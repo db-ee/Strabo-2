@@ -36,6 +36,9 @@ import it.unibz.krdb.obda.owlrefplatform.core.translator.SparqlAlgebraToDatalogT
 import it.unibz.krdb.obda.owlrefplatform.core.unfolding.DatalogUnfolder;
 import it.unibz.krdb.obda.owlrefplatform.core.unfolding.ExpressionEvaluator;
 import it.unibz.krdb.obda.renderer.DatalogProgramRenderer;
+import madgik.exareme.master.queryProcessor.decomposer.dag.NodeHashValues;
+import madgik.exareme.master.queryProcessor.decomposer.query.SQLQuery;
+import madgik.exareme.master.queryProcessor.sparql.DagCreatorDatalogNew;
 
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryLanguage;
@@ -49,6 +52,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -68,13 +72,10 @@ public class StrabonStatement implements OBDAStatement {
 
 	private final Statement sqlstatement;
 
-
-	
-	
 	private boolean canceled = false;
-	
+
 	private boolean queryIsParsed = false;
-	
+
 	private ParsedQuery parsedQ = null;
 
 	private QueryExecutionThread executionthread;
@@ -85,10 +86,8 @@ public class StrabonStatement implements OBDAStatement {
 
 	private SesameConstructTemplate templ;
 
-	
 	private static final Logger log = LoggerFactory.getLogger(StrabonStatement.class);
 
-	
 	/*
 	 * For benchmark purpose
 	 */
@@ -104,7 +103,6 @@ public class StrabonStatement implements OBDAStatement {
 
 		this.sqlstatement = st;
 	}
-
 
 	private class QueryExecutionThread extends Thread {
 
@@ -177,8 +175,8 @@ public class StrabonStatement implements OBDAStatement {
 	}
 
 	/**
-	 * Calls the necessary tuple or graph query execution Implements describe
-	 * uri or var logic Returns the result set for the given query
+	 * Calls the necessary tuple or graph query execution Implements describe uri or
+	 * var logic Returns the result set for the given query
 	 */
 	@Override
 	public it.unibz.krdb.obda.model.ResultSet execute(String strquery) throws OBDAException {
@@ -191,7 +189,7 @@ public class StrabonStatement implements OBDAStatement {
 			pq = qp.parseQuery(strquery, null);
 		} catch (MalformedQueryException e1) {
 			e1.printStackTrace();
-		} 
+		}
 		// encoding ofquery type into numbers
 		if (SPARQLQueryUtility.isSelectQuery(pq)) {
 			parsedQ = pq;
@@ -205,26 +203,27 @@ public class StrabonStatement implements OBDAStatement {
 			TupleResultSet executedQuery = executeTupleQuery(strquery, 2);
 			return executedQuery;
 		} else if (SPARQLQueryUtility.isConstructQuery(pq)) {
-			
+
 			// Here we need to get the template for the CONSTRUCT query results
 			try {
 				templ = new SesameConstructTemplate(strquery);
 			} catch (MalformedQueryException e) {
 				e.printStackTrace();
 			}
-			
+
 			// Here we replace CONSTRUCT query with SELECT query
 			strquery = SPARQLQueryUtility.getSelectFromConstruct(strquery);
 			GraphResultSet executedGraphQuery = executeGraphQuery(strquery, 3);
 			return executedGraphQuery;
-			
+
 		} else if (SPARQLQueryUtility.isDescribeQuery(pq)) {
 			// create list of uriconstants we want to describe
 			List<String> constants = new ArrayList<String>();
 			if (SPARQLQueryUtility.isVarDescribe(strquery)) {
 				// if describe ?var, we have to do select distinct ?var first
 				String sel = SPARQLQueryUtility.getSelectVarDescribe(strquery);
-				it.unibz.krdb.obda.model.ResultSet resultSet = (it.unibz.krdb.obda.model.ResultSet) this.executeTupleQuery(sel, 1);
+				it.unibz.krdb.obda.model.ResultSet resultSet = (it.unibz.krdb.obda.model.ResultSet) this
+						.executeTupleQuery(sel, 1);
 				if (resultSet instanceof EmptyQueryResultSet)
 					return null;
 				else if (resultSet instanceof QuestResultset) {
@@ -233,7 +232,7 @@ public class StrabonStatement implements OBDAStatement {
 						Constant constant = res.getConstant(1);
 						if (constant instanceof URIConstant) {
 							// collect constants in list
-							constants.add(((URIConstant)constant).getURI());
+							constants.add(((URIConstant) constant).getURI());
 						}
 					}
 				}
@@ -304,15 +303,14 @@ public class StrabonStatement implements OBDAStatement {
 
 	/**
 	 * Translates a SPARQL query into Datalog dealing with equivalences and
-	 * verifying that the vocabulary of the query matches the one in the
-	 * ontology. If there are equivalences to handle, this is where its done
-	 * (i.e., renaming atoms that use predicates that have been replaced by a
-	 * canonical one.
+	 * verifying that the vocabulary of the query matches the one in the ontology.
+	 * If there are equivalences to handle, this is where its done (i.e., renaming
+	 * atoms that use predicates that have been replaced by a canonical one.
 	 * 
-
+	 * 
 	 * @return
 	 */
-	
+
 	private DatalogProgram translateAndPreProcess(ParsedQuery pq) {
 		DatalogProgram program;
 		try {
@@ -321,14 +319,14 @@ public class StrabonStatement implements OBDAStatement {
 
 			log.debug("Datalog program translated from the SPARQL query: \n{}", program);
 
-			DatalogUnfolder unfolder = new DatalogUnfolder(program.clone().getRules(), HashMultimap.<Predicate, List<Integer>>create());
+			DatalogUnfolder unfolder = new DatalogUnfolder(program.clone().getRules(),
+					HashMultimap.<Predicate, List<Integer>>create());
 			removeNonAnswerQueries(program);
 
 			program = unfolder.unfold(program, OBDAVocabulary.QUEST_QUERY);
 
 			log.debug("Flattened program: \n{}", program);
-		} 
-		catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			OBDAException ex = new OBDAException(e.getMessage());
 			ex.setStackTrace(e.getStackTrace());
@@ -340,40 +338,37 @@ public class StrabonStatement implements OBDAStatement {
 			CQIE newquery = questInstance.getVocabularyValidator().replaceEquivalences(query);
 			newprogram.appendRule(newquery);
 		}
-		return newprogram;		
+		return newprogram;
 	}
-
-
 
 	private DatalogProgram getUnfolding(DatalogProgram query) throws OBDAException {
 
 		log.debug("Start the partial evaluation process...");
 
 		DatalogProgram unfolding = questInstance.getUnfolder().unfold(query);
-		//log.debug("Partial evaluation: \n{}", unfolding);
+		// log.debug("Partial evaluation: \n{}", unfolding);
 		log.debug("Data atoms evaluated: \n{}", unfolding);
 
 		removeNonAnswerQueries(unfolding);
 
-		//log.debug("After target rules removed: \n{}", unfolding);
+		// log.debug("After target rules removed: \n{}", unfolding);
 		log.debug("Irrelevant rules removed: \n{}", unfolding);
 
 		ExpressionEvaluator evaluator = questInstance.getExpressionEvaluator();
 		evaluator.evaluateExpressions(unfolding);
-		
+
 		/*
-			UnionOfSqlQueries ucq = new UnionOfSqlQueries(questInstance.getUnfolder().getCQContainmentCheck());
-			for (CQIE cq : unfolding.getRules())
-				ucq.add(cq);
-			
-			List<CQIE> rules = new ArrayList<>(unfolding.getRules());
-			unfolding.removeRules(rules); 
-			
-			for (CQIE cq : ucq.asCQIE()) {
-				unfolding.appendRule(cq);
-			}
-			log.debug("CQC performed ({} rules): \n{}", unfolding.getRules().size(), unfolding);
-		 
+		 * UnionOfSqlQueries ucq = new
+		 * UnionOfSqlQueries(questInstance.getUnfolder().getCQContainmentCheck()); for
+		 * (CQIE cq : unfolding.getRules()) ucq.add(cq);
+		 * 
+		 * List<CQIE> rules = new ArrayList<>(unfolding.getRules());
+		 * unfolding.removeRules(rules);
+		 * 
+		 * for (CQIE cq : ucq.asCQIE()) { unfolding.appendRule(cq); }
+		 * log.debug("CQC performed ({} rules): \n{}", unfolding.getRules().size(),
+		 * unfolding);
+		 * 
 		 */
 
 		log.debug("Boolean expression evaluated: \n{}", unfolding);
@@ -407,8 +402,8 @@ public class StrabonStatement implements OBDAStatement {
 	}
 
 	/**
-	 * The method executes select or ask queries by starting a new quest
-	 * execution thread
+	 * The method executes select or ask queries by starting a new quest execution
+	 * thread
 	 * 
 	 * @param strquery
 	 *            the select or ask query string
@@ -444,8 +439,8 @@ public class StrabonStatement implements OBDAStatement {
 	}
 
 	/**
-	 * Internal method to start a new query execution thread type defines the
-	 * query type 1-SELECT, 2-ASK, 3-CONSTRUCT, 4-DESCRIBE
+	 * Internal method to start a new query execution thread type defines the query
+	 * type 1-SELECT, 2-ASK, 3-CONSTRUCT, 4-DESCRIBE
 	 */
 	private void startExecute(String strquery, int type) throws OBDAException {
 		CountDownLatch monitor = new CountDownLatch(1);
@@ -471,10 +466,9 @@ public class StrabonStatement implements OBDAStatement {
 
 	/**
 	 * Rewrites the given input SPARQL query and returns back an expanded SPARQL
-	 * query. The query expansion involves query transformation from SPARQL
-	 * algebra to Datalog objects and then translating back to SPARQL algebra.
-	 * The transformation to Datalog is required to apply the rewriting
-	 * algorithm.
+	 * query. The query expansion involves query transformation from SPARQL algebra
+	 * to Datalog objects and then translating back to SPARQL algebra. The
+	 * transformation to Datalog is required to apply the rewriting algorithm.
 	 * 
 	 * @param sparql
 	 *            The input SPARQL query.
@@ -494,23 +488,23 @@ public class StrabonStatement implements OBDAStatement {
 		} catch (MalformedQueryException e) {
 			throw new OBDAException(e);
 		}
-		
-		// Obtain the query signature
-		//SparqlAlgebraToDatalogTranslator translator = questInstance.getSparqlAlgebraToDatalogTranslator();		
-		//List<String> signatureContainer = translator.getSignature(query);
-		
-		
-		// Translate the SPARQL algebra to datalog program
-		DatalogProgram initialProgram = translateAndPreProcess(query/*, signatureContainer*/);
-		System.out.println("StrabonStatement.translateAndPreprocessed:"+ initialProgram.toString());
 
-		
+		// Obtain the query signature
+		// SparqlAlgebraToDatalogTranslator translator =
+		// questInstance.getSparqlAlgebraToDatalogTranslator();
+		// List<String> signatureContainer = translator.getSignature(query);
+
+		// Translate the SPARQL algebra to datalog program
+		DatalogProgram initialProgram = translateAndPreProcess(query/* , signatureContainer */);
+		System.out.println("StrabonStatement.translateAndPreprocessed:" + initialProgram.toString());
+
 		// Perform the query rewriting
 		DatalogProgram programAfterRewriting = questInstance.getRewriting(initialProgram);
-		
+
 		// Translate the output datalog program back to SPARQL string
 		// TODO Re-enable the prefix manager using Sesame prefix manager
-//		PrefixManager prefixManager = new SparqlPrefixManager(query.getPrefixMapping());
+		// PrefixManager prefixManager = new
+		// SparqlPrefixManager(query.getPrefixMapping());
 		DatalogToSparqlTranslator datalogTranslator = new DatalogToSparqlTranslator();
 		return datalogTranslator.translate(programAfterRewriting);
 	}
@@ -526,14 +520,12 @@ public class StrabonStatement implements OBDAStatement {
 		DatalogProgram rewriting = questInstance.getRewriting(program);
 		return DatalogProgramRenderer.encode(rewriting);
 	}
-	
-	
 
 	/***
-	 * Returns the SQL query for a given SPARQL query. In the process, the
-	 * signature of the query will be set into the query container and the jena
-	 * Query object created (or cached) will be set as jenaQueryContainer[0] so
-	 * that it can be used in other process after getUnfolding.
+	 * Returns the SQL query for a given SPARQL query. In the process, the signature
+	 * of the query will be set into the query container and the jena Query object
+	 * created (or cached) will be set as jenaQueryContainer[0] so that it can be
+	 * used in other process after getUnfolding.
 	 * 
 	 * If the query is not already cached, it will be cached in this process.
 	 * 
@@ -544,31 +536,28 @@ public class StrabonStatement implements OBDAStatement {
 	public String getUnfolding(String strquery) throws Exception {
 		String sql = "";
 
-		
 		// Check the cache first if the system has processed the query string
 		// before
 		if (questInstance.hasCachedSQL(strquery)) {
 			// Obtain immediately the SQL string from cache
 			sql = questInstance.getCachedSQL(strquery);
 
-			//signatureContainer = signaturecache.get(strquery);
-			//query = sesameQueryCache.get(strquery);
+			// signatureContainer = signaturecache.get(strquery);
+			// query = sesameQueryCache.get(strquery);
 
-		} 
-		else {
-			
+		} else {
 
 			ParsedQuery query = null;
-			
-			if (!queryIsParsed){
+
+			if (!queryIsParsed) {
 				QueryParser qp = QueryParserUtil.createParser(QueryLanguage.SPARQL);
 				query = qp.parseQuery(strquery, null); // base URI is null
-				//queryIsParsed = true;
+				// queryIsParsed = true;
 			} else {
 				query = parsedQ;
 				queryIsParsed = false;
 			}
-			System.out.println("StrabonStatement: parsed query"+query);
+			System.out.println("StrabonStatement: parsed query" + query);
 
 			SparqlAlgebraToDatalogTranslator translator = questInstance.getSparqlAlgebraToDatalogTranslator();
 			List<String> signatureContainer = translator.getSignature(query);
@@ -580,16 +569,17 @@ public class StrabonStatement implements OBDAStatement {
 			try {
 				// log.debug("Input query:\n{}", strquery);
 
-				for (CQIE q : program.getRules()) 
+				for (CQIE q : program.getRules())
 					DatalogNormalizer.unfoldJoinTrees(q);
 
- 				log.debug("Normalized program: \n{}", program);
+				log.debug("Normalized program: \n{}", program);
 
 				/*
 				 * Empty unfolding, constructing an empty result set
 				 */
-				if (program.getRules().size() < 1) 
-					throw new OBDAException("Error, the translation of the query generated 0 rules. This is not possible for any SELECT query (other queries are not supported by the translator).");
+				if (program.getRules().size() < 1)
+					throw new OBDAException(
+							"Error, the translation of the query generated 0 rules. This is not possible for any SELECT query (other queries are not supported by the translator).");
 
 				log.debug("Start the rewriting process...");
 
@@ -601,22 +591,30 @@ public class StrabonStatement implements OBDAStatement {
 				programAfterUnfolding = getUnfolding(programAfterRewriting);
 				unfoldingTime = System.currentTimeMillis() - startTime;
 
-				
+				try {
+					for (CQIE cq : programAfterUnfolding.getRules()) {
+						DagCreatorDatalogNew creator = new DagCreatorDatalogNew(cq, new NodeHashValues(),
+								new HashMap<String, String>());
+						SQLQuery result2 = creator.getRootNode();
+					}
+				} catch (Exception e) {
+					log.error("Error while optimizing query. Using default translation. " + e.getMessage());
+				}
+
 				sql = getSQL(programAfterUnfolding, signatureContainer);
 				// cacheQueryAndProperties(strquery, sql);
 				questInstance.cacheSQL(strquery, sql);
-			} 
-			catch (Exception e1) {
+			} catch (Exception e1) {
 				log.debug(e1.getMessage(), e1);
 
-				OBDAException obdaException = new OBDAException("Error rewriting and unfolding into SQL\n" + e1.getMessage());
+				OBDAException obdaException = new OBDAException(
+						"Error rewriting and unfolding into SQL\n" + e1.getMessage());
 				obdaException.setStackTrace(e1.getStackTrace());
 				throw obdaException;
 			}
 		}
 		return sql;
 	}
-
 
 	/**
 	 * Returns the number of tuples returned by the query
@@ -647,7 +645,6 @@ public class StrabonStatement implements OBDAStatement {
 		}
 	}
 
-	
 	@Override
 	public void cancel() throws OBDAException {
 		canceled = true;
@@ -660,12 +657,13 @@ public class StrabonStatement implements OBDAStatement {
 
 	/**
 	 * Called to check whether the statement was cancelled on purpose
+	 * 
 	 * @return
 	 */
-	public boolean isCanceled(){
+	public boolean isCanceled() {
 		return canceled;
 	}
-	
+
 	@Override
 	public int executeUpdate(String query) throws OBDAException {
 		// TODO Auto-generated method stub
@@ -770,9 +768,10 @@ public class StrabonStatement implements OBDAStatement {
 	}
 
 	public int getUCQSizeAfterRewriting() {
-		if(programAfterRewriting.getRules() != null)
+		if (programAfterRewriting.getRules() != null)
 			return programAfterRewriting.getRules().size();
-		else return 0;
+		else
+			return 0;
 	}
 
 	public int getMinQuerySizeAfterRewriting() {
@@ -800,9 +799,10 @@ public class StrabonStatement implements OBDAStatement {
 	}
 
 	public int getUCQSizeAfterUnfolding() {
-		if( programAfterUnfolding.getRules() != null )
+		if (programAfterUnfolding.getRules() != null)
 			return programAfterUnfolding.getRules().size();
-		else return 0;
+		else
+			return 0;
 	}
 
 	public int getMinQuerySizeAfterUnfolding() {
@@ -839,7 +839,7 @@ public class StrabonStatement implements OBDAStatement {
 		}
 		return counter;
 	}
-	
+
 	/***
 	 * Inserts a stream of ABox assertions into the repository.
 	 * 
@@ -847,35 +847,36 @@ public class StrabonStatement implements OBDAStatement {
 	 * 
 	 * @throws SQLException
 	 */
-	public int insertData(Iterator<Assertion> data,  int commit, int batch) throws SQLException {
+	public int insertData(Iterator<Assertion> data, int commit, int batch) throws SQLException {
 		int result = -1;
 
-		EquivalentTriplePredicateIterator newData = new EquivalentTriplePredicateIterator(data, questInstance.getReasoner());
+		EquivalentTriplePredicateIterator newData = new EquivalentTriplePredicateIterator(data,
+				questInstance.getReasoner());
 
-//		if (!useFile) {
+		// if (!useFile) {
 
-			result = questInstance.getSemanticIndexRepository().insertData(conn.getConnection(), newData, commit, batch);
-//		} else {
-			//try {
-				// File temporalFile = new File("quest-copy.tmp");
-				// FileOutputStream os = new FileOutputStream(temporalFile);
-				// ROMAN: this called DOES NOTHING
-				// result = (int) questInstance.getSemanticIndexRepository().loadWithFile(conn.conn, newData);
-				// os.close();
+		result = questInstance.getSemanticIndexRepository().insertData(conn.getConnection(), newData, commit, batch);
+		// } else {
+		// try {
+		// File temporalFile = new File("quest-copy.tmp");
+		// FileOutputStream os = new FileOutputStream(temporalFile);
+		// ROMAN: this called DOES NOTHING
+		// result = (int)
+		// questInstance.getSemanticIndexRepository().loadWithFile(conn.conn, newData);
+		// os.close();
 
-			//} catch (IOException e) {
-			//	log.error(e.getMessage());
-			//}
-//		}
+		// } catch (IOException e) {
+		// log.error(e.getMessage());
+		// }
+		// }
 
 		try {
 			questInstance.updateSemanticIndexMappings();
-		} 
-		catch (Exception e) {
+		} catch (Exception e) {
 			log.error("Error updating semantic index mappings after insert.", e);
 		}
 
 		return result;
 	}
-	
+
 }
