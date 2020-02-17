@@ -311,6 +311,44 @@ public class DBMetadataExtractor {
 			dataType = java.sql.Types.VARCHAR;
 			// TODO change for numerics
 			currentRelation.addAttribute(attributeId2, dataType, typeName, isNullable);
+			
+			if(seedId.getTableName().equals("geometries")) {
+				QuotedID attributeId3 = QuotedID.createIdFromDatabaseRecord("entity");
+				if (printouts)
+					System.out.println("         " + relationId + "." + attributeId3);
+
+				// columnNoNulls, columnNullable, columnNullableUnknown
+				isNullable = false;
+				typeName = "string";
+				dataType = java.sql.Types.VARCHAR;
+				// TODO change for numerics
+				currentRelation.addAttribute(attributeId3, dataType, typeName, isNullable);
+
+				QuotedID attributeId4 = QuotedID.createIdFromDatabaseRecord("geometry");
+				if (printouts)
+					System.out.println("         " + relationId + "." + attributeId4);
+
+				// columnNoNulls, columnNullable, columnNullableUnknown
+				isNullable = false;
+				typeName = "string";
+				dataType = java.sql.Types.VARCHAR;
+				// TODO change for numerics
+				currentRelation.addAttribute(attributeId4, dataType, typeName, isNullable);
+				
+				QuotedID attributeId5 = QuotedID.createIdFromDatabaseRecord("wkt");
+				if (printouts)
+					System.out.println("         " + relationId + "." + attributeId5);
+
+				// columnNoNulls, columnNullable, columnNullableUnknown
+				isNullable = false;
+				typeName = "string";
+				dataType = java.sql.Types.VARCHAR;
+				// TODO change for numerics
+				currentRelation.addAttribute(attributeId5, dataType, typeName, isNullable);
+				UniqueConstraint.Builder builder = UniqueConstraint.builder(currentRelation);
+				builder.add(currentRelation.getAttribute(4));
+				currentRelation.addUniqueConstraint(builder.build("geometry", true));
+			}
 
 		}
 

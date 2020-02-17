@@ -58,6 +58,7 @@ import it.unibz.krdb.obda.model.OBDAModel;
 import it.unibz.krdb.obda.model.impl.OBDADataFactoryImpl;
 import it.unibz.krdb.obda.owlrefplatform.core.QuestConstants;
 import it.unibz.krdb.obda.owlrefplatform.core.QuestPreferences;
+import it.unibz.krdb.obda.owlrefplatform.core.StrabonParameters;
 import it.unibz.krdb.obda.owlrefplatform.core.StrabonStatement;
 import it.unibz.krdb.obda.owlrefplatform.owlapi3.QuestOWL;
 import it.unibz.krdb.obda.owlrefplatform.owlapi3.QuestOWLConfiguration;
@@ -72,7 +73,7 @@ import sesameWrapper.SesameVirtualRepo;
 public class QueryExecutor {
 	
 	static StringBuffer obdaFile;
-	static String propDictionary = "/home/dimitris/spatialdbs/predicate_dictionary.txt";
+	static String propDictionary = "/home/dimitris/spatialdbs/dict100m.csv";
 	
 	public static void main(String[] args) {
 		{
@@ -213,12 +214,27 @@ public class QueryExecutor {
 				mappingId++;
 				obdaFile.append("\n");
 				obdaFile.append("target\t");
-				obdaFile.append("<{s}> ");
-				obdaFile.append(property);
-				obdaFile.append(" {o}^^geo:wktLiteral .\n");
+				obdaFile.append("<{" + StrabonParameters.GEOMETRIES_SECOND_COLUMN +"}> ");
+				obdaFile.append("<"+property+">");
+				obdaFile.append(" {" + StrabonParameters.GEOMETRIES_THIRD_COLUMN +"}^^geo:wktLiteral .\n");
 				obdaFile.append("source\t");
-				obdaFile.append("select s, o from prop");
-				obdaFile.append(predDictionary.get(property));
+				obdaFile.append("select " + StrabonParameters.GEOMETRIES_SECOND_COLUMN +", "+  StrabonParameters.GEOMETRIES_THIRD_COLUMN +" from ");
+				obdaFile.append(StrabonParameters.GEOMETRIES_TABLE);
+				obdaFile.append("\n");
+				obdaFile.append("\n");
+			}
+			else if(property.contains("hasGeometry")){
+				obdaFile.append("mappingId\tmapp");
+				obdaFile.append(mappingId);
+				mappingId++;
+				obdaFile.append("\n");
+				obdaFile.append("target\t");
+				obdaFile.append("<{" + StrabonParameters.GEOMETRIES_FIRST_COLUMN +"}> ");
+				obdaFile.append("<"+property+">");
+				obdaFile.append(" <{" + StrabonParameters.GEOMETRIES_SECOND_COLUMN +"}> .\n");
+				obdaFile.append("source\t");
+				obdaFile.append("select " + StrabonParameters.GEOMETRIES_FIRST_COLUMN +", "+  StrabonParameters.GEOMETRIES_SECOND_COLUMN +" from ");
+				obdaFile.append(StrabonParameters.GEOMETRIES_TABLE);
 				obdaFile.append("\n");
 				obdaFile.append("\n");
 			}
@@ -229,10 +245,10 @@ public class QueryExecutor {
 				obdaFile.append("\n");
 				obdaFile.append("target\t");
 				obdaFile.append("<{s}> ");
-				obdaFile.append(property);
+				obdaFile.append("<"+property+">");
 				obdaFile.append(" {o}^^xsd:integer .\n");
 				obdaFile.append("source\t");
-				obdaFile.append("select s, o from prop");
+				obdaFile.append("select s, o from ");
 				obdaFile.append(predDictionary.get(property));
 				obdaFile.append("\n");
 				obdaFile.append("\n");
@@ -244,10 +260,10 @@ public class QueryExecutor {
 				obdaFile.append("\n");
 				obdaFile.append("target\t");
 				obdaFile.append("<{s}> ");
-				obdaFile.append(property);
+				obdaFile.append("<"+property+">");
 				obdaFile.append(" <{o}> .\n");
 				obdaFile.append("source\t");
-				obdaFile.append("select s, o from prop");
+				obdaFile.append("select s, o from ");
 				obdaFile.append(predDictionary.get(property));
 				obdaFile.append("\n");
 				obdaFile.append("\n");
@@ -267,7 +283,7 @@ public class QueryExecutor {
 			BufferedReader reader = new BufferedReader(new FileReader(filename));
 			String line = null;
 			while ((line = reader.readLine()) != null) {
-				String[] entry=line.split(" -> ");
+				String[] entry=line.split(",");
 				result.put(entry[0], entry[1]);
 			}
 			reader.close();
@@ -283,7 +299,7 @@ public class QueryExecutor {
 		File[] listOfFiles = folder.listFiles();
 		List<String> files = new ArrayList<String>();
 		for (int i = 0; i < listOfFiles.length; i++) {
-			if (listOfFiles[i].isFile() && listOfFiles[i].getCanonicalPath().endsWith("2.q")) {
+			if (listOfFiles[i].isFile() && listOfFiles[i].getCanonicalPath().endsWith(".q")) {
 				files.add(listOfFiles[i].getCanonicalPath());
 			}
 		}
