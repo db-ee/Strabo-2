@@ -80,13 +80,13 @@ public class QueryExecutor {
 
 			try {
 
-				String owlfile = "/home/dimitris/spatialdbs/lgd-bremen.owl";
+				//String owlfile = "/home/dimitris/spatialdbs/lgd-bremen.owl";
 				
 				// for opendap its cop.obda
 				//String obdafile = "/home/dimitris/spatialdbs/lgd-bremen.obda";
 				createObdaFile();
 				OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
-				OWLOntology ontology = manager.loadOntologyFromOntologyDocument((new File(owlfile)));
+				OWLOntology ontology = manager.createOntology(); //empty ontology
 
 				OBDAModel obdaModel;
 				OBDADataFactory fac = OBDADataFactoryImpl.getInstance();
@@ -119,32 +119,11 @@ public class QueryExecutor {
 				QuestOWL reasoner = factory.createReasoner(ontology, config);
 				
 
-				String prefixes = "prefix ex: <http://meraka/moss/exampleBooks.owl#> \n "
-						+ "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n"
-						+ "PREFIX f: <http://melodiesproject.eu/floods/> \n"
-						+ "PREFIX geo: <http://www.opengis.net/ont/geosparql#> \n"
-						+ "PREFIX geof: <http://www.opengis.net/def/function/geosparql/>"
-						+ "PREFIX gadm: <http://melodiesproject.eu/gadm/> \n"
-						+ "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n"
-						+ "PREFIX osm: <http://melodiesproject.eu/osm/> \n"
-						+ "PREFIX clc: <http://melodiesproject.eu/clc/> \n"
-						+ "PREFIX : <http://meraka/moss/exampleBooks.owl#>\n"
-						+ "PREFIX lai: <http://geo.linkedopendata.gr/lai/ontology#> \n"
-						+ "PREFIX lgd: <http://linkedgeodata.org/ontology#> \n";
+				
 
 				/// query repo
 				try {
-					String preds = prefixes + "select  ?s ?s2  ?c where {" + "?s lgd:buildingCategory ?c . \n "
-							+ "?s2 lgd:buildingCategory ?c . \n " + "?s geo:asWKT ?g1 ." + "?s2 geo:asWKT ?g2 ."
-							+ "?s2 rdf:type <http://asasasasa.sa> . "
-							// + "?s <http://meraka/moss/exampleBooks.owl#debt2018> ?d18 . \n"
-							// + "?s <http://meraka/moss/exampleBooks.owl#name> ?name . \n"
-							+ "FILTER(<http://www.opengis.net/def/function/geosparql/sfContains>(?g1, ?g2)). "
-							+ "} limit 10";
-
-					String four = prefixes + "select distinct ?s ?name ?now ?category where { \n"
-							+ "?s four:name ?name . \n" + "?s four:hereNow ?now . \n" + "?s four:cat ?category . \n"
-							+ "} ";
+					
 					
 					StrabonStatement st = reasoner.createStrabonStatement();
 					String[] query_files = readFilesFromDir("/home/dimitris/spatialdbs/queries/");

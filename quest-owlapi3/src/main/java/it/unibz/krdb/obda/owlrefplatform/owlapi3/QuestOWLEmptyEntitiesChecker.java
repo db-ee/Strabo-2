@@ -148,7 +148,7 @@ public class QuestOWLEmptyEntitiesChecker {
 
 	private boolean runSPARQLConceptsQuery(String description) throws Exception {
 		String query = "SELECT ?x WHERE {?x a " + description + ".}";
-		QuestOWLStatement st = conn.createStatement();
+		QuestOWLStatement st = conn.createStrabonStatement();
 		try {
 			QuestOWLResultSet rs = st.executeTuple(query);
 			return (rs.nextRow());
@@ -165,7 +165,7 @@ public class QuestOWLEmptyEntitiesChecker {
 
 	private boolean runSPARQLRolesQuery(String description) throws Exception {
 		String query = "SELECT * WHERE {?x " + description + " ?y.}";
-		QuestOWLStatement st = conn.createStatement();
+		QuestOWLStatement st = conn.createStrabonStatement();
 		try {
 			QuestOWLResultSet rs = st.executeTuple(query);
 			return (rs.nextRow());
