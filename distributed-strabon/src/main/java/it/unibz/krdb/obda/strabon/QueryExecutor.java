@@ -1,4 +1,5 @@
-package inf.unibz.ontop.sesame.tests.general;
+package it.unibz.krdb.obda.strabon;
+
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;

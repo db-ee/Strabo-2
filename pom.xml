@@ -70,7 +70,7 @@
 		<module>quest-sesame</module>
 		<module>quest-db</module>
 		<module>quest-rdb2rdf-compliance</module>
-
+		<module>distributed-strabon</module>
 		<module>quest-test</module>
 		<module>ontop-cli</module>
 
