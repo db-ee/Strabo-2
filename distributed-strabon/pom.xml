@@ -80,7 +80,16 @@
 			<artifactId>ontop-obdalib-r2rml</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
+		<dependency>
+        <groupId>commons-collections</groupId>
+        <artifactId>commons-collections</artifactId>
+        <version>3.2.2</version>
+    </dependency>
+    <dependency>
+    <groupId>com.fasterxml.jackson.core</groupId>
+    <artifactId>jackson-databind</artifactId>
+    <version>2.10.0</version>
+</dependency>
 
 		<dependency>
 			<groupId>${project.groupId}</groupId>
@@ -137,17 +146,18 @@
 			<groupId>org.apache.spark</groupId>
 			<artifactId>spark-core_2.11</artifactId>
 			<version>2.3.2</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.spark</groupId>
 			<artifactId>spark-sql_2.11</artifactId>
 			<version>2.3.2</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.datasyslab</groupId>
 			<artifactId>geospark</artifactId>
 			<version>1.2.0</version>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.datasyslab</groupId>
@@ -159,7 +169,6 @@
 			<artifactId>geospark-viz_2.3</artifactId>
 			<version>1.2.0</version>
 		</dependency>
-
 		<!-- transitive dependencies -->
 		<dependency>
 			<groupId>org.antlr</groupId>
@@ -332,8 +341,30 @@
 
 
 	<build>
-		<finalName>it.unibz.inf.obda.p4plugin-${project.version}</finalName>
+		<finalName>it.unibz.inf.obda.distributedstrabon-${project.version}</finalName>
 		<plugins>
+		<plugin>
+                                       <artifactId>maven-assembly-plugin</artifactId>
+				       <executions>
+      						<execution>
+        					<phase>package</phase>
+        					<goals>
+          						<goal>single</goal>
+        					</goals>
+      						</execution>
+    					</executions>
+                                       <configuration>
+                                               <archive>
+                                                       <manifest>
+							       <addClasspath>true</addClasspath>
+                                                               <mainClass>it.unibz.inf.ontop.sesame.QueryTester</mainClass>
+                                                       </manifest>
+                                               </archive>
+                                               <descriptorRefs>
+                                                       <descriptorRef>jar-with-dependencies</descriptorRef>
+                                               </descriptorRefs>
+                                       </configuration>
+                               </plugin>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>

@@ -37,6 +37,9 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableSet;
 
+import it.unibz.krdb.obda.utils.StrabonParameters;
+
+
 /**
  * Retrieves the database metadata (table schema and database constraints) 
  * 
@@ -312,7 +315,7 @@ public class DBMetadataExtractor {
 			// TODO change for numerics
 			currentRelation.addAttribute(attributeId2, dataType, typeName, isNullable);
 			
-			if(seedId.getTableName().equals("geometries")) {
+			if(seedId.getTableName().equals(StrabonParameters.GEOMETRIES_TABLE)) {
 				QuotedID attributeId3 = QuotedID.createIdFromDatabaseRecord("entity");
 				if (printouts)
 					System.out.println("         " + relationId + "." + attributeId3);
@@ -324,7 +327,7 @@ public class DBMetadataExtractor {
 				// TODO change for numerics
 				currentRelation.addAttribute(attributeId3, dataType, typeName, isNullable);
 
-				QuotedID attributeId4 = QuotedID.createIdFromDatabaseRecord("geometry");
+				QuotedID attributeId4 = QuotedID.createIdFromDatabaseRecord("geom");
 				if (printouts)
 					System.out.println("         " + relationId + "." + attributeId4);
 
@@ -347,7 +350,7 @@ public class DBMetadataExtractor {
 				currentRelation.addAttribute(attributeId5, dataType, typeName, isNullable);
 				UniqueConstraint.Builder builder = UniqueConstraint.builder(currentRelation);
 				builder.add(currentRelation.getAttribute(4));
-				currentRelation.addUniqueConstraint(builder.build("geometry", true));
+				currentRelation.addUniqueConstraint(builder.build("geom", true));
 			}
 
 		}
