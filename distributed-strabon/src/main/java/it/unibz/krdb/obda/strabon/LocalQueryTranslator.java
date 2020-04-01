@@ -31,13 +31,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.spark.serializer.KryoSerializer;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Row;
-import org.apache.spark.sql.SparkSession;
-import org.datasyslab.geospark.serde.GeoSparkKryoRegistrator;
-import org.datasyslab.geosparksql.utils.GeoSparkSQLRegistrator;
-import org.datasyslab.geosparkviz.core.Serde.GeoSparkVizKryoRegistrator;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -62,14 +55,10 @@ import it.unibz.krdb.obda.utils.StrabonParameters;
 import it.unibz.krdb.sql.ImplicitDBConstraintsReader;
 import sesameWrapper.SesameVirtualRepo;
 
-import org.apache.hadoop.fs.FSDataInputStream;
-import org.apache.hadoop.fs.FileStatus;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
 
 //import org.openrdf.query.resultio.sparqlkml.stSPARQLResultsKMLWriter;
 
-public class QueryExecutor {
+public class LocalQueryTranslator {
 
 	private static final Logger log = LoggerFactory.getLogger(QueryExecutor.class);
 	static StringBuffer obdaFile;
@@ -85,43 +74,8 @@ public class QueryExecutor {
 
 			try {
 
-				final SparkSession spark = SparkSession.builder()
-						//.master("local[*]") // Delete this if run in cluster mode
-						.appName("strabonQuery") // Change this to a proper name
-						// Enable GeoSpark custom Kryo serializer
-						.config("spark.serializer", KryoSerializer.class.getName())
-						.config("spark.kryo.registrator", GeoSparkVizKryoRegistrator.class.getName())
-						.config("spark.sql.inMemoryColumnarStorage.compressed", true)
-						.config("hive.exec.dynamic.partition", true)
-						.config("spark.sql.parquet.filterPushdown", true)
-						.config("spark.sql.inMemoryColumnarStorage.batchSize", 20000)
-						.enableHiveSupport()
-						.getOrCreate();
-
-				spark.sql("SET hive.exec.dynamic.partition = true");
-				spark.sql("SET hive.exec.dynamic.partition.mode = nonstrict");
-				spark.sql("SET hive.exec.max.dynamic.partitions = 4000");
-				spark.sql("SET hive.exec.max.dynamic.partitions.pernode = 2000");
-				spark.sql("SET spark.sql.inMemoryColumnarStorage.compressed = true");
-				spark.sql("SET spark.sql.parquet.filterPushdown = true");
-				spark.sql("USE " + database);
-				GeoSparkSQLRegistrator.registerAll(spark);
-				// preload geometeries
-				log.debug("preloading geometries");
-				Dataset<Row> geoms = spark.sql("Select " + StrabonParameters.GEOMETRIES_FIRST_COLUMN + ", "
-						+ StrabonParameters.GEOMETRIES_SECOND_COLUMN + ", ST_GeomFromWKT("
-						+ StrabonParameters.GEOMETRIES_THIRD_COLUMN + ") as "
-						+ StrabonParameters.GEOMETRIES_THIRD_COLUMN + " FROM geometries");
-				geoms.createOrReplaceGlobalTempView(StrabonParameters.GEOMETRIES_TABLE);
-				geoms.count();
-				geoms.cache();
-				// String owlfile = "/home/dimitris/spatialdbs/lgd-bremen.owl";
-
-				// for opendap its cop.obda
-				// String obdafile = "/home/dimitris/spatialdbs/lgd-bremen.obda";
-
-				FileSystem fs = FileSystem.get(spark.sparkContext().hadoopConfiguration());
-				createObdaFile(fs);
+				
+				createObdaFile();
 				OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 				OWLOntology ontology = manager.createOntology(); // empty ontology
 
@@ -161,37 +115,14 @@ public class QueryExecutor {
 				StrabonStatement st = reasoner.createStrabonStatement();
 				List<String> sparqlQueries = new ArrayList<String>();
 
-				Path path = new Path(queriesPath);
-				log.debug("reading queries from " + queriesPath);
-				if (fs.isDirectory(path)) {
-					FileStatus[] fileStatuses = fs.listStatus(path);
+				String[] query_files = readFilesFromDir("/home/dimitris/spatialdbs/queries/");
+				for (String queryfile : query_files) {
+					String sparql=readFile(queryfile);
+					String sql=st.getUnfolding(sparql);
+					System.out.print(sql+"\n");
+				}			
 
-					for (FileStatus fileStatus : fileStatuses) {
-						if (fileStatus.isFile() && fileStatus.getPath().toString().endsWith(".q")) {
-							sparqlQueries.add(readHadoopFile(fileStatus.getPath(), fs));
-						}
 
-					}
-				}
-
-				// String[] query_files =
-				// readFilesFromDir("/home/dimitris/spatialdbs/queries/");
-				for (String sparql : sparqlQueries) {
-					// String sparql = readFile(queryfile);
-					String sql = st.getUnfolding(sparql);
-					log.debug("Query unfolded:" + sql + "\n");
-					log.debug("Strating execution");
-					long start = System.currentTimeMillis();
-					Dataset<Row> result = spark.sql(sql.replaceAll("\"", ""));
-					long resultSize = result.count();
-					log.debug("Execution finished in " + (System.currentTimeMillis() - start) + " with " + resultSize
-							+ " results.");
-				}
-
-				// TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, preds);
-				// TupleQueryResultHandler handler = new SPARQLResultsTSVWriter(System.out);
-
-				// tupleQuery.evaluate(handler);
 
 				System.out.println("Closing...");
 
@@ -205,7 +136,7 @@ public class QueryExecutor {
 
 	}
 
-	private static void createObdaFile(FileSystem fs) throws SQLException, IOException {
+	private static void createObdaFile() throws SQLException, IOException {
 		obdaFile = new StringBuffer();
 		obdaFile.append("[PrefixDeclaration]");
 		obdaFile.append("\n");
@@ -230,7 +161,7 @@ public class QueryExecutor {
 		obdaFile.append("[MappingDeclaration] @collection [[");
 		obdaFile.append("\n");
 
-		Map<String, String> predDictionary = readPredicatesFromHadoop(propDictionary, fs);
+		Map<String, String> predDictionary = readPredicates(propDictionary);
 		int mappingId = 0;
 
 		for (String property : predDictionary.keySet()) {
@@ -318,33 +249,35 @@ public class QueryExecutor {
 		return result;
 	}
 
-	public static Map<String, String> readPredicatesFromHadoop(String filename, FileSystem fs) throws IOException {
-		Path path = new Path(filename);
-		String content = readHadoopFile(path, fs);
-		String[] lines = content.split("\n");
-		Map<String, String> result = new HashMap<String, String>();
-		for (String line : lines) {
-			String[] entry = line.split(",");
-			result.put(entry[0], entry[1]);
+
+
+	private static String[] readFilesFromDir(String string) throws IOException {
+		File folder = new File(string);
+		File[] listOfFiles = folder.listFiles();
+		List<String> files = new ArrayList<String>();
+		for (int i = 0; i < listOfFiles.length; i++) {
+			if (listOfFiles[i].isFile() && listOfFiles[i].getCanonicalPath().endsWith(".q")) {
+				files.add(listOfFiles[i].getCanonicalPath());
+			}
 		}
-		return result;
+		java.util.Collections.sort(files);
+		return files.toArray(new String[files.size()]);
 	}
 
-
-	public static String readHadoopFile(Path hadoopPath, FileSystem fs) throws IOException {
+	public static String readFile(String filename) {
 		String file = "";
-		BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(hadoopPath)));
 		try {
-			String line;
-			line = br.readLine();
-			while (line != null) {
+			BufferedReader reader = new BufferedReader(new FileReader(filename));
+			String line = null;
+			while ((line = reader.readLine()) != null) {
 				file += line + "\n";
-
-				line = br.readLine();
 			}
-		} finally {
-			br.close();
+		} catch (Exception e) {
+			System.err.println("Error reading file: " + filename);
+			e.printStackTrace();
 		}
 		return file;
 	}
+
+
 }

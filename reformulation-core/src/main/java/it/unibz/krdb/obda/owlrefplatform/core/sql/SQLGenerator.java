@@ -95,7 +95,7 @@ public class SQLGenerator implements SQLQueryGenerator {
 	public static final String EHINSIDE_OPERATOR = "ST_Within(%s,%s)";
 	public static final String EHCONTAINS_OPERATOR = "ST_Contains(%s,%s)";
 	
-	private static final String GEOMFROMWKT_OPERATOR = "ST_GeomFromText(%s, 4326)";
+	private static final String GEOMFROMWKT_OPERATOR = "ST_GeomFromWKT(%s)";
 
 	private static final String ADD_OPERATOR = "%s + %s";
 	private static final String SUBTRACT_OPERATOR = "%s - %s";
