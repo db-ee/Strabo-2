@@ -25,10 +25,12 @@ import com.google.common.collect.HashMultimap;
 import it.unibz.krdb.obda.model.*;
 import it.unibz.krdb.obda.model.impl.OBDADataFactoryImpl;
 import it.unibz.krdb.obda.model.impl.OBDAVocabulary;
+import it.unibz.krdb.obda.model.impl.TermUtils;
 import it.unibz.krdb.obda.ontology.Assertion;
 import it.unibz.krdb.obda.owlrefplatform.core.abox.EquivalentTriplePredicateIterator;
 import it.unibz.krdb.obda.owlrefplatform.core.basicoperations.DatalogNormalizer;
 import it.unibz.krdb.obda.owlrefplatform.core.queryevaluation.SPARQLQueryUtility;
+import it.unibz.krdb.obda.owlrefplatform.core.reformulation.QueryConnectedComponent;
 import it.unibz.krdb.obda.owlrefplatform.core.resultset.*;
 import it.unibz.krdb.obda.owlrefplatform.core.translator.DatalogToSparqlTranslator;
 import it.unibz.krdb.obda.owlrefplatform.core.translator.SesameConstructTemplate;
@@ -36,8 +38,15 @@ import it.unibz.krdb.obda.owlrefplatform.core.translator.SparqlAlgebraToDatalogT
 import it.unibz.krdb.obda.owlrefplatform.core.unfolding.DatalogUnfolder;
 import it.unibz.krdb.obda.owlrefplatform.core.unfolding.ExpressionEvaluator;
 import it.unibz.krdb.obda.renderer.DatalogProgramRenderer;
+import it.unibz.krdb.obda.utils.StrabonParameters;
+import it.unibz.krdb.sql.DBMetadata;
+import it.unibz.krdb.sql.DatabaseRelationDefinition;
+import madgik.exareme.master.queryProcessor.decomposer.dag.Node;
 import madgik.exareme.master.queryProcessor.decomposer.dag.NodeHashValues;
 import madgik.exareme.master.queryProcessor.decomposer.query.SQLQuery;
+import madgik.exareme.master.queryProcessor.decomposer.util.Util;
+import madgik.exareme.master.queryProcessor.decomposer.util.VarsToAtoms;
+import madgik.exareme.master.queryProcessor.estimator.NodeSelectivityEstimator;
 import madgik.exareme.master.queryProcessor.sparql.DagCreatorDatalogNew;
 
 import org.openrdf.query.MalformedQueryException;
@@ -53,9 +62,11 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 
 //import org.sqlite.SQLiteConfig;
@@ -65,6 +76,8 @@ import java.util.concurrent.CountDownLatch;
  * reformulation platform reasoner from outside, i.e. Protege
  */
 public class StrabonStatement implements OBDAStatement {
+	
+	private static final OBDADataFactory fac = OBDADataFactoryImpl.getInstance();
 
 	public final Quest questInstance;
 
@@ -83,9 +96,11 @@ public class StrabonStatement implements OBDAStatement {
 	private DatalogProgram programAfterRewriting;
 
 	private DatalogProgram programAfterUnfolding;
+	
+	private DatalogProgram programAfterSplittingSpatialJoin;
 
 	private SesameConstructTemplate templ;
-
+	
 	private static final Logger log = LoggerFactory.getLogger(StrabonStatement.class);
 
 	/*
@@ -95,13 +110,18 @@ public class StrabonStatement implements OBDAStatement {
 	private long rewritingTime = 0;
 	private long unfoldingTime = 0;
 
-	public StrabonStatement(Quest questinstance, QuestConnection conn, Statement st) {
+	private NodeSelectivityEstimator nse;
+
+	public StrabonStatement(Quest questinstance, QuestConnection conn, Statement st, NodeSelectivityEstimator nse) {
 
 		this.questInstance = questinstance;
 
 		this.conn = conn;
 
 		this.sqlstatement = st;
+		
+		this.nse = nse;
+		
 	}
 
 	private class QueryExecutionThread extends Thread {
@@ -388,14 +408,14 @@ public class StrabonStatement implements OBDAStatement {
 		program.removeRules(toRemove);
 	}
 
-	private String getSQL(DatalogProgram query, List<String> signature) throws OBDAException {
+	private SQLResult getSQL(DatalogProgram query, List<String> signature) throws OBDAException {
 		if (query.getRules().size() == 0) {
-			return "";
+			return new SQLResult("", new ArrayList<String>(0), new ArrayList<String>(0));
 		}
 		log.debug("Producing the SQL string...");
 
 		// query = DatalogNormalizer.normalizeDatalogProgram(query);
-		String sql = questInstance.getDatasourceQueryGenerator().generateSourceQuery(query, signature);
+		SQLResult sql = questInstance.getDatasourceQueryGenerator().generateSourceQuery(query, signature);
 
 		log.debug("Resulting SQL: \n{}", sql);
 		return sql;
@@ -533,8 +553,8 @@ public class StrabonStatement implements OBDAStatement {
 	 * @return
 	 * @throws Exception
 	 */
-	public String getUnfolding(String strquery) throws Exception {
-		String sql = "";
+	public SQLResult getUnfolding(String strquery) throws Exception {
+		SQLResult sql;
 
 		// Check the cache first if the system has processed the query string
 		// before
@@ -561,6 +581,7 @@ public class StrabonStatement implements OBDAStatement {
 
 			SparqlAlgebraToDatalogTranslator translator = questInstance.getSparqlAlgebraToDatalogTranslator();
 			List<String> signatureContainer = translator.getSignature(query);
+			
 
 			questInstance.getSesameQueryCache().put(strquery, query);
 			questInstance.getSignatureCache().put(strquery, signatureContainer);
@@ -590,10 +611,18 @@ public class StrabonStatement implements OBDAStatement {
 				final long startTime = System.currentTimeMillis();
 				programAfterUnfolding = getUnfolding(programAfterRewriting);
 				unfoldingTime = System.currentTimeMillis() - startTime;
+				
+				try {
+					programAfterSplittingSpatialJoin = splitSpatialJoin(programAfterUnfolding);
+				} catch (Exception e) {
+					log.error("Could not split query based on spatial join" + e.getMessage());
+				}
+				
+				
 
 				try {
 					for (CQIE cq : programAfterUnfolding.getRules()) {
-						DagCreatorDatalogNew creator = new DagCreatorDatalogNew(cq, new NodeHashValues(),
+						DagCreatorDatalogNew creator = new DagCreatorDatalogNew(cq, nse,
 								new HashMap<String, String>());
 						SQLQuery result2 = creator.getRootNode();
 					}
@@ -601,7 +630,7 @@ public class StrabonStatement implements OBDAStatement {
 					log.error("Error while optimizing query. Using default translation. " + e.getMessage());
 				}
 
-				sql = getSQL(programAfterUnfolding, signatureContainer);
+				sql = getSQL(programAfterSplittingSpatialJoin, signatureContainer);
 				// cacheQueryAndProperties(strquery, sql);
 				questInstance.cacheSQL(strquery, sql);
 			} catch (Exception e1) {
@@ -616,23 +645,103 @@ public class StrabonStatement implements OBDAStatement {
 		return sql;
 	}
 
+	private DatalogProgram splitSpatialJoin(DatalogProgram program) {
+		DatalogProgram result=program.clone();
+		CQIE initial=result.getRules().get(0);
+		Function toRemove=null;
+		Set<Variable> varsInSpatial = new HashSet<>();
+		for (Function atom : initial.getBody()) {
+			Predicate pred = atom.getFunctionSymbol();
+			if (StrabonParameters.isSpatialJoin(pred)) {
+				toRemove=atom;
+				
+				TermUtils.addReferencedVariablesTo(varsInSpatial, atom);
+				if(varsInSpatial.size()!=2) {
+					return program;
+				}
+			}
+		}
+		initial.getBody().remove(toRemove);
+		
+		Set<Variable> existentialVars = new HashSet<>();
+		TermUtils.addReferencedVariablesTo(existentialVars, initial.getHead());
+		
+		
+		List<VarsToAtoms> v2aList=new LinkedList<VarsToAtoms>();
+//		Set<Variable> varsFirst = new HashSet<>();
+//		TermUtils.addReferencedVariablesTo(varsFirst, initial.getBody().get(0));
+//		Set<Function> atomsFirst = new HashSet<>();
+//		atomsFirst.add(initial.getBody().get(0));
+//		VarsToAtoms v2a=new VarsToAtoms(varsFirst, atomsFirst);
+//		v2aList.add(v2a);
+		
+		for(int i=0;i<initial.getBody().size();i++) {
+			Set<Variable> varsNext = new HashSet<>();
+			TermUtils.addReferencedVariablesTo(varsNext, initial.getBody().get(i));
+			Set<Function> atomsNext = new HashSet<>();
+			atomsNext.add(initial.getBody().get(i));
+			VarsToAtoms v2aNext=new VarsToAtoms(varsNext, atomsNext);
+			v2aList.add(0, v2aNext);
+			for(int j=1;j<v2aList.size();j++) {
+				if(v2aNext.mergeCommonVar(v2aList.get(j))) {
+					v2aList.remove(j);
+					j--;
+				}
+			}
+			
+		}
+		
+		//List<QueryConnectedComponent> ccs = QueryConnectedComponent.getConnectedComponents(initial);
+		if(v2aList.size()!=2) {
+			return program;
+		}
+		while(!initial.getBody().isEmpty()) {
+			initial.getBody().remove(0);
+		}
+		for(int i=0;i<v2aList.size();i++) {
+			int id=Util.createUniqueId();
+			DatabaseRelationDefinition replacement=questInstance.getMetaData().createDatabaseRelation(questInstance.getMetaData().getQuotedIDFactory().createRelationID("", "temp"+id));
+			VarsToAtoms cc=v2aList.get(i);
+			List<String> signature=new ArrayList<String>(cc.getVars().size());
+			List<Term> outputs=new ArrayList<Term>();
+			for(Term t:cc.getVars()) {
+				Constant uriTemplate = fac.getConstantLiteral("{}");
+				Term f = fac.getUriTemplate(uriTemplate, t);
+				if(existentialVars.contains(t)||varsInSpatial.contains(t)) {
+					outputs.add(f);
+					signature.add(t.toString());
+					replacement.addAttribute(questInstance.getMetaData().getQuotedIDFactory().createAttributeID(t.toString()), 1, "VARCHAR", false);
+						}
+					}
+			Function ans1=fac.getFunction(fac.getPredicate("temp"+id, outputs.size()), outputs);
+			List<Term> args=new ArrayList<Term>(outputs.size());
+			for(String s:signature) {
+				args.add(fac.getVariable(s));
+			}
+			Function input=fac.getFunction(fac.getPredicate("temp"+id, outputs.size()), args);
+			initial.getBody().add(input);
+			List<Function> body=new ArrayList<Function>();
+			body.addAll(cc.getAtoms());
+			CQIE cq=fac.getCQIE(ans1, body);
+			CQIE clone=cq.clone();
+			clone.setSignature(signature);
+			result.appendRule(clone);
+			
+				
+		}
+		
+		initial.getBody().add(toRemove);
+		return result;
+	}
+
 	/**
 	 * Returns the number of tuples returned by the query
 	 */
 	public long getTupleCount(String query) throws Exception {
 
-		String unf = getUnfolding(query);
-		String newsql = "SELECT count(*) FROM (" + unf + ") t1";
-		if (!canceled) {
-			ResultSet set = sqlstatement.executeQuery(newsql);
-			if (set.next()) {
-				return set.getLong(1);
-			} else {
-				throw new Exception("Tuple count failed due to empty result set.");
-			}
-		} else {
-			throw new Exception("Action canceled.");
-		}
+		
+			throw new SQLException("Not Supported");
+		
 	}
 
 	@Override

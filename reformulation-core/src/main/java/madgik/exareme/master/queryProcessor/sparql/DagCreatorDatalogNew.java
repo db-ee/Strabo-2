@@ -13,6 +13,7 @@ import it.unibz.krdb.obda.model.Term;
 import it.unibz.krdb.obda.model.Variable;
 import it.unibz.krdb.obda.model.impl.FunctionalTermImpl;
 import it.unibz.krdb.obda.model.impl.OBDAVocabulary;
+import it.unibz.krdb.obda.utils.StrabonParameters;
 import madgik.exareme.master.queryProcessor.decomposer.dag.Node;
 import madgik.exareme.master.queryProcessor.decomposer.dag.NodeHashValues;
 import madgik.exareme.master.queryProcessor.decomposer.dp.DPSubLinear;
@@ -38,10 +39,11 @@ public class DagCreatorDatalogNew {
 	JoinClassMap classes;
 	SQLQuery query;
 	private List<Integer> filters;
+	NodeSelectivityEstimator nse;
 	// list to track filter on base tables, 0 no filter, 1 filter on first, 2
 	// filter on second
 
-	public DagCreatorDatalogNew(CQIE q, NodeHashValues hashes, Map<String, String> fetcher) {
+	public DagCreatorDatalogNew(CQIE q, NodeSelectivityEstimator nse, Map<String, String> fetcher) {
 		super();
 		this.first = q;
 		this.hashes = hashes;
@@ -51,17 +53,13 @@ public class DagCreatorDatalogNew {
 		tables = new ArrayList<Table>();
 		query = new SQLQuery();
 		filters = new ArrayList<Integer>();
+		this.nse=nse;
 	}
 
 	public SQLQuery getRootNode() throws SQLException {
-		NodeSelectivityEstimator nse = null;
 		
-		try {
-			nse=new NodeSelectivityEstimator("/media/dimitris/T/watdiv10/" + "histograms.json");
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
+		
 		hashes = new NodeHashValues();
 		hashes.setSelectivityEstimator(nse);
 		
@@ -176,6 +174,9 @@ public class DagCreatorDatalogNew {
 		Term subject = atom.getTerm(0);
 		Term object = atom.getTerm(1);
 		String predString = atom.getFunctionSymbol().getName().replace("prop", "");
+		if(predString.equals(StrabonParameters.GEOMETRIES_TABLE)) {
+			predString="-1";
+		}
 		pred = Integer.parseInt(predString);
 		// pred = (int) fetcher.getIdForProperty(predString);
 
@@ -338,11 +339,11 @@ public class DagCreatorDatalogNew {
 	private void getNodeFromExpression(CQIE expr) throws SQLException {
 		for (Function atom : expr.getBody()) {
 			Predicate pred = atom.getFunctionSymbol();
-			if (pred.getName().startsWith("prop")) {
+			if (pred.getName().startsWith("prop")||pred.getName().startsWith(StrabonParameters.GEOMETRIES_TABLE)) {
 				Node top = new Node(Node.OR);
 				alias++;
 				getNodeForTriplePattern(atom, top, true, null);
-			} else if (isSpatialJoin(pred)) {
+			} else if (StrabonParameters.isSpatialJoin(pred)) {
 				System.out.println("what7??? " + pred);
 			}
 			else {
@@ -353,26 +354,7 @@ public class DagCreatorDatalogNew {
 
 	}
 
-	private boolean isSpatialJoin(Predicate pred) {
-		if ( pred.equals(OBDAVocabulary.OVERLAPS) ||
-				pred.equals(OBDAVocabulary.SFCONTAINS) || 
-				pred.equals(OBDAVocabulary.SFCROSSES ) || 
-				pred.equals(OBDAVocabulary.SFDISJOINT ) || 
-				pred.equals(OBDAVocabulary.SFINTERSECTS ) || 
-				pred.equals(OBDAVocabulary.SFTOUCHES ) || 
-				pred.equals(OBDAVocabulary.SFWITHIN ) || 
-				pred.equals(OBDAVocabulary.SFEQUALS) || 
-				pred.equals(OBDAVocabulary.EHCOVEREDBY) || 
-				pred.equals(OBDAVocabulary.EHCOVERS) || 
-				pred.equals(OBDAVocabulary.EHDISJOINT) || 
-				pred.equals(OBDAVocabulary.EHEQUALS) || 
-				pred.equals(OBDAVocabulary.EHINSIDE) || 
-				pred.equals(OBDAVocabulary.EHOVERLAPS) || 
-				pred.equals(OBDAVocabulary.EHCONTAINS) )
-			return true;
-		else
-			return false;
-	}
+	
 	
 	
 

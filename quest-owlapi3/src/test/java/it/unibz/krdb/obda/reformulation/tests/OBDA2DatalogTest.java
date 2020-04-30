@@ -131,7 +131,7 @@ public class OBDA2DatalogTest extends TestCase {
 		QuestOWL reasoner = (QuestOWL) factory.createReasoner(ontology, new SimpleConfiguration());
 
 		// Get ready for querying
-		reasoner.getStatement();
+		reasoner.getStatement(null);
 	}
 
 	public void testMapping_1() throws IOException, InvalidPredicateDeclarationException, InvalidMappingException {

@@ -243,7 +243,7 @@ public class TreeWitnessRewriterH2Test extends TestCase {
 		QuestOWL reasoner = factory.createReasoner(ontology, new SimpleConfiguration());
 
 		// Now we are ready for querying
-		QuestOWLStatement st = reasoner.getStatement();
+		QuestOWLStatement st = reasoner.getStatement(null);
 
 		List<Result> summaries = new LinkedList<TreeWitnessRewriterH2Test.Result>();
 

@@ -129,7 +129,7 @@ public class JoinElminationMappingTest extends TestCase {
 		reasoner.flush();
 
 		// Now we are ready for querying
-		QuestOWLStatement st = (QuestOWLStatement)reasoner.getStatement();
+		QuestOWLStatement st = (QuestOWLStatement)reasoner.getStatement(null);
 
 		boolean fail = false;
 

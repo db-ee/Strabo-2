@@ -296,7 +296,7 @@ public class QuestOWLStatement implements AutoCloseable {
 
 	public String getUnfolding(String query) throws OWLException {
 		try {
-			return st.getUnfolding(query);
+			return st.getUnfolding(query).getMainQuery();
 		} catch (Exception e) {
 			throw new OntopOWLException(e);
 		}

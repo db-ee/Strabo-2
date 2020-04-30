@@ -25,6 +25,7 @@ import java.sql.Connection;
 import it.unibz.krdb.obda.model.OBDAException;
 import it.unibz.krdb.obda.owlrefplatform.core.QuestConnection;
 import it.unibz.krdb.obda.owlrefplatform.core.QuestStatement;
+import madgik.exareme.master.queryProcessor.estimator.NodeSelectivityEstimator;
 
 import org.semanticweb.owlapi.model.OWLException;
 
@@ -78,8 +79,8 @@ public class QuestOWLConnection implements AutoCloseable {
 
 	}
 	
-	public QuestOWLStatement createStrabonStatement() throws OWLException {
-			return new QuestOWLStatement(conn.createStrabonStatement(), this);
+	public QuestOWLStatement createStrabonStatement(NodeSelectivityEstimator nse) throws OWLException {
+			return new QuestOWLStatement(conn.createStrabonStatement(nse), this);
 	}
 
 	public void commit() throws OWLException {

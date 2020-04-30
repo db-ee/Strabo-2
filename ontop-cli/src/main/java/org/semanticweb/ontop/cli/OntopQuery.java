@@ -89,7 +89,7 @@ public class OntopQuery extends OntopReasoningCommandBase {
         try (
                 QuestOWL reasoner = factory.createReasoner(ontology, new SimpleConfiguration());
                 QuestOWLConnection conn = reasoner.getConnection();
-                QuestOWLStatement st = conn.createStrabonStatement();
+                QuestOWLStatement st = conn.createStrabonStatement(null);
         ) {
 
 			/*

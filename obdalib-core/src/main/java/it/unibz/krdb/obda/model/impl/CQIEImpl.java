@@ -49,6 +49,8 @@ public class CQIEImpl implements CQIE, ListListener {
 	private boolean rehash = true;
 
 	private String string = null;
+	
+	private List<String> signature = null;
 
 	private static final String SPACE = " ";
 	private static final String COMMA = ",";
@@ -219,5 +221,16 @@ public class CQIEImpl implements CQIE, ListListener {
 			TermUtils.addReferencedVariablesTo(vars, atom);
 		}
 		return vars;
+	}
+
+	@Override
+	public List<String> getSignature() {
+		return signature;
+	}
+
+	@Override
+	public void setSignature(List<String> signature) {
+		this.signature=signature;
+		
 	}
 }

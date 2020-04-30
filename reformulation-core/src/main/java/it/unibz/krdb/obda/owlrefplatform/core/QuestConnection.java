@@ -22,6 +22,7 @@ package it.unibz.krdb.obda.owlrefplatform.core;
 
 import it.unibz.krdb.obda.model.OBDAConnection;
 import it.unibz.krdb.obda.model.OBDAException;
+import madgik.exareme.master.queryProcessor.estimator.NodeSelectivityEstimator;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -152,9 +153,9 @@ public class QuestConnection implements OBDAConnection {
 		}
 	}
 
-	public StrabonStatement createStrabonStatement() {
+	public StrabonStatement createStrabonStatement(NodeSelectivityEstimator nse) {
 		StrabonStatement st = new StrabonStatement(this.questinstance, this,
-				null);
+				null, nse);
 		//st.setFetchSize(400);
 		return st;
 	}

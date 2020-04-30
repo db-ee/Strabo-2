@@ -52,6 +52,7 @@ import it.unibz.krdb.obda.model.impl.OBDADataFactoryImpl;
 import it.unibz.krdb.obda.model.impl.OBDAModelImpl;
 import it.unibz.krdb.obda.owlrefplatform.core.QuestConstants;
 import it.unibz.krdb.obda.owlrefplatform.core.QuestPreferences;
+import it.unibz.krdb.obda.owlrefplatform.core.SQLResult;
 import it.unibz.krdb.obda.owlrefplatform.core.StrabonStatement;
 import it.unibz.krdb.obda.owlrefplatform.owlapi3.QuestOWL;
 import it.unibz.krdb.obda.owlrefplatform.owlapi3.QuestOWLConfiguration;
@@ -60,6 +61,7 @@ import it.unibz.krdb.obda.owlrefplatform.owlapi3.QuestOWLFactory;
 import it.unibz.krdb.obda.owlrefplatform.owlapi3.QuestOWLStatement;
 import it.unibz.krdb.obda.utils.StrabonParameters;
 import it.unibz.krdb.sql.ImplicitDBConstraintsReader;
+import madgik.exareme.master.queryProcessor.estimator.NodeSelectivityEstimator;
 import sesameWrapper.SesameVirtualRepo;
 
 import org.apache.hadoop.fs.FSDataInputStream;
@@ -76,12 +78,14 @@ public class QueryExecutor {
 	static String propDictionary;
 	static String queriesPath;
 	static String database;
+	static String statfile;
 
 	public static void main(String[] args) throws Exception {
 		{
 			propDictionary = args[0];
 			queriesPath = args[1];
 			database = args[2];
+			statfile=args[3];
 
 			try {
 
@@ -157,8 +161,14 @@ public class QueryExecutor {
 				QuestOWL reasoner = factory.createReasoner(ontology, config);
 
 				/// query repo
-
-				StrabonStatement st = reasoner.createStrabonStatement();
+				NodeSelectivityEstimator nse=null;
+				try {
+					nse=new NodeSelectivityEstimator(statfile);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				StrabonStatement st = reasoner.createStrabonStatement(nse);
 				List<String> sparqlQueries = new ArrayList<String>();
 
 				Path path = new Path(queriesPath);
@@ -178,14 +188,25 @@ public class QueryExecutor {
 				// readFilesFromDir("/home/dimitris/spatialdbs/queries/");
 				for (String sparql : sparqlQueries) {
 					// String sparql = readFile(queryfile);
-					String sql = st.getUnfolding(sparql);
-					log.debug("Query unfolded:" + sql + "\n");
+					SQLResult sql = st.getUnfolding(sparql);
+					log.debug("Query unfolded:" + sql.getTempQueries() + "\n"
+							+ sql.getMainQuery() + "\n");
 					log.debug("Strating execution");
 					long start = System.currentTimeMillis();
-					Dataset<Row> result = spark.sql(sql.replaceAll("\"", ""));
+					List<String> tempnames=new ArrayList<String>();
+					for(int k=0;k<sql.getTempQueries().size();k++) {
+						String temp=sql.getTempQueries().get(k);
+						Dataset<Row> tempDataset = spark.sql(temp.replaceAll("\"", ""));
+						tempDataset.createOrReplaceGlobalTempView(sql.getTempName(k));
+					}
+					Dataset<Row> result = spark.sql(sql.getMainQuery().replaceAll("\"", ""));
 					long resultSize = result.count();
 					log.debug("Execution finished in " + (System.currentTimeMillis() - start) + " with " + resultSize
 							+ " results.");
+					for(int k=0;k<sql.getTempQueries().size();k++) {
+						spark.sql("DROP VIEW globaltemp."+sql.getTempName(k));
+					}
+					
 				}
 
 				// TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, preds);

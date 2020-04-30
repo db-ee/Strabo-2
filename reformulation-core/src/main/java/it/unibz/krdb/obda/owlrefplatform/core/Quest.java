@@ -204,7 +204,7 @@ public class Quest implements Serializable, RepositoryChangedListener {
 	 * used by the statements
 	 */
 
-	private final Map<String, String> querycache = new ConcurrentHashMap<String, String>();
+	private final Map<String, SQLResult> querycache = new ConcurrentHashMap<String, SQLResult>();
 
 	private final Map<String, List<String>> signaturecache = new ConcurrentHashMap<String, List<String>>();
 
@@ -300,15 +300,15 @@ public class Quest implements Serializable, RepositoryChangedListener {
 		this.applyUserConstraints = true;
 	}
 
-	protected String getCachedSQL(String query) {
-		return querycache.get(query);
+	protected SQLResult getCachedSQL(String sqlResult) {
+		return querycache.get(sqlResult);
 	}
 
 	protected boolean hasCachedSQL(String query) {
 		return querycache.containsKey(query);
 	}
 
-	protected void cacheSQL(String strquery, String sql) {
+	protected void cacheSQL(String strquery, SQLResult sql) {
 		querycache.put(strquery, sql);
 	}
 

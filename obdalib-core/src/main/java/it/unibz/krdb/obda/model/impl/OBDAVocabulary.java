@@ -356,6 +356,8 @@ public class OBDAVocabulary {
 			new COL_TYPE[2]);
 
 	public static final String QUEST_QUERY = "ans1";
+	
+	public static final String TEMP_QUERY = "temp";
 
 	/* SPARQL algebra operations */
 

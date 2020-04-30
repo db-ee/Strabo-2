@@ -29,6 +29,10 @@ public interface CQIE extends Serializable {
 	public Function getHead();
 
 	public List<Function> getBody();
+	
+	public List<String> getSignature();
+	
+	public void setSignature(List<String> signature);
 
 	public void updateHead(Function head);
 

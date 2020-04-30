@@ -181,7 +181,7 @@ public class QuestStatement implements OBDAStatement {
 				
 				// Obtaining the query from the cache
 				 
-				String sql = questInstance.getCachedSQL(strquery);
+				String sql = questInstance.getCachedSQL(strquery).getMainQuery();
 				List<String> signature = questInstance.getSignatureCache().get(strquery);
 				//ParsedQuery query = sesameQueryCache.get(strquery);
 
@@ -491,7 +491,7 @@ public class QuestStatement implements OBDAStatement {
 		log.debug("Producing the SQL string...");
 
 		// query = DatalogNormalizer.normalizeDatalogProgram(query);
-		String sql = questInstance.getDatasourceQueryGenerator().generateSourceQuery(query, signature);
+		String sql = questInstance.getDatasourceQueryGenerator().generateSourceQuery(query, signature).getMainQuery();
 
 		log.debug("Resulting SQL: \n{}", sql);
 		return sql;
@@ -640,7 +640,7 @@ public class QuestStatement implements OBDAStatement {
 		// before
 		if (questInstance.hasCachedSQL(strquery)) {
 			// Obtain immediately the SQL string from cache
-			sql = questInstance.getCachedSQL(strquery);
+			sql = questInstance.getCachedSQL(strquery).getMainQuery();
 
 			//signatureContainer = signaturecache.get(strquery);
 			//query = sesameQueryCache.get(strquery);
@@ -695,7 +695,7 @@ public class QuestStatement implements OBDAStatement {
 				
 				sql = getSQL(programAfterUnfolding, signatureContainer);
 				// cacheQueryAndProperties(strquery, sql);
-				questInstance.cacheSQL(strquery, sql);
+				questInstance.cacheSQL(strquery, new SQLResult(sql, null, null));;
 			} 
 			catch (Exception e1) {
 				log.debug(e1.getMessage(), e1);

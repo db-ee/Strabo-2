@@ -33,6 +33,8 @@ import it.unibz.krdb.obda.owlrefplatform.core.abox.QuestMaterializer;
 import it.unibz.krdb.obda.owlrefplatform.core.mappingprocessing.TMappingExclusionConfig;
 import it.unibz.krdb.obda.utils.VersionInfo;
 import it.unibz.krdb.sql.ImplicitDBConstraintsReader;
+import madgik.exareme.master.queryProcessor.estimator.NodeSelectivityEstimator;
+
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.reasoner.*;
 import org.semanticweb.owlapi.reasoner.InconsistentOntologyException;
@@ -256,14 +258,14 @@ public class QuestOWL extends OWLReasonerBase implements AutoCloseable {
 		this.preferences = preferences;
 	}
 
-	public QuestOWLStatement getStatement() throws OWLException {
+	public QuestOWLStatement getStatement(NodeSelectivityEstimator nse) throws OWLException {
 		if (!questready) {
 			OWLReasonerRuntimeException owlReasonerRuntimeException = new ReasonerInternalException(
 					"Quest was not initialized properly. This is generally indicates, connection problems or error during ontology or mapping pre-processing. \n\nOriginal error message:\n" + questException.getMessage()) ;
 				owlReasonerRuntimeException.setStackTrace(questException.getStackTrace());
 			throw owlReasonerRuntimeException;
 		}
-		return owlconn.createStrabonStatement();
+		return owlconn.createStrabonStatement(nse);
 	}
 
 	private void prepareQuestInstance() throws Exception {
@@ -1881,9 +1883,9 @@ public class QuestOWL extends OWLReasonerBase implements AutoCloseable {
 		}
 	}
 
-	public StrabonStatement createStrabonStatement() {
+	public StrabonStatement createStrabonStatement(NodeSelectivityEstimator nse) {
 		StrabonStatement st = new StrabonStatement(this.questInstance, null,
-				null);
+				null, nse);
 		//st.setFetchSize(400);
 		return st;
 	}

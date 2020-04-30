@@ -26,6 +26,7 @@ import it.unibz.krdb.obda.model.Predicate.COL_TYPE;
 import it.unibz.krdb.obda.model.impl.OBDADataFactoryImpl;
 import it.unibz.krdb.obda.model.impl.OBDAVocabulary;
 import it.unibz.krdb.obda.model.impl.TermUtils;
+import it.unibz.krdb.obda.owlrefplatform.core.SQLResult;
 import it.unibz.krdb.obda.owlrefplatform.core.abox.SemanticIndexURIMap;
 import it.unibz.krdb.obda.owlrefplatform.core.abox.XsdDatatypeConverter;
 import it.unibz.krdb.obda.owlrefplatform.core.basicoperations.DatalogNormalizer;
@@ -167,13 +168,14 @@ public class SQLGenerator implements SQLQueryGenerator {
 	 * method descriptions.
 	 */
 	@Override
-	public String generateSourceQuery(DatalogProgram query, List<String> signature) throws OBDAException {
+	public SQLResult generateSourceQuery(DatalogProgram query, List<String> signature) throws OBDAException {
 		isDistinct = hasSelectDistinctStatement(query);
 		isOrderBy = hasOrderByClause(query);
 		if (query.getQueryModifiers().hasModifiers()) {
 			final String indent = "   ";
 			final String outerViewName = "SUB_QVIEW";
-			String subquery = generateQuery(query, signature, indent);
+			SQLResult res=generateQuery(query, signature, indent);
+			String subquery = res.getMainQuery();
 
 			String modifier = "";
 			List<OrderCondition> conditions = query.getQueryModifiers().getSortConditions();
@@ -186,7 +188,8 @@ public class SQLGenerator implements SQLQueryGenerator {
 			sql += subquery + "\n";
 			sql += ") " + outerViewName + "\n";
 			sql += modifier;
-			return sql;
+			res.setMainQuery(sql);
+			return res;
 		} else {
 			return generateQuery(query, signature, "");
 		}
@@ -218,13 +221,15 @@ public class SQLGenerator implements SQLQueryGenerator {
 	 * Main method. Generates the full query, taking into account
 	 * limit/offset/order by.
 	 */
-	private String generateQuery(DatalogProgram query, List<String> signature,
+	private SQLResult generateQuery(DatalogProgram query, List<String> signature,
 			String indent) throws OBDAException {
 
 		int numberOfQueries = query.getRules().size();
 
 		List<String> queriesStrings = new LinkedList<String>();
 		/* Main loop, constructing the SPJ query for each CQ */
+		List<String> tempResults = new ArrayList<String>();
+		List<String> tempNames = new ArrayList<String>();
 		for (CQIE cq : query.getRules()) {
 
 			/*
@@ -261,7 +266,8 @@ public class SQLGenerator implements SQLQueryGenerator {
 //			log.debug("Normalized CQ: \n{}", cq);
 
 			Predicate headPredicate = cq.getHead().getFunctionSymbol();
-			if (!headPredicate.getName().toString().equals(OBDAVocabulary.QUEST_QUERY)) {
+			if (!(headPredicate.getName().toString().equals(OBDAVocabulary.QUEST_QUERY)
+					|| headPredicate.getName().toString().startsWith(OBDAVocabulary.TEMP_QUERY))) {
 				// not a target query, skip it.
 				continue;
 			}
@@ -278,7 +284,14 @@ public class SQLGenerator implements SQLQueryGenerator {
 			String SELECT = getSelectClause(signature, cq, index, innerdistincts);
 
 			String querystr = SELECT + FROM + WHERE;
-			queriesStrings.add(querystr);
+			if(headPredicate.getName().toString().startsWith(OBDAVocabulary.TEMP_QUERY)) {
+				tempResults.add(querystr);
+				tempNames.add(headPredicate.getName().toString());
+			}
+			else {
+				queriesStrings.add(querystr);
+			}
+			
 		}
 
 		Iterator<String> queryStringIterator = queriesStrings.iterator();
@@ -300,7 +313,7 @@ public class SQLGenerator implements SQLQueryGenerator {
 			result.append(queryStringIterator.next());
 		}
 
-		return result.toString();
+		return new SQLResult(result.toString(), tempResults, tempNames);
 	}
 
 	/***
@@ -772,6 +785,10 @@ public class SQLGenerator implements SQLQueryGenerator {
 		/*
 		 * If the head has size 0 this is a boolean query.
 		 */
+		if(query.getSignature()!=null) {
+			//overwrite global signature
+			signature=query.getSignature();
+		}
 		List<Term> headterms = query.getHead().getTerms();
 		StringBuilder sb = new StringBuilder();
 
@@ -1973,6 +1990,9 @@ public class SQLGenerator implements SQLQueryGenerator {
 		 * Generates the view definition, i.e., "tablename viewname".
 		 */
 		public String getViewDefinition(Function atom) {
+			if(atom.getFunctionSymbol().toString().startsWith("temp")) {
+				return "global_temp."+atom.getFunctionSymbol().toString() +" "+viewNames.get(atom).getSQLRendering();
+			}
 			RelationDefinition def = dataDefinitions.get(atom);
 			if (def instanceof DatabaseRelationDefinition) {
 				return sqladapter.sqlTableName(dataDefinitions.get(atom).getID().getSQLRendering(), 

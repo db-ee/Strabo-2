@@ -45,6 +45,7 @@ import it.unibz.krdb.obda.model.impl.OBDADataFactoryImpl;
 import it.unibz.krdb.obda.model.impl.OBDAModelImpl;
 import it.unibz.krdb.obda.owlrefplatform.core.QuestConstants;
 import it.unibz.krdb.obda.owlrefplatform.core.QuestPreferences;
+import it.unibz.krdb.obda.owlrefplatform.core.SQLResult;
 import it.unibz.krdb.obda.owlrefplatform.core.StrabonStatement;
 import it.unibz.krdb.obda.owlrefplatform.owlapi3.QuestOWL;
 import it.unibz.krdb.obda.owlrefplatform.owlapi3.QuestOWLConfiguration;
@@ -53,6 +54,7 @@ import it.unibz.krdb.obda.owlrefplatform.owlapi3.QuestOWLFactory;
 import it.unibz.krdb.obda.owlrefplatform.owlapi3.QuestOWLStatement;
 import it.unibz.krdb.obda.utils.StrabonParameters;
 import it.unibz.krdb.sql.ImplicitDBConstraintsReader;
+import madgik.exareme.master.queryProcessor.estimator.NodeSelectivityEstimator;
 import sesameWrapper.SesameVirtualRepo;
 
 
@@ -60,17 +62,17 @@ import sesameWrapper.SesameVirtualRepo;
 
 public class LocalQueryTranslator {
 
-	private static final Logger log = LoggerFactory.getLogger(QueryExecutor.class);
+	private static final Logger log = LoggerFactory.getLogger(LocalQueryTranslator.class);
 	static StringBuffer obdaFile;
 	static String propDictionary;
 	static String queriesPath;
-	static String database;
+	static String statfile;
 
 	public static void main(String[] args) throws Exception {
 		{
 			propDictionary = args[0];
 			queriesPath = args[1];
-			database = args[2];
+			statfile = args[2];
 
 			try {
 
@@ -111,15 +113,22 @@ public class LocalQueryTranslator {
 				QuestOWL reasoner = factory.createReasoner(ontology, config);
 
 				/// query repo
-
-				StrabonStatement st = reasoner.createStrabonStatement();
+				NodeSelectivityEstimator nse=null;
+				try {
+					nse=new NodeSelectivityEstimator(statfile);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				StrabonStatement st = reasoner.createStrabonStatement(nse);
 				List<String> sparqlQueries = new ArrayList<String>();
 
 				String[] query_files = readFilesFromDir("/home/dimitris/spatialdbs/queries/");
 				for (String queryfile : query_files) {
 					String sparql=readFile(queryfile);
-					String sql=st.getUnfolding(sparql);
-					System.out.print(sql+"\n");
+					SQLResult sql=st.getUnfolding(sparql);
+					System.out.print(sql.getTempQueries()+"\n");
+					System.out.print(sql.getMainQuery()+"\n");
 				}			
 
 
