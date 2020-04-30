@@ -60,6 +60,7 @@ import org.slf4j.LoggerFactory;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -710,7 +711,7 @@ public class StrabonStatement implements OBDAStatement {
 				if(existentialVars.contains(t)||varsInSpatial.contains(t)) {
 					outputs.add(f);
 					signature.add(t.toString());
-					replacement.addAttribute(questInstance.getMetaData().getQuotedIDFactory().createAttributeID(t.toString()), 1, "VARCHAR", false);
+					replacement.addAttribute(questInstance.getMetaData().getQuotedIDFactory().createAttributeID(t.toString()), Types.VARCHAR, "VARCHAR", false);
 						}
 					}
 			Function ans1=fac.getFunction(fac.getPredicate("temp"+id, outputs.size()), outputs);

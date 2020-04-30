@@ -127,8 +127,8 @@ public class LocalQueryTranslator {
 				for (String queryfile : query_files) {
 					String sparql=readFile(queryfile);
 					SQLResult sql=st.getUnfolding(sparql);
-					System.out.print(sql.getTempQueries()+"\n");
-					System.out.print(sql.getMainQuery()+"\n");
+					System.out.print(sql.getTempQueries().toString().replaceAll("\"", "")+"\n");
+					System.out.print(sql.getMainQuery().replaceAll("\"", "")+"\n");
 				}			
 
 

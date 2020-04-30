@@ -29,7 +29,7 @@ public class SQLResult {
 	}
 
 	public String getTempName(int k) {
-		return tempQueries.get(k);
+		return tempNames.get(k);
 	}
 
 }

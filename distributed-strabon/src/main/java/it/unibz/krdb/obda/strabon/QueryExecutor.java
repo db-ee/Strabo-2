@@ -193,10 +193,11 @@ public class QueryExecutor {
 							+ sql.getMainQuery() + "\n");
 					log.debug("Strating execution");
 					long start = System.currentTimeMillis();
-					List<String> tempnames=new ArrayList<String>();
+					//List<String> tempnames=new ArrayList<String>();
 					for(int k=0;k<sql.getTempQueries().size();k++) {
-						String temp=sql.getTempQueries().get(k);
-						Dataset<Row> tempDataset = spark.sql(temp.replaceAll("\"", ""));
+						String temp=sql.getTempQueries().get(k).replaceAll("\"", "");
+						log.debug("creating temp table "+sql.getTempName(k) + " with query: "+temp);
+						Dataset<Row> tempDataset = spark.sql(temp);
 						tempDataset.createOrReplaceGlobalTempView(sql.getTempName(k));
 					}
 					Dataset<Row> result = spark.sql(sql.getMainQuery().replaceAll("\"", ""));
@@ -204,7 +205,7 @@ public class QueryExecutor {
 					log.debug("Execution finished in " + (System.currentTimeMillis() - start) + " with " + resultSize
 							+ " results.");
 					for(int k=0;k<sql.getTempQueries().size();k++) {
-						spark.sql("DROP VIEW globaltemp."+sql.getTempName(k));
+						//spark.sql("DROP VIEW globaltemp."+sql.getTempName(k));
 					}
 					
 				}
