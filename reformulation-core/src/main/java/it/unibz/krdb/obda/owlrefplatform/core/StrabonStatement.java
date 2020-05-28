@@ -617,6 +617,7 @@ public class StrabonStatement implements OBDAStatement {
 					programAfterSplittingSpatialJoin = splitSpatialJoin(programAfterUnfolding);
 				} catch (Exception e) {
 					log.error("Could not split query based on spatial join" + e.getMessage());
+					programAfterSplittingSpatialJoin=programAfterUnfolding;
 				}
 				
 				

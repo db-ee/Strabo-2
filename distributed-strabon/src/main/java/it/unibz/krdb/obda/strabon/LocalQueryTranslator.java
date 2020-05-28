@@ -22,6 +22,7 @@ import java.io.ByteArrayInputStream;
  * #L%
  */
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -30,7 +31,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -57,7 +57,6 @@ import it.unibz.krdb.sql.ImplicitDBConstraintsReader;
 import madgik.exareme.master.queryProcessor.estimator.NodeSelectivityEstimator;
 import sesameWrapper.SesameVirtualRepo;
 
-
 //import org.openrdf.query.resultio.sparqlkml.stSPARQLResultsKMLWriter;
 
 public class LocalQueryTranslator {
@@ -67,16 +66,29 @@ public class LocalQueryTranslator {
 	static String propDictionary;
 	static String queriesPath;
 	static String statfile;
+	static String asWKTTablesFile;
+	private static Map<String, String> asWKTSubpropertiesToTables;
 
 	public static void main(String[] args) throws Exception {
 		{
 			propDictionary = args[0];
 			queriesPath = args[1];
 			statfile = args[2];
+			asWKTTablesFile = args[3];
+			asWKTSubpropertiesToTables = new HashMap<String, String>();
+
+			try {
+				String asWKTFile = readFile(asWKTTablesFile);
+				for (String nextProp : asWKTFile.split("\n")) {
+					asWKTSubpropertiesToTables.put(nextProp, null);
+				}
+			} catch (Exception fnf) {
+				log.error("Could not read other WKT properties file");
+
+			}
 
 			try {
 
-				
 				createObdaFile();
 				OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 				OWLOntology ontology = manager.createOntology(); // empty ontology
@@ -113,9 +125,9 @@ public class LocalQueryTranslator {
 				QuestOWL reasoner = factory.createReasoner(ontology, config);
 
 				/// query repo
-				NodeSelectivityEstimator nse=null;
+				NodeSelectivityEstimator nse = null;
 				try {
-					nse=new NodeSelectivityEstimator(statfile);
+					nse = new NodeSelectivityEstimator(statfile);
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -123,15 +135,13 @@ public class LocalQueryTranslator {
 				StrabonStatement st = reasoner.createStrabonStatement(nse);
 				List<String> sparqlQueries = new ArrayList<String>();
 
-				String[] query_files = readFilesFromDir("/home/dimitris/spatialdbs/queries/");
+				String[] query_files = readFilesFromDir(queriesPath);
 				for (String queryfile : query_files) {
-					String sparql=readFile(queryfile);
-					SQLResult sql=st.getUnfolding(sparql);
-					System.out.print(sql.getTempQueries().toString().replaceAll("\"", "")+"\n");
-					System.out.print(sql.getMainQuery().replaceAll("\"", "")+"\n");
-				}			
-
-
+					String sparql = readFile(queryfile);
+					SQLResult sql = st.getUnfolding(sparql);
+					System.out.print(sql.getTempQueries().toString().replaceAll("\"", "") + "\n");
+					System.out.print(sql.getMainQuery().replaceAll("\"", "") + "\n");
+				}
 
 				System.out.println("Closing...");
 
@@ -172,10 +182,10 @@ public class LocalQueryTranslator {
 
 		Map<String, String> predDictionary = readPredicates(propDictionary);
 		int mappingId = 0;
-
+		int asWKTsubproperty = 0;
 		for (String property : predDictionary.keySet()) {
 
-			if (property.contains("asWKT")) {
+			if (property.equals("http://www.opengis.net/ont/geosparql#asWKT")) {
 				obdaFile.append("mappingId\tmapp");
 				obdaFile.append(mappingId);
 				mappingId++;
@@ -190,7 +200,24 @@ public class LocalQueryTranslator {
 				obdaFile.append(StrabonParameters.GEOMETRIES_SCHEMA + "." + StrabonParameters.GEOMETRIES_TABLE);
 				obdaFile.append("\n");
 				obdaFile.append("\n");
-			} else if (property.contains("hasGeometry")) {
+			} else if (asWKTSubpropertiesToTables.keySet().contains(property)) {
+				String tablename = "tablewkt" + asWKTsubproperty;
+				asWKTsubproperty++;
+				asWKTSubpropertiesToTables.put(property, tablename);
+				obdaFile.append("mappingId\tmapp");
+				obdaFile.append(mappingId);
+				mappingId++;
+				obdaFile.append("\n");
+				obdaFile.append("target\t");
+				obdaFile.append("<{s}> ");
+				obdaFile.append("<" + property + ">");
+				obdaFile.append(" {o}^^geo:wktLiteral .\n");
+				obdaFile.append("source\t");
+				obdaFile.append("select s, o from ");
+				obdaFile.append(StrabonParameters.GEOMETRIES_SCHEMA + "." + tablename);
+				obdaFile.append("\n");
+				obdaFile.append("\n");
+			} else if (property.equals("http://www.opengis.net/ont/geosparql#hasGeometry")) {
 				obdaFile.append("mappingId\tmapp");
 				obdaFile.append(mappingId);
 				mappingId++;
@@ -202,7 +229,7 @@ public class LocalQueryTranslator {
 				obdaFile.append("source\t");
 				obdaFile.append("select " + StrabonParameters.GEOMETRIES_FIRST_COLUMN + ", "
 						+ StrabonParameters.GEOMETRIES_SECOND_COLUMN + " from ");
-				obdaFile.append(StrabonParameters.GEOMETRIES_SCHEMA + "." +StrabonParameters.GEOMETRIES_TABLE);
+				obdaFile.append(StrabonParameters.GEOMETRIES_SCHEMA + "." + StrabonParameters.GEOMETRIES_TABLE);
 				obdaFile.append("\n");
 				obdaFile.append("\n");
 			} else if (property.contains("has_code")) {
@@ -214,6 +241,20 @@ public class LocalQueryTranslator {
 				obdaFile.append("<{s}> ");
 				obdaFile.append("<" + property + ">");
 				obdaFile.append(" {o}^^xsd:integer .\n");
+				obdaFile.append("source\t");
+				obdaFile.append("select s, o from ");
+				obdaFile.append(predDictionary.get(property));
+				obdaFile.append("\n");
+				obdaFile.append("\n");
+			} else if (property.contains("hasKey")) {
+				obdaFile.append("mappingId\tmapp");
+				obdaFile.append(mappingId);
+				mappingId++;
+				obdaFile.append("\n");
+				obdaFile.append("target\t");
+				obdaFile.append("<{s}> ");
+				obdaFile.append("<" + property + ">");
+				obdaFile.append(" {o}^^xsd:string .\n");
 				obdaFile.append("source\t");
 				obdaFile.append("select s, o from ");
 				obdaFile.append(predDictionary.get(property));
@@ -258,8 +299,6 @@ public class LocalQueryTranslator {
 		return result;
 	}
 
-
-
 	private static String[] readFilesFromDir(String string) throws IOException {
 		File folder = new File(string);
 		File[] listOfFiles = folder.listFiles();
@@ -287,6 +326,5 @@ public class LocalQueryTranslator {
 		}
 		return file;
 	}
-
 
 }

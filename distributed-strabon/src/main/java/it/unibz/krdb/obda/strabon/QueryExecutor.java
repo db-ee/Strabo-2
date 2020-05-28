@@ -79,28 +79,29 @@ public class QueryExecutor {
 	static String queriesPath;
 	static String database;
 	static String statfile;
+	static String asWKTTablesFile;
+	private static Map<String, String> asWKTSubpropertiesToTables;
 
 	public static void main(String[] args) throws Exception {
 		{
 			propDictionary = args[0];
 			queriesPath = args[1];
 			database = args[2];
-			statfile=args[3];
-
+			statfile = args[3];
+			asWKTTablesFile = args[4];
+			asWKTSubpropertiesToTables = new HashMap<String, String>();
 			try {
 
 				final SparkSession spark = SparkSession.builder()
-						//.master("local[*]") // Delete this if run in cluster mode
+						// .master("local[*]") // Delete this if run in cluster mode
 						.appName("strabonQuery") // Change this to a proper name
 						// Enable GeoSpark custom Kryo serializer
 						.config("spark.serializer", KryoSerializer.class.getName())
 						.config("spark.kryo.registrator", GeoSparkVizKryoRegistrator.class.getName())
 						.config("spark.sql.inMemoryColumnarStorage.compressed", true)
-						.config("hive.exec.dynamic.partition", true)
-						.config("spark.sql.parquet.filterPushdown", true)
+						.config("hive.exec.dynamic.partition", true).config("spark.sql.parquet.filterPushdown", true)
 						.config("spark.sql.inMemoryColumnarStorage.batchSize", 20000)
-						.enableHiveSupport()
-						.getOrCreate();
+						.enableHiveSupport().getOrCreate();
 
 				spark.sql("SET hive.exec.dynamic.partition = true");
 				spark.sql("SET hive.exec.dynamic.partition.mode = nonstrict");
@@ -110,22 +111,40 @@ public class QueryExecutor {
 				spark.sql("SET spark.sql.parquet.filterPushdown = true");
 				spark.sql("USE " + database);
 				GeoSparkSQLRegistrator.registerAll(spark);
-				// preload geometeries
-				log.debug("preloading geometries");
-				Dataset<Row> geoms = spark.sql("Select " + StrabonParameters.GEOMETRIES_FIRST_COLUMN + ", "
-						+ StrabonParameters.GEOMETRIES_SECOND_COLUMN + ", ST_GeomFromWKT("
-						+ StrabonParameters.GEOMETRIES_THIRD_COLUMN + ") as "
-						+ StrabonParameters.GEOMETRIES_THIRD_COLUMN + " FROM geometries");
-				geoms.createOrReplaceGlobalTempView(StrabonParameters.GEOMETRIES_TABLE);
-				geoms.count();
-				geoms.cache();
-				// String owlfile = "/home/dimitris/spatialdbs/lgd-bremen.owl";
-
-				// for opendap its cop.obda
-				// String obdafile = "/home/dimitris/spatialdbs/lgd-bremen.obda";
 
 				FileSystem fs = FileSystem.get(spark.sparkContext().hadoopConfiguration());
-				createObdaFile(fs);
+
+				Path asWKT = new Path(asWKTTablesFile);
+				String asWKTFile = readHadoopFile(asWKT, fs);
+				for (String nextProp : asWKTFile.split("\n")) {
+					asWKTSubpropertiesToTables.put(nextProp, null);
+				}
+
+				Map<String, String> predDictionary = readPredicatesFromHadoop(propDictionary, fs);
+				boolean existDefaultGeometrytable = createObdaFile(predDictionary);
+
+				if (existDefaultGeometrytable) {
+					// preload geometeries
+					log.debug("preloading geometries");
+					Dataset<Row> geoms = spark.sql("Select " + StrabonParameters.GEOMETRIES_FIRST_COLUMN + ", "
+							+ StrabonParameters.GEOMETRIES_SECOND_COLUMN + ", ST_GeomFromWKT("
+							+ StrabonParameters.GEOMETRIES_THIRD_COLUMN + ") as "
+							+ StrabonParameters.GEOMETRIES_THIRD_COLUMN + " FROM geometries");
+					geoms.createOrReplaceGlobalTempView(StrabonParameters.GEOMETRIES_TABLE);
+					geoms.count();
+					geoms.cache();
+				}
+
+				for (String asWKTsubprop : asWKTSubpropertiesToTables.keySet()) {
+					String tblName = asWKTSubpropertiesToTables.get(asWKTsubprop);
+					log.debug("preloading asWKT subproperty tables");
+					Dataset<Row> geoms = spark
+							.sql("Select s, ST_GeomFromWKT(o) as o FROM " + predDictionary.get(asWKTsubprop) + " ");
+					geoms.createOrReplaceGlobalTempView(tblName);
+					geoms.count();
+					geoms.cache();
+				}
+
 				OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 				OWLOntology ontology = manager.createOntology(); // empty ontology
 
@@ -161,9 +180,9 @@ public class QueryExecutor {
 				QuestOWL reasoner = factory.createReasoner(ontology, config);
 
 				/// query repo
-				NodeSelectivityEstimator nse=null;
+				NodeSelectivityEstimator nse = null;
 				try {
-					nse=new NodeSelectivityEstimator(statfile);
+					nse = new NodeSelectivityEstimator(statfile);
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -187,16 +206,16 @@ public class QueryExecutor {
 				// String[] query_files =
 				// readFilesFromDir("/home/dimitris/spatialdbs/queries/");
 				for (String sparql : sparqlQueries) {
+					try {
 					// String sparql = readFile(queryfile);
 					SQLResult sql = st.getUnfolding(sparql);
-					log.debug("Query unfolded:" + sql.getTempQueries() + "\n"
-							+ sql.getMainQuery() + "\n");
+					log.debug("Query unfolded:" + sql.getTempQueries() + "\n" + sql.getMainQuery() + "\n");
 					log.debug("Strating execution");
 					long start = System.currentTimeMillis();
-					//List<String> tempnames=new ArrayList<String>();
-					for(int k=0;k<sql.getTempQueries().size();k++) {
-						String temp=sql.getTempQueries().get(k).replaceAll("\"", "");
-						log.debug("creating temp table "+sql.getTempName(k) + " with query: "+temp);
+					// List<String> tempnames=new ArrayList<String>();
+					for (int k = 0; k < sql.getTempQueries().size(); k++) {
+						String temp = sql.getTempQueries().get(k).replaceAll("\"", "");
+						log.debug("creating temp table " + sql.getTempName(k) + " with query: " + temp);
 						Dataset<Row> tempDataset = spark.sql(temp);
 						tempDataset.createOrReplaceGlobalTempView(sql.getTempName(k));
 					}
@@ -204,10 +223,14 @@ public class QueryExecutor {
 					long resultSize = result.count();
 					log.debug("Execution finished in " + (System.currentTimeMillis() - start) + " with " + resultSize
 							+ " results.");
-					for(int k=0;k<sql.getTempQueries().size();k++) {
+					for (int k = 0; k < sql.getTempQueries().size(); k++) {
 						//spark.sql("DROP VIEW globaltemp."+sql.getTempName(k));
 					}
-					
+					} catch (Exception ex){
+						log.error("Could not execute query "+sparql+
+								"\nException: "+ex.getMessage());
+					}
+
 				}
 
 				// TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, preds);
@@ -227,7 +250,8 @@ public class QueryExecutor {
 
 	}
 
-	private static void createObdaFile(FileSystem fs) throws SQLException, IOException {
+	private static boolean createObdaFile(Map<String, String> predDictionary) throws SQLException, IOException {
+		boolean existsGeometryTable = false;
 		obdaFile = new StringBuffer();
 		obdaFile.append("[PrefixDeclaration]");
 		obdaFile.append("\n");
@@ -252,12 +276,13 @@ public class QueryExecutor {
 		obdaFile.append("[MappingDeclaration] @collection [[");
 		obdaFile.append("\n");
 
-		Map<String, String> predDictionary = readPredicatesFromHadoop(propDictionary, fs);
+		int asWKTsubproperty = 0;
 		int mappingId = 0;
 
 		for (String property : predDictionary.keySet()) {
 
-			if (property.contains("asWKT")) {
+			if (property.equals("http://www.opengis.net/ont/geosparql#asWKT")) {
+				existsGeometryTable = true;
 				obdaFile.append("mappingId\tmapp");
 				obdaFile.append(mappingId);
 				mappingId++;
@@ -272,7 +297,7 @@ public class QueryExecutor {
 				obdaFile.append(StrabonParameters.GEOMETRIES_SCHEMA + "." + StrabonParameters.GEOMETRIES_TABLE);
 				obdaFile.append("\n");
 				obdaFile.append("\n");
-			} else if (property.contains("hasGeometry")) {
+			} else if (property.equals("http://www.opengis.net/ont/geosparql#hasGeometry")) {
 				obdaFile.append("mappingId\tmapp");
 				obdaFile.append(mappingId);
 				mappingId++;
@@ -284,7 +309,7 @@ public class QueryExecutor {
 				obdaFile.append("source\t");
 				obdaFile.append("select " + StrabonParameters.GEOMETRIES_FIRST_COLUMN + ", "
 						+ StrabonParameters.GEOMETRIES_SECOND_COLUMN + " from ");
-				obdaFile.append(StrabonParameters.GEOMETRIES_SCHEMA + "." +StrabonParameters.GEOMETRIES_TABLE);
+				obdaFile.append(StrabonParameters.GEOMETRIES_SCHEMA + "." + StrabonParameters.GEOMETRIES_TABLE);
 				obdaFile.append("\n");
 				obdaFile.append("\n");
 			} else if (property.contains("has_code")) {
@@ -296,6 +321,38 @@ public class QueryExecutor {
 				obdaFile.append("<{s}> ");
 				obdaFile.append("<" + property + ">");
 				obdaFile.append(" {o}^^xsd:integer .\n");
+				obdaFile.append("source\t");
+				obdaFile.append("select s, o from ");
+				obdaFile.append(predDictionary.get(property));
+				obdaFile.append("\n");
+				obdaFile.append("\n");
+
+			} else if (asWKTSubpropertiesToTables.keySet().contains(property)) {
+				String tablename = "tablewkt" + asWKTsubproperty;
+				asWKTsubproperty++;
+				asWKTSubpropertiesToTables.put(property, tablename);
+				obdaFile.append("mappingId\tmapp");
+				obdaFile.append(mappingId);
+				mappingId++;
+				obdaFile.append("\n");
+				obdaFile.append("target\t");
+				obdaFile.append("<{s}> ");
+				obdaFile.append("<" + property + ">");
+				obdaFile.append(" {o}^^geo:wktLiteral .\n");
+				obdaFile.append("source\t");
+				obdaFile.append("select s, o from ");
+				obdaFile.append(StrabonParameters.GEOMETRIES_SCHEMA + "." + tablename);
+				obdaFile.append("\n");
+				obdaFile.append("\n");
+			} else if (property.contains("hasKey")) {
+				obdaFile.append("mappingId\tmapp");
+				obdaFile.append(mappingId);
+				mappingId++;
+				obdaFile.append("\n");
+				obdaFile.append("target\t");
+				obdaFile.append("<{s}> ");
+				obdaFile.append("<" + property + ">");
+				obdaFile.append(" {o}^^xsd:string .\n");
 				obdaFile.append("source\t");
 				obdaFile.append("select s, o from ");
 				obdaFile.append(predDictionary.get(property));
@@ -320,7 +377,7 @@ public class QueryExecutor {
 
 		}
 		obdaFile.append("]]");
-
+		return existsGeometryTable;
 	}
 
 	public static Map<String, String> readPredicates(String filename) {
@@ -351,7 +408,6 @@ public class QueryExecutor {
 		}
 		return result;
 	}
-
 
 	public static String readHadoopFile(Path hadoopPath, FileSystem fs) throws IOException {
 		String file = "";
