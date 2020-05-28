@@ -1,5 +1,7 @@
 package it.unibz.krdb.obda.owlrefplatform.core.queryevaluation;
 
+import it.unibz.krdb.obda.model.Function;
+
 /*
  * #%L
  * ontop-reformulation-core
@@ -21,6 +23,9 @@ package it.unibz.krdb.obda.owlrefplatform.core.queryevaluation;
  */
 
 import it.unibz.krdb.obda.model.OBDAQueryModifiers.OrderCondition;
+import it.unibz.krdb.obda.model.Term;
+import it.unibz.krdb.obda.model.ValueConstant;
+import it.unibz.krdb.obda.model.impl.FunctionalTermImpl;
 
 import java.sql.Types;
 import java.util.List;
@@ -440,6 +445,31 @@ public class SQL99DialectAdapter implements SQLDialectAdapter {
 		return sqlQuote(signatureVariableName + proposedSuffix);
 	}
 
+
+	@Override
+	public String strEncodeForSpatialDistance(String left, String right, Term term3) {
+		if(term3 instanceof Function) {
+			Function f=(Function)term3;
+			if(f.getArity()==2) {
+				if(f.getTerm(1) instanceof ValueConstant) {
+					ValueConstant vc=(ValueConstant)f.getTerm(1);
+					if(vc.getValue().equals("http://www.opengis.net/def/uom/OGC/1.0/metre")) {
+						return "ST_Distance(Geography("+left+"), Geography("+right+"))";
+					}
+					else if(vc.getValue().equals("http://www.opengis.net/def/uom/OGC/1.0/degree")) {
+						return "ST_Distance("+left+", "+right+")";
+					}
+				}
+			}
+		}
+		throw new IllegalArgumentException("Error, No such unit of measure exists: "+term3.toString() +
+				"\n Supported units of measure: \n"+
+				"http://www.opengis.net/def/uom/OGC/1.0/metre \n"+
+				"http://www.opengis.net/def/uom/OGC/1.0/degree");
+	}
+
+
+	
 	
 
 

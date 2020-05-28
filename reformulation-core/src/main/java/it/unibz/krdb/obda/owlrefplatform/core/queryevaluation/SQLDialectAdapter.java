@@ -21,6 +21,7 @@ package it.unibz.krdb.obda.owlrefplatform.core.queryevaluation;
  */
 
 import it.unibz.krdb.obda.model.OBDAQueryModifiers.OrderCondition;
+import it.unibz.krdb.obda.model.Term;
 
 import java.util.List;
 import java.util.Set;
@@ -131,4 +132,7 @@ public interface SQLDialectAdapter {
 	public String dateMonth(String date);
 
 	public String rand();
+
+	public String strEncodeForSpatialDistance(String leftOp, String rightOp, Term term3);
+
 }

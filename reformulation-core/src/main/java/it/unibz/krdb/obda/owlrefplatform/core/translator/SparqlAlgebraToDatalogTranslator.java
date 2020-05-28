@@ -1092,6 +1092,9 @@ public class SparqlAlgebraToDatalogTranslator {
     private Term getFunctionCallTerm(FunctionCall expr) {
     	
         switch(expr.getURI()){
+        	
+        case "http://www.opengis.net/def/function/geosparql/distance":
+        	return getSpatialDistance(expr.getArgs());
          
             case "http://www.w3.org/2005/xpath-functions#concat":
                 return getConcat(expr.getArgs());
@@ -1191,6 +1194,21 @@ public class SparqlAlgebraToDatalogTranslator {
         }
     }
 
+
+	private Term getSpatialDistance(List<ValueExpr> args) {
+		if (args.size() != 3){
+            throw new UnsupportedOperationException("Wrong number of arguments (found " 
+		+ args.size() + ", only 3 supported) for Spatial Distance function");					
+		}
+		ValueExpr geom1 = args.get(0); 
+		ValueExpr geom2 = args.get(1); 
+		ValueExpr unit_of_measurement = args.get(2);
+		Term g1 = getExpression(geom1);
+		Term g2 = getExpression(geom2);
+		Term uom = getExpression(unit_of_measurement);
+		Term term = ofac.getFunctionSpatialDistance(g1, g2, uom);
+		return term;
+	}
 
 	private Term getConstantExpression(Value v) {
 

@@ -87,6 +87,7 @@ public class SQLGenerator implements SQLQueryGenerator {
 	public static final String SFWITHIN_OPERATOR = "ST_Within(%s,%s)";
 	public static final String SFCONTAINS_OPERATOR = "ST_Contains(%s,%s)";
 	public static final String SFCROSSES_OPERATOR = "ST_Crosses(%s,%s)";
+	public static final String SFDISTANCE_OPERATOR = "ST_Distance(%s,%s,%s)";
 	
 	public static final String EHEQUALS_OPERATOR = "ST_EQUALS(%s,%s)";
 	public static final String EHDISJOINT_OPERATOR = "ST_Disjoint(%s,%s)";
@@ -1563,15 +1564,8 @@ public class SQLGenerator implements SQLQueryGenerator {
 				if (isUnary(function)){
 					String result = String.format(expressionFormat, leftOp);
 					return result;
-				} 
-				
-				if (!isUnary(function) & !isBinary(function)){
-					return expressionFormat;
 				}
-				
-				
-				
-				else {
+				else if (isBinary(function)) {
 					Term term2 = function.getTerms().get(1);
 					String rightOp = getSQLString(term2, index, true);
 					String result = String.format(expressionFormat, leftOp, rightOp); 
@@ -1580,8 +1574,30 @@ public class SQLGenerator implements SQLQueryGenerator {
 						} else {
 							return result;
 					}
-			}
-			
+				} else if (function.getArity()==3) {
+					Term term2 = function.getTerms().get(1);
+					String rightOp = getSQLString(term2, index, true);
+					Term term3 = function.getTerms().get(2);
+					String thrirdOp = getSQLString(term3, index, true);
+					String result = null;
+					if(function.getFunctionSymbol().getName().equals(OBDAVocabulary.SFDISTANCE.getName())) {
+						result = sqladapter.strEncodeForSpatialDistance(leftOp, rightOp, term3);
+					}
+					else {
+						result = String.format(expressionFormat, leftOp, rightOp, thrirdOp);
+					}
+					  
+						if (useBrackets) {
+							return String.format("(%s)", result);
+						} else {
+							return result;
+					}
+				}
+				else {
+					return expressionFormat;
+				}
+
+				
 		} else {
 			String functionName = functionSymbol.toString();
 			if (functionName.equals(OBDAVocabulary.QUEST_CAST.getName())) {
@@ -1817,8 +1833,10 @@ public class SQLGenerator implements SQLQueryGenerator {
 		} else if(functionSymbol.equals(OBDAVocabulary.OVERLAPS)){
 			operator = OVERLAPS_OPERATOR;
 		} else if(functionSymbol.equals(OBDAVocabulary.SFEQUALS)){
-			operator = SFEQUALS_OPERATOR;
-		} else if(functionSymbol.equals(OBDAVocabulary.SFDISJOINT)){
+			operator = SFEQUALS_OPERATOR; 
+		} else if(functionSymbol.equals(OBDAVocabulary.SFDISTANCE)){
+			operator = SFDISTANCE_OPERATOR;
+		}else if(functionSymbol.equals(OBDAVocabulary.SFDISJOINT)){
 			operator = SFDISJOINT_OPERATOR;
 		} else if(functionSymbol.equals(OBDAVocabulary.SFINTERSECTS)){
 			operator = SFINTERSECTS_OPERATOR;
@@ -1881,7 +1899,10 @@ public class SQLGenerator implements SQLQueryGenerator {
 			operator = sqladapter.round();
 		} else if (functionSymbol.equals(OBDAVocabulary.RAND)) {
 			operator = sqladapter.rand();
-		} else {
+		} 
+		else if (functionSymbol.equals(OBDAVocabulary.SFDISTANCE)) {
+			operator = SFDISTANCE_OPERATOR;
+		}else {
 			throw new RuntimeException("Unknown numerical operator: " + functionSymbol);
 		}
 		return operator;

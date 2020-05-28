@@ -716,8 +716,8 @@ public class OBDADataFactoryImpl implements OBDADataFactory {
 	}
 
 	@Override
-	public Function getFunctionSpatialDistance(Term term1, Term term2) {
-		 return getFunction(OBDAVocabulary.SFDISTANCE, term1, term2);
+	public Function getFunctionSpatialDistance(Term term1, Term term2, Term term3) {
+		 return getFunction(OBDAVocabulary.SFDISTANCE, term1, term2, term3);
 
 	}
 

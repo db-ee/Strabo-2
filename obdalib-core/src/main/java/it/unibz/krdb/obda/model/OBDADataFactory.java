@@ -190,7 +190,7 @@ public interface OBDADataFactory extends Serializable {
 		/*Non topological query functions */
 	//TODO implement them: the arguments of some of them will have to change
 	
-	public Function getFunctionSpatialDistance(Term term1, Term term2);
+	public Function getFunctionSpatialDistance(Term term1, Term term2, Term term3);
 	public Function getFunctionSpatialBuffer(Term term1, Term term2);
 	public Function getFunctionSpatialConvexHull(Term term1, Term term2);
 	public Function getFunctionSpatialIntersection(Term term1, Term term2);

@@ -194,8 +194,8 @@ public class OBDAVocabulary {
 	public static final Predicate EHCONTAINS = new BooleanOperationPredicateImpl(
 			ehContains, 2);
 	
-	public static final Predicate SFDISTANCE = new BooleanOperationPredicateImpl(
-			sfdistance, 2);
+	public static final Predicate SFDISTANCE = new NumericalOperationPredicateImpl(
+			sfdistance, 3);
 	public static final Predicate SFBUFFER = new BooleanOperationPredicateImpl(
 			sfbuffer, 2);
 	public static final Predicate SFCONVEXHULL = new BooleanOperationPredicateImpl(

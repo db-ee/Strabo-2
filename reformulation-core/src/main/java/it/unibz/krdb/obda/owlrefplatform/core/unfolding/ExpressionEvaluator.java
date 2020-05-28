@@ -269,6 +269,7 @@ public class ExpressionEvaluator {
 				pred == OBDAVocabulary.EHCOVEREDBY ||
 				pred == OBDAVocabulary.EHCOVERS ||
 				pred == OBDAVocabulary.EHDISJOINT ||
+				pred == OBDAVocabulary.SFDISTANCE ||
 				pred == OBDAVocabulary.EHINSIDE)  {
 			return evalSpatialOverlap(term);
 		} else if (pred == OBDAVocabulary.GT) {
@@ -756,6 +757,10 @@ public class ExpressionEvaluator {
 			return fac.getFunctionSpatialContains(arg1, arg2);
 		else if (pred == OBDAVocabulary.SFEQUALS)
 			return fac.getFunctionSpatialEquals(arg1, arg2);
+		else if (pred == OBDAVocabulary.SFDISTANCE) {
+			Term uom=term.getTerm(2);
+			return fac.getFunctionSpatialDistance(arg1, arg2, uom);
+		}
 		else if (pred == OBDAVocabulary.SFINTERSECTS)
 			return fac.getFunctionSpatialIntersects(arg1, arg2);
 		else if (pred == OBDAVocabulary.SFTOUCHES)
