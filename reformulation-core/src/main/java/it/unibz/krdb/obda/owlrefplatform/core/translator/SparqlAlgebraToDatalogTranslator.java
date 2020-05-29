@@ -1093,8 +1093,25 @@ public class SparqlAlgebraToDatalogTranslator {
     	
         switch(expr.getURI()){
         	
-        case "http://www.opengis.net/def/function/geosparql/distance":
-        	return getSpatialDistance(expr.getArgs());
+        	case "http://www.opengis.net/def/function/geosparql/distance":
+        		return getSpatialDistance(expr.getArgs());
+        		
+        	case "http://www.opengis.net/def/function/geosparql/sfIntersects":	
+        	case "http://www.opengis.net/def/function/geosparql/sfTouches":
+        	case "http://www.opengis.net/def/function/geosparql/sfContains":	
+        	case "http://www.opengis.net/def/function/geosparql/sfWithin":	
+        	case "http://www.opengis.net/def/function/geosparql/sfCrosses":	
+        	case "http://www.opengis.net/def/function/geosparql/sfOverlaps":	
+        	case "http://www.opengis.net/def/function/geosparql/sfDisjoint":
+        	case "http://www.opengis.net/def/function/geosparql/ehEquals":	
+        	case "http://www.opengis.net/def/function/geosparql/ehDisjoint":	
+        	case "http://www.opengis.net/def/function/geosparql/ehInside":	
+        	case "http://www.opengis.net/def/function/geosparql/ehCoveredBy":	
+        	case "http://www.opengis.net/def/function/geosparql/ehCovers":	
+        	case "http://www.opengis.net/def/function/geosparql/ehOverlap":	
+        	case "http://www.opengis.net/def/function/geosparql/ehContains":
+        		return getBinarySpatialFunction(expr.getURI(), expr.getArgs());
+        		
          
             case "http://www.w3.org/2005/xpath-functions#concat":
                 return getConcat(expr.getArgs());
@@ -1194,6 +1211,83 @@ public class SparqlAlgebraToDatalogTranslator {
         }
     }
 
+
+	private Term getBinarySpatialFunction(String uri, List<ValueExpr> args) {
+		if (args.size() != 2){
+            throw new UnsupportedOperationException("Wrong number of arguments (found " 
+		+ args.size() + ", only 2 supported) for" +uri+ " function");					
+		}
+		Term term1=getExpression(args.get(0));
+		Term term2 = getExpression(args.get(1));
+		if (term1 instanceof Function){
+			Term arg = ((Function) term1).getTerm(0);
+			ofac.getFunctionGeomFromWKT(arg);
+			term1 = arg;
+		}
+		switch(uri){    		
+    	case "http://www.opengis.net/def/function/geosparql/sfIntersects":
+    		return ofac.getFunctionSpatialIntersects(term1, term2);
+    	case "http://www.opengis.net/def/function/geosparql/sfTouches":
+    		return ofac.getFunctionSpatialTouches(term1, term2);
+    	case "http://www.opengis.net/def/function/geosparql/sfContains":	
+    		return ofac.getFunctionSpatialContains(term1, term2);
+    	case "http://www.opengis.net/def/function/geosparql/sfWithin":	
+    		return ofac.getFunctionSpatialWithin(term1, term2);
+    	case "http://www.opengis.net/def/function/geosparql/sfCrosses":	
+    		return ofac.getFunctionSpatialCrosses(term1, term2);
+    	case "http://www.opengis.net/def/function/geosparql/sfOverlaps":	
+    		return ofac.getFunctionSpatialWithin(term1, term2);
+    	case "http://www.opengis.net/def/function/geosparql/sfDisjoint":
+    		return ofac.getFunctionSpatialDisjoint(term1, term2);
+    	case "http://www.opengis.net/def/function/geosparql/ehEquals":	   		
+    	case "http://www.opengis.net/def/function/geosparql/ehDisjoint":	
+    		return ofac.getFunctionEHDisjoint(term1, term2);
+    	case "http://www.opengis.net/def/function/geosparql/ehInside":	
+    		return ofac.getFunctionEHInside(term1, term2);
+    	case "http://www.opengis.net/def/function/geosparql/ehCoveredBy":	
+    		return ofac.getFunctionEHCoveredBy(term1, term2);
+    	case "http://www.opengis.net/def/function/geosparql/ehCovers":	
+    		return ofac.getFunctionEHCovers(term1, term2);
+    	case "http://www.opengis.net/def/function/geosparql/ehOverlap":	
+    		return ofac.getFunctionEHOverlap(term1, term2);
+    	case "http://www.opengis.net/def/function/geosparql/ehContains":
+    		return ofac.getFunctionEHContains(term1, term2);
+    	default: throw new UnsupportedOperationException("Unknown Function:" +uri);
+    		
+		}
+		
+	}
+
+	private Term getSpatialTouches(List<ValueExpr> args) {
+		if (args.size() != 2){
+            throw new UnsupportedOperationException("Wrong number of arguments (found " 
+		+ args.size() + ", only 2 supported) for Spatial Touches function");					
+		}
+		Term term1=getExpression(args.get(0));
+		Term term2 = getExpression(args.get(1));
+		if (term1 instanceof Function){
+			Term arg = ((Function) term1).getTerm(0);
+			ofac.getFunctionGeomFromWKT(arg);
+			term1 = arg;
+		}
+		return ofac.getFunctionSpatialTouches(term1, term2);
+	}
+
+	private Term getSpatialIntersects(List<ValueExpr> args) {
+		if (args.size() != 2){
+            throw new UnsupportedOperationException("Wrong number of arguments (found " 
+		+ args.size() + ", only 2 supported) for Spatial Intersects function");					
+		}
+		Term term1=getExpression(args.get(0));
+		Term term2 = getExpression(args.get(1));
+		if (term1 instanceof Function){
+			 Term arg = ((Function) term1).getTerm(0);
+			 ofac.getFunctionGeomFromWKT(arg);
+			 term1 = arg;
+			 }
+			 return ofac.getFunctionSpatialIntersects(term1, term2);
+
+	}
 
 	private Term getSpatialDistance(List<ValueExpr> args) {
 		if (args.size() != 3){
