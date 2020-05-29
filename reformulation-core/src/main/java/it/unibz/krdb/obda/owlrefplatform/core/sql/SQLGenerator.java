@@ -919,7 +919,22 @@ public class SQLGenerator implements SQLQueryGenerator {
             		Term left = ov.getTerm(0);
                     String leftOp = getSQLString(left, index, true);
                     mainColumn = String.format("(" + expressionFormat + ")", leftOp);
-            	} else { mainColumn = expressionFormat; }
+            	}
+            	else if (ov.getArity()==3) {
+            		Term term1 = ov.getTerms().get(0);
+            		Term term2 = ov.getTerms().get(1);
+					String rightOp = getSQLString(term2, index, true);
+					String leftOp = getSQLString(term1, index, true);
+					Term term3 = ov.getTerms().get(2);
+					String thrirdOp = getSQLString(term3, index, true);
+					if(ov.getFunctionSymbol().getName().equals(OBDAVocabulary.SFDISTANCE.getName())) {
+						mainColumn = "(" + sqladapter.strEncodeForSpatialDistance(leftOp, rightOp, term3) +")";
+					}
+					else {
+						mainColumn =String.format("(" + expressionFormat + ")", leftOp, rightOp, thrirdOp);
+					}
+            	}
+            	else { mainColumn = expressionFormat; }
             } else {
 				throw new IllegalArgumentException(
 						"Error generating SQL query. Found an invalid function during translation: "
