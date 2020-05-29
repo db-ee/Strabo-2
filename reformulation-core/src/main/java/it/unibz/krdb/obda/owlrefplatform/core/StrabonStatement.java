@@ -663,6 +663,10 @@ public class StrabonStatement implements OBDAStatement {
 				}
 			}
 		}
+		if(toRemove==null) {
+			//does not contain spatial join
+			return program;
+		}
 		initial.getBody().remove(toRemove);
 		
 		Set<Variable> existentialVars = new HashSet<>();
