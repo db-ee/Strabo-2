@@ -100,24 +100,29 @@ public class QueryExecutor {
 						.config("spark.kryo.registrator", GeoSparkVizKryoRegistrator.class.getName())
 						.config("spark.sql.inMemoryColumnarStorage.compressed", true)
 						.config("hive.exec.dynamic.partition", true).config("spark.sql.parquet.filterPushdown", true)
-						.config("spark.sql.inMemoryColumnarStorage.batchSize", 20000)
-						.enableHiveSupport().getOrCreate();
+						.config("spark.sql.inMemoryColumnarStorage.batchSize", 20000).enableHiveSupport().getOrCreate();
 
 				spark.sql("SET hive.exec.dynamic.partition = true");
 				spark.sql("SET hive.exec.dynamic.partition.mode = nonstrict");
 				spark.sql("SET hive.exec.max.dynamic.partitions = 4000");
 				spark.sql("SET hive.exec.max.dynamic.partitions.pernode = 2000");
 				spark.sql("SET spark.sql.inMemoryColumnarStorage.compressed = true");
+				spark.sql("SET spark.sql.crossJoin.enabled=true");//for self-spatial joins on geometry table 
 				spark.sql("SET spark.sql.parquet.filterPushdown = true");
 				spark.sql("USE " + database);
 				GeoSparkSQLRegistrator.registerAll(spark);
 
 				FileSystem fs = FileSystem.get(spark.sparkContext().hadoopConfiguration());
 
-				Path asWKT = new Path(asWKTTablesFile);
-				String asWKTFile = readHadoopFile(asWKT, fs);
-				for (String nextProp : asWKTFile.split("\n")) {
-					asWKTSubpropertiesToTables.put(nextProp, null);
+				try {
+					Path asWKT = new Path(asWKTTablesFile);
+					String asWKTFile = readHadoopFile(asWKT, fs);
+					for (String nextProp : asWKTFile.split("\n")) {
+						asWKTSubpropertiesToTables.put(nextProp, null);
+					}
+				} catch (Exception fnf) {
+					log.error("Could not read other WKT properties file");
+
 				}
 
 				Map<String, String> predDictionary = readPredicatesFromHadoop(propDictionary, fs);
@@ -129,7 +134,8 @@ public class QueryExecutor {
 					Dataset<Row> geoms = spark.sql("Select " + StrabonParameters.GEOMETRIES_FIRST_COLUMN + ", "
 							+ StrabonParameters.GEOMETRIES_SECOND_COLUMN + ", ST_GeomFromWKT("
 							+ StrabonParameters.GEOMETRIES_THIRD_COLUMN + ") as "
-							+ StrabonParameters.GEOMETRIES_THIRD_COLUMN + " FROM geometries");
+							+ StrabonParameters.GEOMETRIES_THIRD_COLUMN + " FROM geometries where "+
+							StrabonParameters.GEOMETRIES_THIRD_COLUMN + " IS NOT NULL");
 					geoms.createOrReplaceGlobalTempView(StrabonParameters.GEOMETRIES_TABLE);
 					geoms.count();
 					geoms.cache();
@@ -207,28 +213,27 @@ public class QueryExecutor {
 				// readFilesFromDir("/home/dimitris/spatialdbs/queries/");
 				for (String sparql : sparqlQueries) {
 					try {
-					// String sparql = readFile(queryfile);
-					SQLResult sql = st.getUnfolding(sparql);
-					log.debug("Query unfolded:" + sql.getTempQueries() + "\n" + sql.getMainQuery() + "\n");
-					log.debug("Strating execution");
-					long start = System.currentTimeMillis();
-					// List<String> tempnames=new ArrayList<String>();
-					for (int k = 0; k < sql.getTempQueries().size(); k++) {
-						String temp = sql.getTempQueries().get(k).replaceAll("\"", "");
-						log.debug("creating temp table " + sql.getTempName(k) + " with query: " + temp);
-						Dataset<Row> tempDataset = spark.sql(temp);
-						tempDataset.createOrReplaceGlobalTempView(sql.getTempName(k));
-					}
-					Dataset<Row> result = spark.sql(sql.getMainQuery().replaceAll("\"", ""));
-					long resultSize = result.count();
-					log.debug("Execution finished in " + (System.currentTimeMillis() - start) + " with " + resultSize
-							+ " results.");
-					for (int k = 0; k < sql.getTempQueries().size(); k++) {
-						//spark.sql("DROP VIEW globaltemp."+sql.getTempName(k));
-					}
-					} catch (Exception ex){
-						log.error("Could not execute query "+sparql+
-								"\nException: "+ex.getMessage());
+						// String sparql = readFile(queryfile);
+						SQLResult sql = st.getUnfolding(sparql);
+						log.debug("Query unfolded:" + sql.getTempQueries() + "\n" + sql.getMainQuery() + "\n");
+						log.debug("Strating execution");
+						long start = System.currentTimeMillis();
+						// List<String> tempnames=new ArrayList<String>();
+						for (int k = 0; k < sql.getTempQueries().size(); k++) {
+							String temp = sql.getTempQueries().get(k).replaceAll("\"", "");
+							log.debug("creating temp table " + sql.getTempName(k) + " with query: " + temp);
+							Dataset<Row> tempDataset = spark.sql(temp);
+							tempDataset.createOrReplaceGlobalTempView(sql.getTempName(k));
+						}
+						Dataset<Row> result = spark.sql(sql.getMainQuery().replaceAll("\"", ""));
+						long resultSize = result.count();
+						log.debug("Execution finished in " + (System.currentTimeMillis() - start) + " with "
+								+ resultSize + " results.");
+						for (int k = 0; k < sql.getTempQueries().size(); k++) {
+							// spark.sql("DROP VIEW globaltemp."+sql.getTempName(k));
+						}
+					} catch (Exception ex) {
+						log.error("Could not execute query " + sparql + "\nException: " + ex.getMessage());
 					}
 
 				}

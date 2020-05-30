@@ -343,7 +343,7 @@ public class DagCreatorDatalogNew {
 				Node top = new Node(Node.OR);
 				alias++;
 				getNodeForTriplePattern(atom, top, true, null);
-			} else if (StrabonParameters.isSpatialJoin(pred)) {
+			} else if (StrabonParameters.isSpatialJoin(atom)) {
 				System.out.println("what7??? " + pred);
 			}
 			else {

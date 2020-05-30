@@ -652,28 +652,57 @@ public class StrabonStatement implements OBDAStatement {
 		CQIE initial=result.getRules().get(0);
 		Function toRemove=null;
 		Set<Variable> varsInSpatial = new HashSet<>();
+		
+		boolean containsSpatialJoin=false;
+		
 		for (Function atom : initial.getBody()) {
-			Predicate pred = atom.getFunctionSymbol();
-			if (StrabonParameters.isSpatialJoin(pred)) {
+			
+			if (StrabonParameters.isSpatialJoin(atom)) {
 				toRemove=atom;
 				
 				TermUtils.addReferencedVariablesTo(varsInSpatial, atom);
 				if(varsInSpatial.size()!=2) {
 					return program;
 				}
+				else {
+					containsSpatialJoin=true;
+					break;
+				}
 			}
 		}
-		if(toRemove==null) {
-			//does not contain spatial join
+		if(!containsSpatialJoin){
+			for(Term projection:initial.getHead().getTerms()) {
+				//check for spatial distance join in head
+				if (projection instanceof Function) {
+					Function nested=(Function) projection;
+					if(nested.getFunctionSymbol().equals(OBDAVocabulary.SFDISTANCE)) {
+						TermUtils.addReferencedVariablesTo(varsInSpatial, nested);
+						if(varsInSpatial.size()!=2) {
+							return program;
+						}
+						else {
+							containsSpatialJoin=true;
+							break;
+						}
+					}
+				}
+			}
+			
+		}
+		if(!containsSpatialJoin){
 			return program;
 		}
-		initial.getBody().remove(toRemove);
+		
+		if(toRemove!=null) {
+			initial.getBody().remove(toRemove);
+		}
+		
 		
 		Set<Variable> existentialVars = new HashSet<>();
 		TermUtils.addReferencedVariablesTo(existentialVars, initial.getHead());
 		
 		
-		List<VarsToAtoms> v2aList=new LinkedList<VarsToAtoms>();
+		
 //		Set<Variable> varsFirst = new HashSet<>();
 //		TermUtils.addReferencedVariablesTo(varsFirst, initial.getBody().get(0));
 //		Set<Function> atomsFirst = new HashSet<>();
@@ -681,12 +710,15 @@ public class StrabonStatement implements OBDAStatement {
 //		VarsToAtoms v2a=new VarsToAtoms(varsFirst, atomsFirst);
 //		v2aList.add(v2a);
 		
+		List<VarsToAtoms> v2aList=new LinkedList<VarsToAtoms>();
 		for(int i=0;i<initial.getBody().size();i++) {
 			Set<Variable> varsNext = new HashSet<>();
 			TermUtils.addReferencedVariablesTo(varsNext, initial.getBody().get(i));
 			Set<Function> atomsNext = new HashSet<>();
 			atomsNext.add(initial.getBody().get(i));
-			VarsToAtoms v2aNext=new VarsToAtoms(varsNext, atomsNext);
+			Set<Term> converted=new HashSet<Term>();
+			converted.addAll(varsNext);
+			VarsToAtoms v2aNext=new VarsToAtoms(converted, atomsNext);
 			v2aList.add(0, v2aNext);
 			for(int j=1;j<v2aList.size();j++) {
 				if(v2aNext.mergeCommonVar(v2aList.get(j))) {
@@ -699,7 +731,29 @@ public class StrabonStatement implements OBDAStatement {
 		
 		//List<QueryConnectedComponent> ccs = QueryConnectedComponent.getConnectedComponents(initial);
 		if(v2aList.size()!=2) {
-			return program;
+			//try to split using also constant URIs as "common variables"
+			//e.g. consider a join: <id1> :p1 ?a1 . <id1> :p2 ?a2
+			v2aList=new LinkedList<VarsToAtoms>();
+			for(int i=0;i<initial.getBody().size();i++) {
+				Set<Term> varsNext = new HashSet<>();
+				TermUtils.addReferencedVariablesAndURIsTo(varsNext, initial.getBody().get(i));
+				Set<Function> atomsNext = new HashSet<>();
+				atomsNext.add(initial.getBody().get(i));
+				VarsToAtoms v2aNext=new VarsToAtoms(varsNext, atomsNext);
+				v2aList.add(0, v2aNext);
+				for(int j=1;j<v2aList.size();j++) {
+					if(v2aNext.mergeCommonVar(v2aList.get(j))) {
+						v2aList.remove(j);
+						j--;
+					}
+				}
+				
+			}
+			if(v2aList.size()!=2) {
+				//could not split program in two
+				return program;
+			}
+			
 		}
 		while(!initial.getBody().isEmpty()) {
 			initial.getBody().remove(0);
@@ -735,8 +789,9 @@ public class StrabonStatement implements OBDAStatement {
 			
 				
 		}
-		
-		initial.getBody().add(toRemove);
+		if(toRemove!=null) {
+			initial.getBody().add(toRemove);
+		}
 		return result;
 	}
 

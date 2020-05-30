@@ -1,6 +1,10 @@
 package it.unibz.krdb.obda.utils;
 
+import it.unibz.krdb.obda.model.BooleanOperationPredicate;
+import it.unibz.krdb.obda.model.Function;
+import it.unibz.krdb.obda.model.NumericalOperationPredicate;
 import it.unibz.krdb.obda.model.Predicate;
+import it.unibz.krdb.obda.model.Term;
 import it.unibz.krdb.obda.model.impl.OBDAVocabulary;
 
 public class StrabonParameters {
@@ -11,7 +15,8 @@ public class StrabonParameters {
 	public static final String GEOMETRIES_SECOND_COLUMN = "geom";
 	public static final String GEOMETRIES_THIRD_COLUMN = "wkt";
 	
-	public static boolean isSpatialJoin(Predicate pred) {
+	public static boolean isSpatialJoin(Function atom) {
+		Predicate pred = atom.getFunctionSymbol();
 		if ( pred.equals(OBDAVocabulary.OVERLAPS) ||
 				pred.equals(OBDAVocabulary.SFCONTAINS) || 
 				pred.equals(OBDAVocabulary.SFCROSSES ) || 
@@ -26,10 +31,22 @@ public class StrabonParameters {
 				pred.equals(OBDAVocabulary.EHEQUALS) || 
 				pred.equals(OBDAVocabulary.EHINSIDE) || 
 				pred.equals(OBDAVocabulary.EHOVERLAPS) || 
+				pred.equals(OBDAVocabulary.SFDISTANCE) ||
 				pred.equals(OBDAVocabulary.EHCONTAINS) )
 			return true;
-		else
-			return false;
+		else {
+			//check if it is arithemtic condition on spatial distance join
+			if(pred instanceof BooleanOperationPredicate ) {
+				for(Term t:atom.getTerms()) {
+					if (t instanceof Function) {
+						Function nested=(Function) t;
+						if(nested.getFunctionSymbol().equals(OBDAVocabulary.SFDISTANCE))
+							return true;
+					}
+				}
+			}
+		}
+		return false;
 	}
 
 }

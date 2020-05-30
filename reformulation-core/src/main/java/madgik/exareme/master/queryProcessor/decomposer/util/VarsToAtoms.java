@@ -17,19 +17,21 @@ import madgik.exareme.master.queryProcessor.decomposer.dag.Node;
 
 public class VarsToAtoms {
 	
-	private Set<Variable> vars;
+	private Set<Term> vars;
 	private Set<Function> atoms;
 	
 	public VarsToAtoms() {
-		this.vars = new HashSet<Variable>();
+		this.vars = new HashSet<Term>();
 		this.atoms = new HashSet<Function>();
 	}
 
-	public VarsToAtoms(Set<Variable> vars, Set<Function> atoms) {
+	public VarsToAtoms(Set<Term> vars, Set<Function> atoms) {
 		super();
 		this.vars = vars;
 		this.atoms = atoms;
 	}
+
+	
 
 	public boolean mergeCommonVar(VarsToAtoms other) {
 		//if this VarsToAtoms has common vars with other, it merges
