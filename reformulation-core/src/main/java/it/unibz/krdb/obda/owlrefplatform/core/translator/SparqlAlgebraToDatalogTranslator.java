@@ -78,6 +78,10 @@ public class SparqlAlgebraToDatalogTranslator {
 
 	private final UriTemplateMatcher uriTemplateMatcher;
 	private final SemanticIndexURIMap uriRef;  
+	private boolean nextIsNested;
+	//becomes true during the parsing of outer query, so if nested queries are present they can be identified as such
+	
+	private OBDAQueryModifiers currentModifiers;
 	
 	private static final Logger log = LoggerFactory.getLogger(SparqlAlgebraToDatalogTranslator.class);
 	
@@ -90,6 +94,8 @@ public class SparqlAlgebraToDatalogTranslator {
 	public SparqlAlgebraToDatalogTranslator(UriTemplateMatcher templateMatcher, SemanticIndexURIMap uriRef) {
 		uriTemplateMatcher = templateMatcher;
 		this.uriRef = uriRef;
+		nextIsNested=false;
+		currentModifiers=new OBDAQueryModifiers();
 	}
 	
 	/**
@@ -136,14 +142,14 @@ public class SparqlAlgebraToDatalogTranslator {
 		if (te instanceof Slice) {
 			// Add LIMIT and OFFSET modifiers, if any
 			Slice slice = (Slice)te;
-			pr.getQueryModifiers().setOffset(slice.getOffset());
-			pr.getQueryModifiers().setLimit(slice.getLimit());
+			currentModifiers.setOffset(slice.getOffset());
+			currentModifiers.setLimit(slice.getLimit());
 			return translateTupleExpr(slice.getArg(), pr, newHeadName); // narrow down the query
 		} 
 		else if (te instanceof Distinct) {
 			// Add DISTINCT modifier, if any
 			Distinct distinct = (Distinct) te;
-			pr.getQueryModifiers().setDistinct();
+			currentModifiers.setDistinct();
 			return translateTupleExpr(distinct.getArg(), pr, newHeadName); // narrow down the query
 		} 
 		else if (te instanceof Order) {
@@ -158,12 +164,22 @@ public class SparqlAlgebraToDatalogTranslator {
 				Var v = (Var) expression;
 				Variable var = ofac.getVariable(v.getName());
 				int direction =  c.isAscending() ? OrderCondition.ORDER_ASCENDING : OrderCondition.ORDER_DESCENDING; 
-				pr.getQueryModifiers().addOrderCondition(var, direction);
+				currentModifiers.addOrderCondition(var, direction);
 			}
 			return translateTupleExpr(order.getArg(), pr, newHeadName); // narrow down the query
 		} 
 		else if (te instanceof Projection) {
-			return translate((Projection) te, pr, newHeadName);
+			if(!nextIsNested) {
+				//this is outer select, continue as normal
+				nextIsNested=true;
+				return translate((Projection) te, pr, newHeadName, false);
+			}
+			else {
+				return translate((Projection) te, pr, newHeadName, true);
+				//this is nested SELECT, materialize
+			}
+			
+			
 		} 
 		else if (te instanceof Filter) {
 			return translate((Filter) te, pr, newHeadName);
@@ -402,7 +418,7 @@ public class SparqlAlgebraToDatalogTranslator {
 	 * @return 
 	 */
 
-	private Function translate(Projection project, DatalogProgram pr, String  newHeadName) {
+	private Function translate(Projection project, DatalogProgram pr, String  newHeadName, boolean materialize) {
 
 		Function atom = translateTupleExpr(project.getArg(), pr, newHeadName + "0");
 		
@@ -424,8 +440,21 @@ public class SparqlAlgebraToDatalogTranslator {
 			}
 			varList.add(ofac.getVariable(var.getTargetName()));
 		}
-
-		CQIE rule = createRule(pr, newHeadName, varList, atom);
+		String name = newHeadName;
+		if(materialize) {
+			name = OBDAVocabulary.TEMP_VIEW_QUERY+newHeadName;
+		}
+		CQIE rule = createRule(pr, name, varList, atom);
+		if(materialize) {
+			List<String> signature=new ArrayList<String>();
+			for(Term h:varList) {
+				signature.add(h.toString());
+			}
+			rule.setSignature(signature);
+		}
+		rule.setQueryModifiers(this.currentModifiers);
+		rule.setMaterialize(materialize);
+		currentModifiers=new OBDAQueryModifiers();
 		return rule.getHead();
 	}
 

@@ -199,28 +199,12 @@ public class OBDADataFactoryImpl implements OBDADataFactory {
 	}
 
 	@Override
-	public DatalogProgram getDatalogProgram(OBDAQueryModifiers modifiers) {
-		DatalogProgram p = new DatalogProgramImpl();
-		p.getQueryModifiers().copy(modifiers);
-		return p;
-	}
-	
-	@Override
 	public DatalogProgram getDatalogProgram(Collection<CQIE> rules) {
 		DatalogProgram p = new DatalogProgramImpl();
 		p.appendRule(rules);
 		return p;
 	}
 	
-	@Override
-	public DatalogProgram getDatalogProgram(OBDAQueryModifiers modifiers, Collection<CQIE> rules) {
-		DatalogProgram p = new DatalogProgramImpl();
-		p.appendRule(rules);
-		p.getQueryModifiers().copy(modifiers);
-		return p;
-	}
-	
-
 	@Override
 	public OBDAMappingAxiom getRDBMSMappingAxiom(String id, OBDASQLQuery sourceQuery, List<Function> targetQuery) {
 		return new RDBMSMappingAxiomImpl(id, sourceQuery, targetQuery);
@@ -823,6 +807,8 @@ public class OBDADataFactoryImpl implements OBDADataFactory {
 				atomTerms.set(i, newTerm);
 			}
 		}
+		freshRule.setMaterialize(rule.materialize());
+		freshRule.setQueryModifiers(rule.getQueryModifiers());
 		return freshRule;
 	}
 

@@ -50,7 +50,7 @@ public class DatalogToSparqlTranslator {
 
 	private PrefixManager prefixManager;
 
-	private OBDAQueryModifiers queryModifiers;
+	//private OBDAQueryModifiers queryModifiers;
 
 	/**
 	 * Creates the translator with a default prefix manager. The default prefix
@@ -80,7 +80,7 @@ public class DatalogToSparqlTranslator {
 		printPrefixDeclaration(sb);
 		sb.append("\n");
 		
-		queryModifiers = datalog.getQueryModifiers();
+		//queryModifiers = datalog.getQueryModifiers();
 		
 		// Print the query projection
 		printQueryProjection(datalog, sb);
@@ -89,9 +89,9 @@ public class DatalogToSparqlTranslator {
 		printQueryBody(datalog, sb);
 		
 		// Print the query modifier, if any
-		if (datalog.hasModifiers()) {
-			printQueryModifier(datalog, sb);
-		}
+		//if (datalog.hasModifiers()) {
+		//	printQueryModifier(datalog, sb);
+		//}
 		return sb.toString();
 	}
 
@@ -261,10 +261,11 @@ public class DatalogToSparqlTranslator {
 
 	private void printQueryProjection(DatalogProgram datalog, StringBuilder sb) {
 		sb.append(SparqlKeyword.SELECT + " ");
-		if (queryModifiers.isDistinct()) {
+		
+		CQIE mainQuery = datalog.getRules().get(0);  // assume the first rule contains the projection
+		if ( datalog.getRules().get(0).getQueryModifiers().isDistinct()) {
 			sb.append(SparqlKeyword.DISTINCT + " ");
 		}
-		CQIE mainQuery = datalog.getRules().get(0);  // assume the first rule contains the projection
 		for (Term term : mainQuery.getHead().getTerms()) {
 			sb.append(toSparql(term));
 			sb.append(" ");
@@ -365,29 +366,7 @@ public class DatalogToSparqlTranslator {
 		}
 	}
 
-	private void printQueryModifier(DatalogProgram datalog, StringBuilder sb) {
-		sb.append("\n");
-		if (queryModifiers.hasLimit()) {
-			sb.append(SparqlKeyword.LIMIT + " " + queryModifiers.getLimit());
-			sb.append("\n");
-		}
-		if (queryModifiers.hasOffset()) {
-			sb.append(SparqlKeyword.OFFSET + " " + queryModifiers.getOffset());
-			sb.append("\n");
-		}
-		if (queryModifiers.hasOrder()) {
-			sb.append(SparqlKeyword.ORDER_BY + " ");
-			for (OrderCondition condition : queryModifiers.getSortConditions()) {
-				String var = toSparql(condition.getVariable());
-				switch (condition.getDirection()) {
-					case OrderCondition.ORDER_ASCENDING: sb.append(SparqlKeyword.ASCENDING + " (" + var + ")"); break;
-					case OrderCondition.ORDER_DESCENDING: sb.append(SparqlKeyword.DESCENDING + " (" + var + ")"); break;
-					default: sb.append(var);
-				}
-				sb.append(" ");
-			}
-		}
-	}
+
 
 	private boolean hasDefinition(List<CQIE> rules) {
 		return rules.size() == 0 ? false : true;

@@ -22,6 +22,7 @@ package it.unibz.krdb.obda.model.impl;
 
 import it.unibz.krdb.obda.model.CQIE;
 import it.unibz.krdb.obda.model.Function;
+import it.unibz.krdb.obda.model.OBDAQueryModifiers;
 import it.unibz.krdb.obda.model.Term;
 import it.unibz.krdb.obda.model.Variable;
 import it.unibz.krdb.obda.utils.EventGeneratingLinkedList;
@@ -51,10 +52,13 @@ public class CQIEImpl implements CQIE, ListListener {
 	private String string = null;
 	
 	private List<String> signature = null;
+	private OBDAQueryModifiers modifiers;
 
 	private static final String SPACE = " ";
 	private static final String COMMA = ",";
 	private static final String INV_IMPLIES = ":-";
+	
+	private boolean materialize=false;
 
 	// TODO Remove isBoolean from the signature and from any method
 	protected CQIEImpl(Function head, List<Function> body) {		
@@ -76,6 +80,8 @@ public class CQIEImpl implements CQIE, ListListener {
 			EventGeneratingList<Term> headterms = (EventGeneratingList<Term>) head.getTerms();
 			headterms.addListener(this);
 		}
+		modifiers = new OBDAQueryModifiers();
+		materialize=false;
 	}
 	
 	// TODO Remove isBoolean from the signature and from any method
@@ -101,6 +107,8 @@ public class CQIEImpl implements CQIE, ListListener {
 				EventGeneratingList<Term> headterms = (EventGeneratingList<Term>) head.getTerms();
 				headterms.addListener(this);
 			}
+			modifiers = new OBDAQueryModifiers();
+			materialize=false;
 		}
 		
 		
@@ -194,7 +202,12 @@ public class CQIEImpl implements CQIE, ListListener {
 		CQIEImpl newquery = new CQIEImpl(copyHead, copyBody);
 		newquery.rehash = this.rehash;
 		newquery.string = this.string;
+		newquery.modifiers = modifiers.clone();
+		if(this.signature != null) {
+			newquery.signature = new ArrayList<String>(this.signature);
+		}
 		newquery.hash = this.hash;
+		newquery.materialize = this.materialize;
 
 		return newquery;
 	}
@@ -231,6 +244,33 @@ public class CQIEImpl implements CQIE, ListListener {
 	@Override
 	public void setSignature(List<String> signature) {
 		this.signature=signature;
+		
+	}
+	
+	@Override
+	public OBDAQueryModifiers getQueryModifiers() {
+		return modifiers;
+	}
+	
+	@Override
+	public boolean hasModifiers() {
+		return modifiers.hasModifiers();
+	}
+
+	@Override
+	public void setQueryModifiers(OBDAQueryModifiers currentModifiers) {
+		this.modifiers=currentModifiers;
+		
+	}
+
+	@Override
+	public boolean materialize() {
+		return materialize;
+	}
+
+	@Override
+	public void setMaterialize(boolean b) {
+		this.materialize=b;
 		
 	}
 }

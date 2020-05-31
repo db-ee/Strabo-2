@@ -354,7 +354,7 @@ public class StrabonStatement implements OBDAStatement {
 			throw e;
 		}
 		log.debug("Replacing equivalences...");
-		DatalogProgram newprogram = OBDADataFactoryImpl.getInstance().getDatalogProgram(program.getQueryModifiers());
+		DatalogProgram newprogram = OBDADataFactoryImpl.getInstance().getDatalogProgram();
 		for (CQIE query : program.getRules()) {
 			CQIE newquery = questInstance.getVocabularyValidator().replaceEquivalences(query);
 			newprogram.appendRule(newquery);
@@ -402,7 +402,8 @@ public class StrabonStatement implements OBDAStatement {
 		List<CQIE> toRemove = new LinkedList<CQIE>();
 		for (CQIE rule : program.getRules()) {
 			Predicate headPredicate = rule.getHead().getFunctionSymbol();
-			if (!headPredicate.getName().toString().equals(OBDAVocabulary.QUEST_QUERY)) {
+			if (!headPredicate.getName().toString().equals(OBDAVocabulary.QUEST_QUERY) && 
+					!headPredicate.getName().toString().startsWith(OBDAVocabulary.TEMP_VIEW_QUERY)) {
 				toRemove.add(rule);
 			}
 		}
@@ -588,6 +589,19 @@ public class StrabonStatement implements OBDAStatement {
 			questInstance.getSignatureCache().put(strquery, signatureContainer);
 
 			DatalogProgram program = translateAndPreProcess(query);
+			
+			//create metadata for temp tables
+			for(CQIE cq:program.getRules()) {
+				Predicate head=cq.getHead().getFunctionSymbol();
+				if(head.getName().startsWith(OBDAVocabulary.TEMP_VIEW_QUERY)){
+					DatabaseRelationDefinition replacement=questInstance.getMetaData().createDatabaseRelation(questInstance.getMetaData().getQuotedIDFactory().createRelationID("", head.getName()));
+					for(String t:cq.getSignature()) {
+						replacement.addAttribute(questInstance.getMetaData().getQuotedIDFactory().createAttributeID(t.toString()), Types.VARCHAR, "VARCHAR", false);
+						
+					}
+				}
+			}
+			
 			try {
 				// log.debug("Input query:\n{}", strquery);
 
@@ -649,6 +663,9 @@ public class StrabonStatement implements OBDAStatement {
 
 	private DatalogProgram splitSpatialJoin(DatalogProgram program) {
 		DatalogProgram result=program.clone();
+		int initialSize=result.getRules().size();
+		
+		//TODO split all queries
 		CQIE initial=result.getRules().get(0);
 		Function toRemove=null;
 		Set<Variable> varsInSpatial = new HashSet<>();
@@ -760,7 +777,7 @@ public class StrabonStatement implements OBDAStatement {
 		}
 		for(int i=0;i<v2aList.size();i++) {
 			int id=Util.createUniqueId();
-			DatabaseRelationDefinition replacement=questInstance.getMetaData().createDatabaseRelation(questInstance.getMetaData().getQuotedIDFactory().createRelationID("", "temp"+id));
+			DatabaseRelationDefinition replacement=questInstance.getMetaData().createDatabaseRelation(questInstance.getMetaData().getQuotedIDFactory().createRelationID("", OBDAVocabulary.TEMP_VIEW_QUERY+id));
 			VarsToAtoms cc=v2aList.get(i);
 			List<String> signature=new ArrayList<String>(cc.getVars().size());
 			List<Term> outputs=new ArrayList<Term>();
@@ -773,19 +790,19 @@ public class StrabonStatement implements OBDAStatement {
 					replacement.addAttribute(questInstance.getMetaData().getQuotedIDFactory().createAttributeID(t.toString()), Types.VARCHAR, "VARCHAR", false);
 						}
 					}
-			Function ans1=fac.getFunction(fac.getPredicate("temp"+id, outputs.size()), outputs);
+			Function ans1=fac.getFunction(fac.getPredicate(OBDAVocabulary.TEMP_VIEW_QUERY+id, outputs.size()), outputs);
 			List<Term> args=new ArrayList<Term>(outputs.size());
 			for(String s:signature) {
 				args.add(fac.getVariable(s));
 			}
-			Function input=fac.getFunction(fac.getPredicate("temp"+id, outputs.size()), args);
+			Function input=fac.getFunction(fac.getPredicate(OBDAVocabulary.TEMP_VIEW_QUERY+id, outputs.size()), args);
 			initial.getBody().add(input);
 			List<Function> body=new ArrayList<Function>();
 			body.addAll(cc.getAtoms());
 			CQIE cq=fac.getCQIE(ans1, body);
 			CQIE clone=cq.clone();
 			clone.setSignature(signature);
-			result.appendRule(clone);
+			result.addFirstRuleRule(clone);
 			
 				
 		}

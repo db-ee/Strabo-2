@@ -426,7 +426,7 @@ public class QuestStatement implements OBDAStatement {
 			throw e;
 		}
 		log.debug("Replacing equivalences...");
-		DatalogProgram newprogram = OBDADataFactoryImpl.getInstance().getDatalogProgram(program.getQueryModifiers());
+		DatalogProgram newprogram = OBDADataFactoryImpl.getInstance().getDatalogProgram();
 		for (CQIE query : program.getRules()) {
 			CQIE newquery = questInstance.getVocabularyValidator().replaceEquivalences(query);
 			newprogram.appendRule(newquery);

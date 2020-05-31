@@ -29,6 +29,8 @@ public interface DatalogProgram extends Serializable {
 	public List<CQIE> getRules();
 
 	public void appendRule(CQIE rule);
+	
+	public void addFirstRuleRule(CQIE rule);
 
 	public void appendRule(Collection<CQIE> rule);
 
@@ -42,9 +44,6 @@ public interface DatalogProgram extends Serializable {
 	 */
 	public List<CQIE> getRules(Predicate headPredicate);
 
-	public OBDAQueryModifiers getQueryModifiers();
-
-	public boolean hasModifiers();
 		
 	public DatalogProgram clone();
 

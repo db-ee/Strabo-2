@@ -41,4 +41,14 @@ public interface CQIE extends Serializable {
 	public CQIE clone();
 	
 	public Set<Variable> getReferencedVariables();
+	
+	public OBDAQueryModifiers getQueryModifiers();
+
+	public boolean hasModifiers();
+
+	public void setQueryModifiers(OBDAQueryModifiers currentModifiers);
+	
+	public boolean materialize();
+	
+	public void setMaterialize(boolean b);
 }

@@ -657,7 +657,7 @@ public class DatalogToSparqlTranslatorTest {
 
 	private DatalogProgram createDatalogProgram(OBDAQueryModifiers modifiers, CQIE... queryAndRules) {
 		List<CQIE> program = Arrays.asList(queryAndRules);
-		return dataFactory.getDatalogProgram(modifiers, program);
+		return dataFactory.getDatalogProgram(program);
 	}
 
 	private DatalogProgram createDatalogProgram(CQIE... queryAndRules) {

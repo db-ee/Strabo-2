@@ -190,7 +190,7 @@ public class DatalogUnfolder implements UnfoldingMechanism {
 			EQNormalizer.enforceEqualities(query);
 		
 		
-		DatalogProgram result = termFactory.getDatalogProgram(inputquery.getQueryModifiers());
+		DatalogProgram result = termFactory.getDatalogProgram();
 		result.appendRule(workingSet);
 		
 		for (CQIE query : workingSet)
@@ -961,6 +961,15 @@ public class DatalogUnfolder implements UnfoldingMechanism {
 						iterator.previous();
 					}
 			}
+			else {
+				if(rule.materialize()) {
+					this.ruleIndex.get(rule.getHead().getFunctionSymbol()).clear();
+					//this.extensionalPredicates.add(rule.getHead().getFunctionSymbol());
+					//CQIE fresh=termFactory.getFreshCQIECopy(rule);
+					//fresh.getBody().clear();
+					//this.ruleIndex.get(rule.getHead().getFunctionSymbol()).add(fresh);
+				}
+			}
 			// otherwise, the result is empty and so,
 			// this rule is already a partial evaluation
 		}
@@ -1093,13 +1102,18 @@ public class DatalogUnfolder implements UnfoldingMechanism {
 		 * Leaf predicates are ignored (as boolean or algebra predicates)
 		 */
 		Predicate pred = focusAtom.getFunctionSymbol();
-		if (extensionalPredicates.contains(pred)) {
+		if (extensionalPredicates.contains(pred) ) {
 			// The atom is a leaf, that means that is a data atom that
 			// has no resolvent rule, and marks the end points to compute
 			// partial evaluations
 
 			return Collections.emptyList();
 		}
+		
+		
+		
+		
+		
 		/*
 		 * This is a real data atom, it either generates something, or null
 		 * (empty)
@@ -1111,6 +1125,18 @@ public class DatalogUnfolder implements UnfoldingMechanism {
 		 * If there are none, the atom is logically empty, careful, LEFT JOIN
 		 * alert!
 		 */
+		
+		
+		if(pred.getName().startsWith(OBDAVocabulary.TEMP_VIEW_QUERY)) {
+			//temp view, add a dummy rule and put it in extensional predicates for next invocations
+			Function copyFocus = (Function) focusAtom.clone();
+			CQIE dummyRule = termFactory.getCQIE(copyFocus, copyFocus);
+			rulesDefiningTheAtom = new ArrayList<CQIE>();
+			rulesDefiningTheAtom.add(dummyRule);
+			extensionalPredicates.add(pred);
+			
+		}
+		
 
 		List<CQIE> result = null;
 		if (rulesDefiningTheAtom == null) {

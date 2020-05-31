@@ -57,7 +57,7 @@ import org.slf4j.LoggerFactory;
 /**
  * 
  */
-
+//TODO DELETE THIS
 public class TreeWitnessRewriter implements QueryRewriter {
 
 	private static final OBDADataFactory fac = OBDADataFactoryImpl.getInstance();
@@ -334,7 +334,7 @@ public class TreeWitnessRewriter implements QueryRewriter {
 		if (outputRules.size() > 1) 
 			CQCUtilities.removeContainedQueries(outputRules, dataDependenciesCQC);
 		
-		DatalogProgram output = fac.getDatalogProgram(dp.getQueryModifiers(), outputRules);
+		DatalogProgram output = fac.getDatalogProgram(outputRules);
 
 		double endtime = System.currentTimeMillis();
 		double tm = (endtime - startime) / 1000;

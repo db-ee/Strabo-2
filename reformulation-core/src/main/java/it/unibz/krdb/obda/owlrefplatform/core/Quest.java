@@ -753,14 +753,16 @@ public class Quest implements Serializable, RepositoryChangedListener {
 			// }
 
 			// Setting up the reformulation engine
-			if (reformulate == false) {
-				rewriter = new DummyReformulator();
-			} else if (QuestConstants.TW.equals(reformulationTechnique)) {
-				rewriter = new TreeWitnessRewriter();
-			} else {
-				throw new IllegalArgumentException(
-						"Invalid value for argument: " + QuestPreferences.REFORMULATION_TECHNIQUE);
-			}
+			//we do not reformulate in Strabon!
+			rewriter = new DummyReformulator();
+//			if (reformulate == false) {
+//				rewriter = new DummyReformulator();
+//			} else if (QuestConstants.TW.equals(reformulationTechnique)) {
+//				rewriter = new TreeWitnessRewriter();
+//			} else {
+//				throw new IllegalArgumentException(
+//						"Invalid value for argument: " + QuestPreferences.REFORMULATION_TECHNIQUE);
+//			}
 
 			rewriter.setTBox(reformulationReasoner, inputOntology.getVocabulary(), sigma);
 

@@ -126,12 +126,28 @@ public class DatalogProgramImpl implements DatalogProgram {
 	}
 
 	@Override
-	public OBDAQueryModifiers getQueryModifiers() {
-		return modifiers;
+	public void addFirstRuleRule(CQIE rule) {
+		if (rule == null) {
+			throw new IllegalArgumentException("DatalogProgram: Recieved a null rule.");
+		}
+		if (rules.contains(rule)) {
+			return; // Skip if the rule already exists!
+		}
+
+		rules.add(0, rule);
+
+		Function head = rule.getHead();
+		if (head != null) {
+			Predicate predicate = rule.getHead().getFunctionSymbol();
+			List<CQIE> indexedRules = predicateIndex.get(predicate);
+			if (indexedRules == null) {
+				indexedRules = new LinkedList<CQIE>();
+				predicateIndex.put(predicate, indexedRules);
+			}
+			indexedRules.add(0, rule);
+		}
+		
 	}
-	
-	@Override
-	public boolean hasModifiers() {
-		return modifiers.hasModifiers();
-	}
+
+
 }

@@ -132,8 +132,8 @@ public class SQLGenerator implements SQLQueryGenerator {
 	private boolean generatingREPLACE = true;
 	private boolean distinctResultSet = false;
 
-	private boolean isDistinct = false;
-	private boolean isOrderBy = false;
+	//private boolean isDistinct = false;
+	//private boolean isOrderBy = false;
 	private boolean isSI = false;
 	private SemanticIndexURIMap uriRefIds;
 	
@@ -170,30 +170,8 @@ public class SQLGenerator implements SQLQueryGenerator {
 	 */
 	@Override
 	public SQLResult generateSourceQuery(DatalogProgram query, List<String> signature) throws OBDAException {
-		isDistinct = hasSelectDistinctStatement(query);
-		isOrderBy = hasOrderByClause(query);
-		if (query.getQueryModifiers().hasModifiers()) {
-			final String indent = "   ";
-			final String outerViewName = "SUB_QVIEW";
-			SQLResult res=generateQuery(query, signature, indent);
-			String subquery = res.getMainQuery();
-
-			String modifier = "";
-			List<OrderCondition> conditions = query.getQueryModifiers().getSortConditions();
-			long limit = query.getQueryModifiers().getLimit();
-			long offset = query.getQueryModifiers().getOffset();
-			modifier = sqladapter.sqlOrderByAndSlice(conditions,outerViewName,limit, offset) + "\n";
-
-			String sql = "SELECT *\n";
-			sql += "FROM (\n";
-			sql += subquery + "\n";
-			sql += ") " + outerViewName + "\n";
-			sql += modifier;
-			res.setMainQuery(sql);
-			return res;
-		} else {
 			return generateQuery(query, signature, "");
-		}
+		
 	}
 
 	@Override
@@ -201,15 +179,15 @@ public class SQLGenerator implements SQLQueryGenerator {
 		return distinctResultSet;
 	}
 
-	private boolean hasSelectDistinctStatement(DatalogProgram query) {
+	private boolean hasSelectDistinctStatement(CQIE cq) {
 		boolean toReturn = false;
-		if (query.getQueryModifiers().hasModifiers()) {
-			toReturn = query.getQueryModifiers().isDistinct();
+		if (cq.getQueryModifiers().hasModifiers()) {
+			toReturn = cq.getQueryModifiers().isDistinct();
 		}
 		return toReturn;
 	}
 	
-	private boolean hasOrderByClause(DatalogProgram query) {
+	private boolean hasOrderByClause(CQIE query) {
 		boolean toReturn = false;
 		if (query.getQueryModifiers().hasModifiers()) {
 			final List<OrderCondition> conditions = query.getQueryModifiers().getSortConditions();
@@ -231,8 +209,10 @@ public class SQLGenerator implements SQLQueryGenerator {
 		/* Main loop, constructing the SPJ query for each CQ */
 		List<String> tempResults = new ArrayList<String>();
 		List<String> tempNames = new ArrayList<String>();
+		boolean outerDistinct=false;
 		for (CQIE cq : query.getRules()) {
-
+			
+			boolean isDistinct = hasSelectDistinctStatement(cq);
 			/*
 			 * Here we normalize so that the form of the CQ is as close to the
 			 * form of a normal SQL algebra as possible, particularly, no shared
@@ -268,13 +248,13 @@ public class SQLGenerator implements SQLQueryGenerator {
 
 			Predicate headPredicate = cq.getHead().getFunctionSymbol();
 			if (!(headPredicate.getName().toString().equals(OBDAVocabulary.QUEST_QUERY)
-					|| headPredicate.getName().toString().startsWith(OBDAVocabulary.TEMP_QUERY))) {
+					|| headPredicate.getName().toString().startsWith(OBDAVocabulary.TEMP_VIEW_QUERY))) {
 				// not a target query, skip it.
 				continue;
 			}
 
 			QueryAliasIndex index = new QueryAliasIndex(cq);
-
+			
 			boolean innerdistincts = false;
 			if (isDistinct && !distinctResultSet && numberOfQueries == 1) {
 				innerdistincts = true;
@@ -285,11 +265,37 @@ public class SQLGenerator implements SQLQueryGenerator {
 			String SELECT = getSelectClause(signature, cq, index, innerdistincts);
 
 			String querystr = SELECT + FROM + WHERE;
-			if(headPredicate.getName().toString().startsWith(OBDAVocabulary.TEMP_QUERY)) {
+			
+			
+			
+			boolean isOrderBy = hasOrderByClause(cq);
+			if (cq.getQueryModifiers().hasModifiers()) {
+				//String indent = "   ";
+				String outerViewName = "SUB_QVIEW";
+				
+				
+
+				String modifier = "";
+				List<OrderCondition> conditions = cq.getQueryModifiers().getSortConditions();
+				long limit = cq.getQueryModifiers().getLimit();
+				long offset = cq.getQueryModifiers().getOffset();
+				modifier = sqladapter.sqlOrderByAndSlice(conditions,outerViewName,limit, offset) + "\n";
+
+				String sql = "SELECT *\n";
+				sql += "FROM (\n";
+				sql += querystr + "\n";
+				sql += ") " + outerViewName + "\n";
+				sql += modifier;
+				querystr = sql;
+			}
+			
+			
+			if(headPredicate.getName().toString().startsWith(OBDAVocabulary.TEMP_VIEW_QUERY)) {
 				tempResults.add(querystr);
 				tempNames.add(headPredicate.getName().toString());
 			}
 			else {
+				outerDistinct=isDistinct;
 				queriesStrings.add(querystr);
 			}
 			
@@ -302,7 +308,7 @@ public class SQLGenerator implements SQLQueryGenerator {
 		}
 
 		String UNION = null;
-		if (isDistinct && !distinctResultSet) {
+		if (outerDistinct && !distinctResultSet) {
 			UNION = "UNION";
 		} else {
 			UNION = "UNION ALL";
@@ -851,7 +857,9 @@ public class SQLGenerator implements SQLQueryGenerator {
 			mainColumn = sqladapter.getSQLLexicalFormString(uc.getURI().toString());
 		} else if (ht == OBDAVocabulary.NULL) {
 			mainColumn = "NULL";
-		} else if (ht instanceof Function) {
+		}
+		else if (ht instanceof Function) {
+		
 			/*
 			 * if it's a function we need to get the nested value if its a
 			 * datatype function or we need to do the CONCAT if its URI(....).
@@ -1306,17 +1314,8 @@ public class SQLGenerator implements SQLQueryGenerator {
 
 	// TODO: move to SQLAdapter
 	private String getStringConcatenation(SQLDialectAdapter adapter, String[] params) {
-		String toReturn = sqladapter.strConcat(params);
-		if (adapter instanceof DB2SQLDialectAdapter) {
-			/*
-			 * A work around to handle DB2 (>9.1) issue SQL0134N: Improper use of a string column, host variable, constant, or function name.
-			 * http://publib.boulder.ibm.com/infocenter/db2luw/v9r5/index.jsp?topic=%2Fcom.ibm.db2.luw.messages.sql.doc%2Fdoc%2Fmsql00134n.html
-			 */
-			if (isDistinct || isOrderBy) {
-				return adapter.sqlCast(toReturn, Types.VARCHAR);
-			}
-		}
-		return toReturn;
+		return sqladapter.strConcat(params);
+		
 	}
 
 	private boolean isGeomColType(Term term, QueryAliasIndex index) {
@@ -2026,7 +2025,7 @@ public class SQLGenerator implements SQLQueryGenerator {
 		 * Generates the view definition, i.e., "tablename viewname".
 		 */
 		public String getViewDefinition(Function atom) {
-			if(atom.getFunctionSymbol().toString().startsWith("temp")) {
+			if(atom.getFunctionSymbol().toString().startsWith(OBDAVocabulary.TEMP_VIEW_QUERY)) {
 				return "global_temp."+atom.getFunctionSymbol().toString() +" "+viewNames.get(atom).getSQLRendering();
 			}
 			RelationDefinition def = dataDefinitions.get(atom);

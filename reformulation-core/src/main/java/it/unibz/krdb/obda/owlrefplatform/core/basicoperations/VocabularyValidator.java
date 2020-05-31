@@ -52,7 +52,10 @@ public class VocabularyValidator {
 
 
 	public CQIE replaceEquivalences(CQIE query) {
-		return dfac.getCQIE(query.getHead(), replaceEquivalences(query.getBody()));
+		CQIE result=dfac.getCQIE(query.getHead(), replaceEquivalences(query.getBody()));
+		result.setQueryModifiers(query.getQueryModifiers());
+		result.setSignature(query.getSignature());
+		return result;
 	}
 		
 	private <T extends Term> List<T> replaceEquivalences(List<T> body) {
