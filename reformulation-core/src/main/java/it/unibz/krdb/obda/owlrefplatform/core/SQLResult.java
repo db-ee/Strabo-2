@@ -31,5 +31,15 @@ public class SQLResult {
 	public String getTempName(int k) {
 		return tempNames.get(k);
 	}
+	
+	public String getTextResult() {
+		String toReturn = "";
+		for(int i=0;i<tempQueries.size();i++) {
+			toReturn+=("Create temporary table "+tempNames.get(i)+" as ");
+			toReturn+=(tempQueries.get(i));
+			toReturn+=mainQuery;
+		}
+		return toReturn;
+	}
 
 }

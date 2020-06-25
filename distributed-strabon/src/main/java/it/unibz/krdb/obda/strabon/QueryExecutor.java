@@ -214,8 +214,9 @@ public class QueryExecutor {
 				for (String sparql : sparqlQueries) {
 					try {
 						// String sparql = readFile(queryfile);
+						log.debug("Start Executing SPARQL query: "+sparql);
 						SQLResult sql = st.getUnfolding(sparql);
-						log.debug("Query unfolded:" + sql.getTempQueries() + "\n" + sql.getMainQuery() + "\n");
+						log.debug("Query unfolded:" + sql.getTextResult() + "\n");
 						log.debug("Strating execution");
 						long start = System.currentTimeMillis();
 						// List<String> tempnames=new ArrayList<String>();
@@ -227,10 +228,12 @@ public class QueryExecutor {
 						}
 						Dataset<Row> result = spark.sql(sql.getMainQuery().replaceAll("\"", ""));
 						long resultSize = result.count();
+						
 						log.debug("Execution finished in " + (System.currentTimeMillis() - start) + " with "
 								+ resultSize + " results.");
+						result.show(false);
 						for (int k = 0; k < sql.getTempQueries().size(); k++) {
-							// spark.sql("DROP VIEW globaltemp."+sql.getTempName(k));
+							//spark.sql("DROP VIEW globaltemp."+sql.getTempName(k));
 						}
 					} catch (Exception ex) {
 						log.error("Could not execute query " + sparql + "\nException: " + ex.getMessage());
@@ -274,7 +277,7 @@ public class QueryExecutor {
 		obdaFile.append("\n");
 		obdaFile.append("password\ttest");
 		obdaFile.append("\n");
-		obdaFile.append("driverClass\tmadgik.exareme.jdbc.embedded.AdpDriver");
+		obdaFile.append("driverClass\tmadgik.exareme.jdbc.Spark");
 		obdaFile.append("\n");
 
 		obdaFile.append("\n");

@@ -137,10 +137,10 @@ public class LocalQueryTranslator {
 
 				String[] query_files = readFilesFromDir(queriesPath);
 				for (String queryfile : query_files) {
+					System.out.println("Starting execution of query "+queryfile);
 					String sparql = readFile(queryfile);
 					SQLResult sql = st.getUnfolding(sparql);
-					System.out.print(sql.getTempQueries().toString().replaceAll("\"", "") + "\n");
-					System.out.print(sql.getMainQuery().replaceAll("\"", "") + "\n");
+					System.out.print(sql.getMainQuery());
 				}
 
 				System.out.println("Closing...");
@@ -173,7 +173,7 @@ public class LocalQueryTranslator {
 		obdaFile.append("\n");
 		obdaFile.append("password\ttest");
 		obdaFile.append("\n");
-		obdaFile.append("driverClass\tmadgik.exareme.jdbc.embedded.AdpDriver");
+		obdaFile.append("driverClass\tmadgik.exareme.jdbc.Spark");
 		obdaFile.append("\n");
 
 		obdaFile.append("\n");

@@ -56,6 +56,8 @@ public class SQLAdapterFactory {
                 return new MonetDBSQLDialectAdapter();
             case "com.sap.db.jdbc.Driver":
                 return new SAPHANASQLDialectAdapter();
+            case "madgik.exareme.jdbc.Spark":
+            	return new SparkDialectAdapter();
 			default:
 				log.warn("WARNING: the specified driver doesn't correspond to any of the drivers officially supported by Ontop.");
 				log.warn("WARNING: Contact the authors for further support.");

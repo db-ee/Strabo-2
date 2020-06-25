@@ -41,6 +41,7 @@ import it.unibz.krdb.obda.renderer.DatalogProgramRenderer;
 import it.unibz.krdb.obda.utils.StrabonParameters;
 import it.unibz.krdb.sql.DBMetadata;
 import it.unibz.krdb.sql.DatabaseRelationDefinition;
+import it.unibz.krdb.sql.RelationID;
 import madgik.exareme.master.queryProcessor.decomposer.dag.Node;
 import madgik.exareme.master.queryProcessor.decomposer.dag.NodeHashValues;
 import madgik.exareme.master.queryProcessor.decomposer.query.SQLQuery;
@@ -77,7 +78,7 @@ import java.util.concurrent.CountDownLatch;
  * reformulation platform reasoner from outside, i.e. Protege
  */
 public class StrabonStatement implements OBDAStatement {
-	
+
 	private static final OBDADataFactory fac = OBDADataFactoryImpl.getInstance();
 
 	public final Quest questInstance;
@@ -97,11 +98,11 @@ public class StrabonStatement implements OBDAStatement {
 	private DatalogProgram programAfterRewriting;
 
 	private DatalogProgram programAfterUnfolding;
-	
+
 	private DatalogProgram programAfterSplittingSpatialJoin;
 
 	private SesameConstructTemplate templ;
-	
+
 	private static final Logger log = LoggerFactory.getLogger(StrabonStatement.class);
 
 	/*
@@ -120,9 +121,9 @@ public class StrabonStatement implements OBDAStatement {
 		this.conn = conn;
 
 		this.sqlstatement = st;
-		
+
 		this.nse = nse;
-		
+
 	}
 
 	private class QueryExecutionThread extends Thread {
@@ -402,8 +403,8 @@ public class StrabonStatement implements OBDAStatement {
 		List<CQIE> toRemove = new LinkedList<CQIE>();
 		for (CQIE rule : program.getRules()) {
 			Predicate headPredicate = rule.getHead().getFunctionSymbol();
-			if (!headPredicate.getName().toString().equals(OBDAVocabulary.QUEST_QUERY) && 
-					!headPredicate.getName().toString().startsWith(OBDAVocabulary.TEMP_VIEW_QUERY)) {
+			if (!headPredicate.getName().toString().equals(OBDAVocabulary.QUEST_QUERY)
+					&& !headPredicate.getName().toString().startsWith(OBDAVocabulary.TEMP_VIEW_QUERY)) {
 				toRemove.add(rule);
 			}
 		}
@@ -427,10 +428,8 @@ public class StrabonStatement implements OBDAStatement {
 	 * The method executes select or ask queries by starting a new quest execution
 	 * thread
 	 * 
-	 * @param strquery
-	 *            the select or ask query string
-	 * @param type
-	 *            1 - SELECT, 2 - ASK
+	 * @param strquery the select or ask query string
+	 * @param type     1 - SELECT, 2 - ASK
 	 * @return the obtained TupleResultSet result
 	 * @throws OBDAException
 	 */
@@ -448,10 +447,8 @@ public class StrabonStatement implements OBDAStatement {
 	/**
 	 * The method executes construct or describe queries
 	 * 
-	 * @param strquery
-	 *            the query string
-	 * @param type
-	 *            3- CONSTRUCT, 4 - DESCRIBE
+	 * @param strquery the query string
+	 * @param type     3- CONSTRUCT, 4 - DESCRIBE
 	 * @return the obtained GraphResultSet result
 	 * @throws OBDAException
 	 */
@@ -492,11 +489,10 @@ public class StrabonStatement implements OBDAStatement {
 	 * to Datalog objects and then translating back to SPARQL algebra. The
 	 * transformation to Datalog is required to apply the rewriting algorithm.
 	 * 
-	 * @param sparql
-	 *            The input SPARQL query.
+	 * @param sparql The input SPARQL query.
 	 * @return An expanded SPARQL query.
-	 * @throws OBDAException
-	 *             if errors occur during the transformation and translation.
+	 * @throws OBDAException if errors occur during the transformation and
+	 *                       translation.
 	 */
 	public String getSPARQLRewriting(String sparql) throws OBDAException {
 		if (!SPARQLQueryUtility.isSelectQuery(sparql)) {
@@ -583,25 +579,34 @@ public class StrabonStatement implements OBDAStatement {
 
 			SparqlAlgebraToDatalogTranslator translator = questInstance.getSparqlAlgebraToDatalogTranslator();
 			List<String> signatureContainer = translator.getSignature(query);
-			
 
 			questInstance.getSesameQueryCache().put(strquery, query);
 			questInstance.getSignatureCache().put(strquery, signatureContainer);
 
 			DatalogProgram program = translateAndPreProcess(query);
-			
-			//create metadata for temp tables
-			for(CQIE cq:program.getRules()) {
-				Predicate head=cq.getHead().getFunctionSymbol();
-				if(head.getName().startsWith(OBDAVocabulary.TEMP_VIEW_QUERY)){
-					DatabaseRelationDefinition replacement=questInstance.getMetaData().createDatabaseRelation(questInstance.getMetaData().getQuotedIDFactory().createRelationID("", head.getName()));
-					for(String t:cq.getSignature()) {
-						replacement.addAttribute(questInstance.getMetaData().getQuotedIDFactory().createAttributeID(t.toString()), Types.VARCHAR, "VARCHAR", false);
-						
+
+			// create metadata for temp tables
+			for (CQIE cq : program.getRules()) {
+				Predicate head = cq.getHead().getFunctionSymbol();
+				if (head.getName().startsWith(OBDAVocabulary.TEMP_VIEW_QUERY)) {
+					RelationID relation = questInstance.getMetaData().getQuotedIDFactory().createRelationID("",
+							head.getName());
+					// questInstance.getMetaData().removeDatabaseRelation(relation);
+					DatabaseRelationDefinition replacement = questInstance.getMetaData()
+							.createDatabaseRelation(relation);
+					for (String t : cq.getSignature()) {
+						try {
+							replacement.addAttribute(
+									questInstance.getMetaData().getQuotedIDFactory().createAttributeID(t.toString()),
+									Types.VARCHAR, "VARCHAR", false);
+						} catch (IllegalArgumentException e) {
+							log.debug("Attribute already exists");
+						}
+
 					}
 				}
 			}
-			
+
 			try {
 				// log.debug("Input query:\n{}", strquery);
 
@@ -626,20 +631,17 @@ public class StrabonStatement implements OBDAStatement {
 				final long startTime = System.currentTimeMillis();
 				programAfterUnfolding = getUnfolding(programAfterRewriting);
 				unfoldingTime = System.currentTimeMillis() - startTime;
-				
+
 				try {
 					programAfterSplittingSpatialJoin = splitSpatialJoin(programAfterUnfolding);
 				} catch (Exception e) {
 					log.error("Could not split query based on spatial join" + e.getMessage());
-					programAfterSplittingSpatialJoin=programAfterUnfolding;
+					programAfterSplittingSpatialJoin = programAfterUnfolding;
 				}
-				
-				
 
 				try {
 					for (CQIE cq : programAfterUnfolding.getRules()) {
-						DagCreatorDatalogNew creator = new DagCreatorDatalogNew(cq, nse,
-								new HashMap<String, String>());
+						DagCreatorDatalogNew creator = new DagCreatorDatalogNew(cq, nse, new HashMap<String, String>());
 						SQLQuery result2 = creator.getRootNode();
 					}
 				} catch (Exception e) {
@@ -662,154 +664,195 @@ public class StrabonStatement implements OBDAStatement {
 	}
 
 	private DatalogProgram splitSpatialJoin(DatalogProgram program) {
-		DatalogProgram result=program.clone();
-		int initialSize=result.getRules().size();
-		
-		//TODO split all queries
-		CQIE initial=result.getRules().get(0);
-		Function toRemove=null;
-		Set<Variable> varsInSpatial = new HashSet<>();
-		
-		boolean containsSpatialJoin=false;
-		
-		for (Function atom : initial.getBody()) {
+		DatalogProgram result = program.clone();
+
+		for (int k = 0; k < result.getRules().size(); k++) {
+			CQIE initial = result.getRules().get(k);
+			List<Function> spatialJoins = new ArrayList<Function>(1); 
+			Set<Variable> varsInSpatial = new HashSet<>();
+
+			boolean containsSpatialJoin = queryHasSpatialJoin(initial, varsInSpatial, spatialJoins);
+
 			
-			if (StrabonParameters.isSpatialJoin(atom)) {
-				toRemove=atom;
-				
-				TermUtils.addReferencedVariablesTo(varsInSpatial, atom);
-				if(varsInSpatial.size()!=2) {
-					return program;
-				}
-				else {
-					containsSpatialJoin=true;
-					break;
-				}
+			if (!containsSpatialJoin) {
+				containsSpatialJoin = hasSpatialDistanceJoinInSelect(initial, varsInSpatial);
+
 			}
-		}
-		if(!containsSpatialJoin){
-			for(Term projection:initial.getHead().getTerms()) {
-				//check for spatial distance join in head
-				if (projection instanceof Function) {
-					Function nested=(Function) projection;
-					if(nested.getFunctionSymbol().equals(OBDAVocabulary.SFDISTANCE)) {
-						TermUtils.addReferencedVariablesTo(varsInSpatial, nested);
-						if(varsInSpatial.size()!=2) {
-							return program;
-						}
-						else {
-							containsSpatialJoin=true;
-							break;
-						}
-					}
-				}
+			if (!containsSpatialJoin || varsInSpatial.size()!=2) {
+				continue;
+			}
+
+			
+			//initial.getBody().removeAll(toRemove);
+			
+			
+
+			Set<Variable> existentialVars = new HashSet<>();
+			//will be added to temp queries along with vars in spatial join
+			TermUtils.addReferencedVariablesTo(existentialVars, initial.getHead());
+
+
+			List<VarsToAtoms> v2aList = new LinkedList<VarsToAtoms>();
+			//keep split sets (connected components) of vars to atoms
+			
+			for(Variable spatialVar:varsInSpatial) {
+				//start with two initial components each containing a
+				//var from the spatial join
+				Set<Term> vars1 = new HashSet<>();
+				vars1.add(spatialVar);
+				Set<Function> atoms1 = new HashSet<>();
+				v2aList.add(new  VarsToAtoms(vars1, atoms1));
 			}
 			
-		}
-		if(!containsSpatialJoin){
-			return program;
-		}
-		
-		if(toRemove!=null) {
-			initial.getBody().remove(toRemove);
-		}
-		
-		
-		Set<Variable> existentialVars = new HashSet<>();
-		TermUtils.addReferencedVariablesTo(existentialVars, initial.getHead());
-		
-		
-		
-//		Set<Variable> varsFirst = new HashSet<>();
-//		TermUtils.addReferencedVariablesTo(varsFirst, initial.getBody().get(0));
-//		Set<Function> atomsFirst = new HashSet<>();
-//		atomsFirst.add(initial.getBody().get(0));
-//		VarsToAtoms v2a=new VarsToAtoms(varsFirst, atomsFirst);
-//		v2aList.add(v2a);
-		
-		List<VarsToAtoms> v2aList=new LinkedList<VarsToAtoms>();
-		for(int i=0;i<initial.getBody().size();i++) {
-			Set<Variable> varsNext = new HashSet<>();
-			TermUtils.addReferencedVariablesTo(varsNext, initial.getBody().get(i));
-			Set<Function> atomsNext = new HashSet<>();
-			atomsNext.add(initial.getBody().get(i));
-			Set<Term> converted=new HashSet<Term>();
-			converted.addAll(varsNext);
-			VarsToAtoms v2aNext=new VarsToAtoms(converted, atomsNext);
-			v2aList.add(0, v2aNext);
-			for(int j=1;j<v2aList.size();j++) {
-				if(v2aNext.mergeCommonVar(v2aList.get(j))) {
-					v2aList.remove(j);
-					j--;
-				}
-			}
 			
-		}
-		
-		//List<QueryConnectedComponent> ccs = QueryConnectedComponent.getConnectedComponents(initial);
-		if(v2aList.size()!=2) {
-			//try to split using also constant URIs as "common variables"
-			//e.g. consider a join: <id1> :p1 ?a1 . <id1> :p2 ?a2
-			v2aList=new LinkedList<VarsToAtoms>();
-			for(int i=0;i<initial.getBody().size();i++) {
-				Set<Term> varsNext = new HashSet<>();
-				TermUtils.addReferencedVariablesAndURIsTo(varsNext, initial.getBody().get(i));
+			/* for (int i = 0; i < initial.getBody().size(); i++) {
+				Set<Variable> varsNext = new HashSet<>();
+				TermUtils.addReferencedVariablesTo(varsNext, initial.getBody().get(i));
 				Set<Function> atomsNext = new HashSet<>();
 				atomsNext.add(initial.getBody().get(i));
-				VarsToAtoms v2aNext=new VarsToAtoms(varsNext, atomsNext);
+				Set<Term> converted = new HashSet<Term>();
+				converted.addAll(varsNext);
+				VarsToAtoms v2aNext = new VarsToAtoms(converted, atomsNext);
 				v2aList.add(0, v2aNext);
-				for(int j=1;j<v2aList.size();j++) {
-					if(v2aNext.mergeCommonVar(v2aList.get(j))) {
+				for (int j = 1; j < v2aList.size(); j++) {
+					if (v2aNext.mergeCommonVar(v2aList.get(j))) {
 						v2aList.remove(j);
 						j--;
 					}
 				}
-				
-			}
-			if(v2aList.size()!=2) {
-				//could not split program in two
-				return program;
-			}
+
+			}*/
+
 			
-		}
-		while(!initial.getBody().isEmpty()) {
-			initial.getBody().remove(0);
-		}
-		for(int i=0;i<v2aList.size();i++) {
-			int id=Util.createUniqueId();
-			DatabaseRelationDefinition replacement=questInstance.getMetaData().createDatabaseRelation(questInstance.getMetaData().getQuotedIDFactory().createRelationID("", OBDAVocabulary.TEMP_VIEW_QUERY+id));
-			VarsToAtoms cc=v2aList.get(i);
-			List<String> signature=new ArrayList<String>(cc.getVars().size());
-			List<Term> outputs=new ArrayList<Term>();
-			for(Term t:cc.getVars()) {
-				Constant uriTemplate = fac.getConstantLiteral("{}");
-				Term f = fac.getUriTemplate(uriTemplate, t);
-				if(existentialVars.contains(t)||varsInSpatial.contains(t)) {
-					outputs.add(f);
-					signature.add(t.toString());
-					replacement.addAttribute(questInstance.getMetaData().getQuotedIDFactory().createAttributeID(t.toString()), Types.VARCHAR, "VARCHAR", false);
+			//if (v2aList.size() != 2) {
+				// split query to connected components
+				// try to split using also constant URIs as "common variables"
+				// e.g. consider a join: <id1> :p1 ?a1 . <id1> :p2 ?a2
+				//v2aList = new LinkedList<VarsToAtoms>();
+				for (int i = 0; i < initial.getBody().size(); i++) {
+					if(spatialJoins.contains(initial.getBody().get(i)))
+						continue;
+					Set<Term> varsNext = new HashSet<>();
+					TermUtils.addReferencedVariablesAndURIsTo(varsNext, initial.getBody().get(i));
+					Set<Function> atomsNext = new HashSet<>();
+					atomsNext.add(initial.getBody().get(i));
+					VarsToAtoms v2aNext = new VarsToAtoms(varsNext, atomsNext);
+					v2aList.add(0, v2aNext);
+					for (int j = 1; j < v2aList.size(); j++) {
+						if (v2aNext.mergeCommonVar(v2aList.get(j))) {
+							v2aList.remove(j);
+							j--;
 						}
 					}
-			Function ans1=fac.getFunction(fac.getPredicate(OBDAVocabulary.TEMP_VIEW_QUERY+id, outputs.size()), outputs);
-			List<Term> args=new ArrayList<Term>(outputs.size());
-			for(String s:signature) {
-				args.add(fac.getVariable(s));
-			}
-			Function input=fac.getFunction(fac.getPredicate(OBDAVocabulary.TEMP_VIEW_QUERY+id, outputs.size()), args);
-			initial.getBody().add(input);
-			List<Function> body=new ArrayList<Function>();
-			body.addAll(cc.getAtoms());
-			CQIE cq=fac.getCQIE(ans1, body);
-			CQIE clone=cq.clone();
-			clone.setSignature(signature);
-			result.addFirstRuleRule(clone);
-			
+
+				}
 				
-		}
-		if(toRemove!=null) {
-			initial.getBody().add(toRemove);
+				//each of the two vars in spatial join must have ended
+				//on a separate connected component
+				//for these two connceted components create temp tables by
+				//removing corresponding atoms from initial query and adding them
+				//to new temp ones
+				for(VarsToAtoms v2a:v2aList) {
+					if(v2a.getVars().containsAll(varsInSpatial)) {
+						//spatial vars ended up in the 
+						//same component do not split query
+						containsSpatialJoin=false;
+						break;
+						
+					}
+					else {
+						for(Variable spatialVar:varsInSpatial) {
+							if(v2a.getVars().contains(spatialVar)) {
+								initial.getBody().removeAll(v2a.getAtoms());
+								result.addFirstRuleRule(createTempTable(v2a, initial, existentialVars, varsInSpatial));
+								k++;
+							}
+						}
+					}
+				}
+				if(!containsSpatialJoin)
+					continue;
+
+			
+			
+			
+			//initial.getBody().addAll(toRemove);
+			
 		}
 		return result;
+	}
+
+	private CQIE createTempTable(VarsToAtoms cc, CQIE initial, Set<Variable> existentialVars, Set<Variable> varsInSpatial) {
+		int id = Util.createUniqueId();
+		DatabaseRelationDefinition replacement = questInstance.getMetaData()
+				.createDatabaseRelation(questInstance.getMetaData().getQuotedIDFactory().createRelationID("",
+						OBDAVocabulary.TEMP_VIEW_QUERY + id));
+		//VarsToAtoms cc = v2aList.get(i);
+		List<String> signature = new ArrayList<String>(cc.getVars().size());
+		List<Term> outputs = new ArrayList<Term>();
+		for (Term t : cc.getVars()) {
+			Constant uriTemplate = fac.getConstantLiteral("{}");
+			Term f = fac.getUriTemplate(uriTemplate, t);
+			if (existentialVars.contains(t) || varsInSpatial.contains(t)) {
+				outputs.add(f);
+				signature.add(t.toString());
+				replacement.addAttribute(
+						questInstance.getMetaData().getQuotedIDFactory().createAttributeID(t.toString()),
+						Types.VARCHAR, "VARCHAR", false);
+			}
+		}
+		Function ans1 = fac.getFunction(fac.getPredicate(OBDAVocabulary.TEMP_VIEW_QUERY + id, outputs.size()),
+				outputs);
+		List<Term> args = new ArrayList<Term>(outputs.size());
+		for (String s : signature) {
+			args.add(fac.getVariable(s));
+		}
+		Function input = fac.getFunction(fac.getPredicate(OBDAVocabulary.TEMP_VIEW_QUERY + id, outputs.size()),
+				args);
+		initial.getBody().add(input);
+		List<Function> body = new ArrayList<Function>();
+		body.addAll(cc.getAtoms());
+		CQIE cq = fac.getCQIE(ans1, body);
+		CQIE clone = cq.clone();
+		clone.setSignature(signature);
+		return clone;
+	}
+
+	private boolean hasSpatialDistanceJoinInSelect(CQIE initial, Set<Variable> varsInSpatial) {
+		for (Term projection : initial.getHead().getTerms()) {
+			// check for spatial distance join in head
+			if (projection instanceof Function) {
+				Function nested = (Function) projection;
+				if (nested.getFunctionSymbol().equals(OBDAVocabulary.SFDISTANCE)) {
+					TermUtils.addReferencedVariablesTo(varsInSpatial, nested);
+					if (varsInSpatial.size() != 2) {
+						return false;
+					} else {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+
+	private boolean queryHasSpatialJoin(CQIE initial, Set<Variable> varsInSpatial, List<Function> spatialJoins) {
+		for (Function atom : initial.getBody()) {
+
+			if (StrabonParameters.isSpatialJoin(atom)) {
+				
+
+				TermUtils.addReferencedVariablesTo(varsInSpatial, atom);
+				if (varsInSpatial.size() != 2) {
+					log.debug("Spatial join with "+varsInSpatial.size() + " variables. Cannot split spatial join");
+					return false;
+				} else {
+					spatialJoins.add(atom);
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -817,9 +860,8 @@ public class StrabonStatement implements OBDAStatement {
 	 */
 	public long getTupleCount(String query) throws Exception {
 
-		
-			throw new SQLException("Not Supported");
-		
+		throw new SQLException("Not Supported");
+
 	}
 
 	@Override
