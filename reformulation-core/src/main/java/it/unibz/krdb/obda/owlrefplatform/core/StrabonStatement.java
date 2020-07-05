@@ -420,7 +420,7 @@ public class StrabonStatement implements OBDAStatement {
 		// query = DatalogNormalizer.normalizeDatalogProgram(query);
 		SQLResult sql = questInstance.getDatasourceQueryGenerator().generateSourceQuery(query, signature);
 
-		log.debug("Resulting SQL: \n{}", sql);
+		//log.debug("Resulting SQL: \n{}", sql);
 		return sql;
 	}
 

@@ -39,8 +39,9 @@ public class SQLResult {
 		for(int i=0;i<tempQueries.size();i++) {
 			toReturn+=("Create temporary table "+tempNames.get(i)+" as ");
 			toReturn+=(tempQueries.get(i));
-			toReturn+=mainQuery;
+			toReturn+="\n";
 		}
+		toReturn+=mainQuery;
 		return toReturn;
 	}
 

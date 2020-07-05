@@ -139,7 +139,7 @@ public class LocalQueryTranslator {
 					System.out.println("Starting execution of query "+queryfile);
 					String sparql = readFile(queryfile);
 					SQLResult sql = st.getUnfolding(sparql);
-					System.out.print(sql.getMainQuery());
+					System.out.println(sql.getTextResult());
 				}
 
 				System.out.println("Closing...");
