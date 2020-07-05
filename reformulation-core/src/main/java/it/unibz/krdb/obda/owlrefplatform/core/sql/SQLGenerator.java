@@ -320,7 +320,7 @@ public class SQLGenerator implements SQLQueryGenerator {
 			result.append(queryStringIterator.next());
 		}
 
-		return new SQLResult(result.toString(), tempResults, tempNames);
+		return new SQLResult(result.toString(), tempResults, tempNames, signature);
 	}
 
 	/***

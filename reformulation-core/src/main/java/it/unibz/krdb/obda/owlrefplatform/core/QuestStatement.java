@@ -695,7 +695,7 @@ public class QuestStatement implements OBDAStatement {
 				
 				sql = getSQL(programAfterUnfolding, signatureContainer);
 				// cacheQueryAndProperties(strquery, sql);
-				questInstance.cacheSQL(strquery, new SQLResult(sql, null, null));;
+				questInstance.cacheSQL(strquery, new SQLResult(sql, null, null, null));;
 			} 
 			catch (Exception e1) {
 				log.debug(e1.getMessage(), e1);

@@ -55,7 +55,6 @@ import it.unibz.krdb.obda.owlrefplatform.owlapi3.QuestOWLStatement;
 import it.unibz.krdb.obda.utils.StrabonParameters;
 import it.unibz.krdb.sql.ImplicitDBConstraintsReader;
 import madgik.exareme.master.queryProcessor.estimator.NodeSelectivityEstimator;
-import sesameWrapper.SesameVirtualRepo;
 
 //import org.openrdf.query.resultio.sparqlkml.stSPARQLResultsKMLWriter;
 

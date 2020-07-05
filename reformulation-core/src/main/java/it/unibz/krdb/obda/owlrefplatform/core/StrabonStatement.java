@@ -413,7 +413,7 @@ public class StrabonStatement implements OBDAStatement {
 
 	private SQLResult getSQL(DatalogProgram query, List<String> signature) throws OBDAException {
 		if (query.getRules().size() == 0) {
-			return new SQLResult("", new ArrayList<String>(0), new ArrayList<String>(0));
+			return new SQLResult("", new ArrayList<String>(0), new ArrayList<String>(0), new ArrayList<String>(0));
 		}
 		log.debug("Producing the SQL string...");
 

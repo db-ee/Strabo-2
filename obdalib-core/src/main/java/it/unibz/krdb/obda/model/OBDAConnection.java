@@ -1,5 +1,6 @@
 package it.unibz.krdb.obda.model;
 
+
 /*
  * #%L
  * ontop-obdalib-core

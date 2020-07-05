@@ -24,6 +24,8 @@ import java.sql.Connection;
 
 import it.unibz.krdb.obda.model.OBDAConnection;
 import it.unibz.krdb.obda.model.OBDAException;
+import it.unibz.krdb.obda.model.OBDAStatement;
+import madgik.exareme.master.queryProcessor.estimator.NodeSelectivityEstimator;
 
 public class QuestDBConnection implements OBDAConnection {
 

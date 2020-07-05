@@ -7,12 +7,14 @@ public class SQLResult {
 	private String mainQuery;
 	List<String> tempQueries;
 	List<String> tempNames;
+	List<String> outputs;
 	
-	public SQLResult(String mainQuery, List<String> tempQueries, List<String> tempNames) {
+	public SQLResult(String mainQuery, List<String> tempQueries, List<String> tempNames, List<String> outputs) {
 		super();
 		this.mainQuery = mainQuery;
 		this.tempQueries = tempQueries;
 		this.tempNames=tempNames;
+		this.outputs=outputs;
 	}
 	
 	public String getMainQuery() {
@@ -40,6 +42,10 @@ public class SQLResult {
 			toReturn+=mainQuery;
 		}
 		return toReturn;
+	}
+
+	public List<String> getSignature() {
+		return this.outputs;
 	}
 
 }

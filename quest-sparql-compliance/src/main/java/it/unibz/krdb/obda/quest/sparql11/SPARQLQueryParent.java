@@ -613,9 +613,9 @@ public abstract class SPARQLQueryParent extends TestCase {
 			RDFParser rdfParser = Rio.createParser(rdfFormat, dataRep.getValueFactory());
 			ParserConfig config = rdfParser.getParserConfig();
 			// To emulate DatatypeHandling.IGNORE 
-			config.addNonFatalError(BasicParserSettings.FAIL_ON_UNKNOWN_DATATYPES);
-			config.addNonFatalError(BasicParserSettings.VERIFY_DATATYPE_VALUES);
-			config.addNonFatalError(BasicParserSettings.NORMALIZE_DATATYPE_VALUES);
+			//config.addNonFatalError(BasicParserSettings.FAIL_ON_UNKNOWN_DATATYPES);
+			//config.addNonFatalError(BasicParserSettings.VERIFY_DATATYPE_VALUES);
+			//config.addNonFatalError(BasicParserSettings.NORMALIZE_DATATYPE_VALUES);
 //			config.set(BasicParserSettings.PRESERVE_BNODE_IDS, true);
 			
 //			rdfParser.setVerifyData(false);
@@ -711,9 +711,9 @@ public abstract class SPARQLQueryParent extends TestCase {
 			RDFParser parser = Rio.createParser(rdfFormat, dataRep.getValueFactory());
 			ParserConfig config = parser.getParserConfig();
 			// To emulate DatatypeHandling.IGNORE 
-			config.addNonFatalError(BasicParserSettings.FAIL_ON_UNKNOWN_DATATYPES);
-			config.addNonFatalError(BasicParserSettings.VERIFY_DATATYPE_VALUES);
-			config.addNonFatalError(BasicParserSettings.NORMALIZE_DATATYPE_VALUES);
+			//config.addNonFatalError(BasicParserSettings.FAIL_ON_UNKNOWN_DATATYPES);
+			//config.addNonFatalError(BasicParserSettings.VERIFY_DATATYPE_VALUES);
+			//config.addNonFatalError(BasicParserSettings.NORMALIZE_DATATYPE_VALUES);
 			config.set(BasicParserSettings.PRESERVE_BNODE_IDS, true);
 //			parser.setDatatypeHandling(DatatypeHandling.IGNORE);
 //			parser.setPreserveBNodeIDs(true);

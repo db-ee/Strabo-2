@@ -38,7 +38,6 @@ import it.unibz.krdb.obda.owlrefplatform.core.QuestConnection;
 import it.unibz.krdb.obda.owlrefplatform.core.QuestConstants;
 import it.unibz.krdb.obda.owlrefplatform.core.QuestPreferences;
 import it.unibz.krdb.obda.owlrefplatform.core.abox.RDBMSSIRepositoryManager;
-import it.unibz.krdb.obda.r2rml.R2RMLReader;
 import it.unibz.krdb.sql.DBMetadata;
 import it.unibz.krdb.sql.ImplicitDBConstraintsReader;
 
@@ -114,16 +113,7 @@ public class QuestDBVirtualStore extends QuestDBAbstractStore {
 			//read obda file
 			ModelIOManager modelIO = new ModelIOManager(obdaModel);
 			modelIO.load(new File(obdaURI));
-		} else if (obdaURI.toString().endsWith(".ttl")) {
-			//read R2RML file
-			R2RMLReader reader = null;
-			try {
-				reader = new R2RMLReader(new File(obdaURI));
-				obdaModel = reader.readModel(obdaURI);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
+		} 
 		return obdaModel;
 	}
 
@@ -203,8 +193,7 @@ public class QuestDBVirtualStore extends QuestDBAbstractStore {
 		//obtain obdaModel
 		OBDAModel obdaModel;
 		if (mappings != null) {
-			R2RMLReader reader = new R2RMLReader(mappings);
-			obdaModel = reader.readModel(source.getSourceID());
+			throw new Exception("mappings are null");
 		}
 		else {
 			String baseIRI = Objects.requireNonNull(config.getProperty(QuestPreferences.BASE_IRI), "Base IRI is requires for direct mappings");

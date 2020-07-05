@@ -148,9 +148,9 @@ public class QuestDatatypeTestUtils {
 			RDFParser rdfParser = Rio.createParser(RDFFormat.TURTLE, vf);
 			ParserConfig config = rdfParser.getParserConfig();
 			// To emulate DatatypeHandling.IGNORE 
-			config.addNonFatalError(BasicParserSettings.FAIL_ON_UNKNOWN_DATATYPES);
-			config.addNonFatalError(BasicParserSettings.VERIFY_DATATYPE_VALUES);
-			config.addNonFatalError(BasicParserSettings.NORMALIZE_DATATYPE_VALUES);
+			//config.addNonFatalError(BasicParserSettings.FAIL_ON_UNKNOWN_DATATYPES);
+			//config.addNonFatalError(BasicParserSettings.VERIFY_DATATYPE_VALUES);
+			//config.addNonFatalError(BasicParserSettings.NORMALIZE_DATATYPE_VALUES);
 //			rdfParser.setVerifyData(false);
 //			rdfParser.setStopAtFirstError(true);
 //			rdfParser.setDatatypeHandling(RDFParser.DatatypeHandling.IGNORE);
