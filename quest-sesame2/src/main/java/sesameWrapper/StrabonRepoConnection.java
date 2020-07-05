@@ -25,8 +25,6 @@ import info.aduna.iteration.CloseableIteratorIteration;
 import info.aduna.iteration.Iteration;
 import it.unibz.krdb.obda.model.OBDAException;
 import it.unibz.krdb.obda.owlrefplatform.core.QuestConstants;
-import it.unibz.krdb.obda.owlrefplatform.core.QuestDBConnection;
-import it.unibz.krdb.obda.owlrefplatform.core.QuestDBStatement;
 import it.unibz.krdb.obda.owlrefplatform.core.StrabonStatement;
 import it.unibz.krdb.obda.sesame.SesameRDFIterator;
 
@@ -379,25 +377,7 @@ throw new RuntimeException(e);
         	  
           }
           
-          private class Process implements Runnable{
-        	  private SesameRDFIterator iterator;
-        	  private QuestDBStatement questStmt;
-        	  public Process(SesameRDFIterator iterator, QuestDBStatement qstm) throws OBDAException
-        	  {
-        		  this.iterator = iterator;
-        		  this.questStmt = qstm;
-        	  }
-        	  
-        	  public void run()
-        	  {
-        		    try {
-						questStmt.add(iterator, boolToInt(autoCommit), 5000);
-        		    	
-					} catch (SQLException e) {
-						throw new RuntimeException(e);
-					}
-        	  }
-          }
+
                        
       
   

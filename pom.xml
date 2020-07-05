@@ -64,10 +64,7 @@
 		<module>obdalib-sesame</module>
 		<module>quest-owlapi3</module>
 		<module>quest-distribution</module>
-		<module>quest-sparql-compliance</module>
-		<module>quest-db</module>
 		<module>distributed-strabon</module>
-		<module>quest-test</module>
 		<module>ontop-docker-test-env</module>
 		<module>quest-sesame2</module>
     	<module>endpoint2</module>
@@ -515,12 +512,6 @@
 				<groupId>org.openrdf.sesame</groupId>
 				<artifactId>sesame-rio-api</artifactId>
 				<version>${sesame.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.openrdf.sesame</groupId>
-				<artifactId>sesame-sparql-compliance</artifactId>
-				<version>${sesame.version}</version>
-				<type>war</type>
 			</dependency>
 			<dependency>
 				<groupId>org.openrdf.sesame</groupId>

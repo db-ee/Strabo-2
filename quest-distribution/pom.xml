@@ -33,11 +33,6 @@
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>ontop-quest-db</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
 			<artifactId>ontop-quest-sesame</artifactId>
 			<version>${project.version}</version>
 		</dependency>

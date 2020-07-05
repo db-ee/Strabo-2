@@ -22,8 +22,6 @@ package sesameWrapper;
 
 import it.unibz.krdb.obda.model.OBDAException;
 import it.unibz.krdb.obda.model.TupleResultSet;
-import it.unibz.krdb.obda.owlrefplatform.core.QuestDBConnection;
-import it.unibz.krdb.obda.owlrefplatform.core.QuestDBStatement;
 import it.unibz.krdb.obda.owlrefplatform.core.SQLResult;
 import it.unibz.krdb.obda.owlrefplatform.core.StrabonStatement;
 import it.unibz.krdb.obda.strabon.QueryExecutor;
