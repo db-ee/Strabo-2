@@ -19,22 +19,6 @@ package it.unibz.krdb.obda.owlrefplatform.core.translator;
  * limitations under the License.
  * #L%
  */
-
-import gr.uoa.di.madgik.sesame.functions.EHContainsFunc;
-import gr.uoa.di.madgik.sesame.functions.EHCoveredByFunc;
-import gr.uoa.di.madgik.sesame.functions.EHCoversFunc;
-import gr.uoa.di.madgik.sesame.functions.EHDisjointFunc;
-import gr.uoa.di.madgik.sesame.functions.EHEqualsFunc;
-import gr.uoa.di.madgik.sesame.functions.EHInsideFunc;
-import gr.uoa.di.madgik.sesame.functions.EHOverlapFunc;
-import gr.uoa.di.madgik.sesame.functions.SpatialContainFunc;
-import gr.uoa.di.madgik.sesame.functions.SpatialCrossesFunc;
-import gr.uoa.di.madgik.sesame.functions.SpatialDisjointFunc;
-import gr.uoa.di.madgik.sesame.functions.SpatialEqualFunc;
-import gr.uoa.di.madgik.sesame.functions.SpatialIntersectsFunc;
-import gr.uoa.di.madgik.sesame.functions.SpatialOverlapFunc;
-import gr.uoa.di.madgik.sesame.functions.SpatialTouchesFunc;
-import gr.uoa.di.madgik.sesame.functions.SpatialWithinFunc;
 import it.unibz.krdb.obda.model.*;
 import it.unibz.krdb.obda.model.OBDAQueryModifiers.OrderCondition;
 import it.unibz.krdb.obda.model.Predicate.COL_TYPE;
@@ -761,7 +745,7 @@ public class SparqlAlgebraToDatalogTranslator {
 	private Term getExpression(ValueExpr expr) {
 		if (expr instanceof Var) {
 			return getOntopTerm((Var) expr);
-		} 
+		}
 		else if (expr instanceof org.openrdf.query.algebra.ValueConstant) {
 			return getConstantExpression(((org.openrdf.query.algebra.ValueConstant) expr).getValue());
 		} 
@@ -775,6 +759,7 @@ public class SparqlAlgebraToDatalogTranslator {
 			return ofac.getFunctionIsNotNull(getOntopTerm(((Bound) expr).getArg()));
 		} 
 		else if (expr instanceof FunctionCall) {
+			//spatial function calls here
             return getFunctionCallTerm((FunctionCall)expr);
 		} 
 		throw new RuntimeException("The expression " + expr + " is not supported yet!");
@@ -1526,112 +1511,7 @@ public class SparqlAlgebraToDatalogTranslator {
 			case NE:
 				return ofac.getFunctionNEQ(term1, term2);
 			}			
-		} else if (expr instanceof SpatialOverlapFunc) {
-			if (term1 instanceof Function){
-				Term arg = ((Function) term1).getTerm(0);
-				ofac.getFunctionGeomFromWKT(arg);
-				term1 = arg;
-			}
-			return ofac.getFunctionOverlaps(term1, term2); 
-		}else if (expr instanceof SpatialWithinFunc) {
-			if (term1 instanceof Function){
-				Term arg = ((Function) term1).getTerm(0);
-				ofac.getFunctionGeomFromWKT(arg);
-				term1 = arg;
-			}
-			return ofac.getFunctionSpatialWithin(term1, term2); 
-		}else if (expr instanceof SpatialContainFunc) {
-			if (term1 instanceof Function){
-				Term arg = ((Function) term1).getTerm(0);
-				ofac.getFunctionGeomFromWKT(arg);
-				term1 = arg;
-			}
-			return ofac.getFunctionSpatialContains(term1, term2); 
-		}else if (expr instanceof SpatialCrossesFunc) {
-			if (term1 instanceof Function){
-				Term arg = ((Function) term1).getTerm(0);
-				ofac.getFunctionGeomFromWKT(arg);
-				term1 = arg;
-			}
-			return ofac.getFunctionSpatialCrosses(term1, term2); 
-		}else if (expr instanceof SpatialDisjointFunc) {
-			if (term1 instanceof Function){
-				Term arg = ((Function) term1).getTerm(0);
-				ofac.getFunctionGeomFromWKT(arg);
-				term1 = arg;
-			}
-			return ofac.getFunctionSpatialDisjoint(term1, term2); 
-		}else if (expr instanceof SpatialEqualFunc) {
-			if (term1 instanceof Function){
-				Term arg = ((Function) term1).getTerm(0);
-				ofac.getFunctionGeomFromWKT(arg);
-				term1 = arg;
-			}
-			return ofac.getFunctionSpatialEquals(term1, term2); 
-		}else if (expr instanceof SpatialIntersectsFunc) {
-			if (term1 instanceof Function){
-				Term arg = ((Function) term1).getTerm(0);
-				ofac.getFunctionGeomFromWKT(arg);
-				term1 = arg;
-			}
-			return ofac.getFunctionSpatialIntersects(term1, term2); 
-		}else if (expr instanceof SpatialTouchesFunc) {
-			if (term1 instanceof Function){
-				Term arg = ((Function) term1).getTerm(0);
-				ofac.getFunctionGeomFromWKT(arg);
-				term1 = arg;
-			}
-			return ofac.getFunctionSpatialTouches(term1, term2); 
-		}else if (expr instanceof EHOverlapFunc) {
-			if (term1 instanceof Function){
-				Term arg = ((Function) term1).getTerm(0);
-				ofac.getFunctionGeomFromWKT(arg);
-				term1 = arg;
-			}
-			return ofac.getFunctionEHOverlap(term1, term2); 
-		}else if (expr instanceof EHContainsFunc) {
-			if (term1 instanceof Function){
-				Term arg = ((Function) term1).getTerm(0);
-				ofac.getFunctionGeomFromWKT(arg);
-				term1 = arg;
-			}
-			return ofac.getFunctionEHContains(term1, term2); 
-		}else if (expr instanceof EHCoversFunc) {
-			if (term1 instanceof Function){
-				Term arg = ((Function) term1).getTerm(0);
-				ofac.getFunctionGeomFromWKT(arg);
-				term1 = arg;
-			}
-			return ofac.getFunctionEHCovers(term1, term2); 
-		}else if (expr instanceof EHCoveredByFunc) {
-			if (term1 instanceof Function){
-				Term arg = ((Function) term1).getTerm(0);
-				ofac.getFunctionGeomFromWKT(arg);
-				term1 = arg;
-			}
-			return ofac.getFunctionEHCoveredBy(term1, term2); 
-		}else if (expr instanceof EHDisjointFunc) {
-			if (term1 instanceof Function){
-				Term arg = ((Function) term1).getTerm(0);
-				ofac.getFunctionGeomFromWKT(arg);
-				term1 = arg;
-			}
-			return ofac.getFunctionEHDisjoint(term1, term2); 
-		}else if (expr instanceof EHEqualsFunc) {
-			if (term1 instanceof Function){
-				Term arg = ((Function) term1).getTerm(0);
-				ofac.getFunctionGeomFromWKT(arg);
-				term1 = arg;
-			}
-			return ofac.getFunctionEHEquals(term1, term2); 
-		}else if (expr instanceof EHInsideFunc) {
-			if (term1 instanceof Function){
-				Term arg = ((Function) term1).getTerm(0);
-				ofac.getFunctionGeomFromWKT(arg);
-				term1 = arg;
-			}
-			return ofac.getFunctionEHInside(term1, term2); 
-		} 
+		}
 		else if (expr instanceof MathExpr) {
 			switch (((MathExpr)expr).getOperator()) {
 				case PLUS:
@@ -1648,7 +1528,8 @@ public class SparqlAlgebraToDatalogTranslator {
 		else if (expr instanceof LangMatches) {
 			return ofac.getLANGMATCHESFunction(term1, toLowerCase(term2));
 		} 
-		
+
+		//TODO add spatial functions here
 		throw new RuntimeException("The expression " + expr + " is not supported yet!");
 	}
 

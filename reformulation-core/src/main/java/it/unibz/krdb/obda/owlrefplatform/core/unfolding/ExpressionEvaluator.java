@@ -20,21 +20,7 @@ package it.unibz.krdb.obda.owlrefplatform.core.unfolding;
  * #L%
  */
 
-import gr.uoa.di.madgik.sesame.functions.EHContainsFunc;
-import gr.uoa.di.madgik.sesame.functions.EHCoveredByFunc;
-import gr.uoa.di.madgik.sesame.functions.EHCoversFunc;
-import gr.uoa.di.madgik.sesame.functions.EHDisjointFunc;
-import gr.uoa.di.madgik.sesame.functions.EHEqualsFunc;
-import gr.uoa.di.madgik.sesame.functions.EHInsideFunc;
-import gr.uoa.di.madgik.sesame.functions.EHOverlapFunc;
-import gr.uoa.di.madgik.sesame.functions.SpatialContainFunc;
-import gr.uoa.di.madgik.sesame.functions.SpatialCrossesFunc;
-import gr.uoa.di.madgik.sesame.functions.SpatialDisjointFunc;
-import gr.uoa.di.madgik.sesame.functions.SpatialEqualFunc;
-import gr.uoa.di.madgik.sesame.functions.SpatialIntersectsFunc;
-import gr.uoa.di.madgik.sesame.functions.SpatialOverlapFunc;
-import gr.uoa.di.madgik.sesame.functions.SpatialTouchesFunc;
-import gr.uoa.di.madgik.sesame.functions.SpatialWithinFunc;
+
 import it.unibz.krdb.obda.model.AlgebraOperatorPredicate;
 import it.unibz.krdb.obda.model.DatatypeFactory;
 import it.unibz.krdb.obda.model.Function;
@@ -753,7 +739,8 @@ public class ExpressionEvaluator {
 		
 		if (pred == OBDAVocabulary.OVERLAPS)
 			return	fac.getFunctionOverlaps(arg1, arg2);
-		else if (pred instanceof SpatialContainFunc)
+		//else if (pred instanceof SpatialContainFunc)
+		else if (pred == OBDAVocabulary.SFCONTAINS)
 			return fac.getFunctionSpatialContains(arg1, arg2);
 		else if (pred == OBDAVocabulary.SFEQUALS)
 			return fac.getFunctionSpatialEquals(arg1, arg2);

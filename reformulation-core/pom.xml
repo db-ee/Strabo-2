@@ -40,11 +40,11 @@
 			<artifactId>sesame-queryparser-api</artifactId>
 		</dependency> 
 		
-	<!-- 	<dependency>
+	 	<dependency>
 			<groupId>org.openrdf.sesame</groupId>
 			<artifactId>sesame-queryparser-sparql</artifactId>
 		</dependency> 
- -->
+
 <!--  		<dependency>
   			<groupId>net.sf.jgrapht</groupId>
   			<artifactId>jgrapht</artifactId>
