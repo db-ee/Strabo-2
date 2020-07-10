@@ -67,6 +67,21 @@
             <!-- Google Maps Key -->
             <value>${googlemapskey}</value>
         </constructor-arg>
+
+	<constructor-arg type="java.lang.String" >
+            <!-- Statistics File  -->
+            <value>${statisticsfile}</value>
+        </constructor-arg>
+
+	<constructor-arg type="java.lang.String" >
+            <!-- Dictionary File -->
+            <value>${dictionaryfile}</value>
+        </constructor-arg>
+
+        <constructor-arg type="java.lang.String" >
+            <!-- asWKT tables File  -->
+            <value>${asWKTfile}</value>
+        </constructor-arg>
                 
         <constructor-arg type="int" >
             <!-- Query limit -->
@@ -76,22 +91,6 @@
         <constructor-arg type="boolean" >
             <!-- Load from File -->
             <value>true</value>
-        </constructor-arg>
-
-	 <constructor-arg type="java.lang.String" >
-            <!-- Dictionary File -->
-            <value>${dictionaryfile}</value>
-        </constructor-arg>
-
-
-	 <constructor-arg type="java.lang.String" >
-            <!-- Statistics File  -->
-            <value>${statisticsfile}</value>
-        </constructor-arg>
-	
-	<constructor-arg type="java.lang.String" >
-            <!-- asWKT tables File  -->
-            <value>${asWKTfile}</value>
         </constructor-arg>
         
         <!-- Boolean variable linkURL in stSPARQLResultsHTMLWriter.java (line 115) to change the links between web and describe -->

@@ -224,6 +224,9 @@ public class StrabonBeanWrapper implements org.springframework.beans.factory.Dis
         if ((this.strabon == null) && (!init())) {
             throw new RepositoryException("Could not connect to Strabon.");
         }
+        if(this.con == null){
+            throw new RepositoryException("Strabon has not been initialized properly.");
+        }
         if (answerFormatStrabon.equalsIgnoreCase(Format.PIECHART.toString()) || answerFormatStrabon.equalsIgnoreCase(Format.AREACHART.toString())
                 || answerFormatStrabon.equalsIgnoreCase(Format.COLUMNCHART.toString())) {
             TupleQuery tq = con.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
@@ -300,6 +303,8 @@ public class StrabonBeanWrapper implements org.springframework.beans.factory.Dis
 
             }
         } else {
+            TupleQuery tq = con.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
+            TupleQueryResult result = tq.evaluate();
             //TODO strabon.query(queryString, Format.fromString(answerFormatStrabon), strabon.getSailRepoConnection(), out);
         }
 

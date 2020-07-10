@@ -94,7 +94,7 @@ public class QueryExecutor {
 						asWKTSubpropertiesToTables.put(nextProp, null);
 					}
 				} catch (Exception fnf) {
-					log.error("Could not read other WKT properties file");
+					log.error("Could not read other WKT properties file "+fnf.getMessage());
 
 				}
 

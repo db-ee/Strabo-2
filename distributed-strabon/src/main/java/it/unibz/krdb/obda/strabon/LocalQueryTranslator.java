@@ -88,7 +88,7 @@ public class LocalQueryTranslator {
 
 			try {
 
-				createObdaFile();
+				createObdaFile(readPredicates(propDictionary));
 				OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 				OWLOntology ontology = manager.createOntology(); // empty ontology
 
@@ -154,7 +154,8 @@ public class LocalQueryTranslator {
 
 	}
 
-	private static void createObdaFile() throws SQLException, IOException {
+	public static boolean createObdaFile(Map<String, String> predDictionary) throws SQLException, IOException {
+		boolean existsGeometryTable = false;
 		obdaFile = new StringBuffer();
 		obdaFile.append("[PrefixDeclaration]");
 		obdaFile.append("\n");
@@ -179,12 +180,13 @@ public class LocalQueryTranslator {
 		obdaFile.append("[MappingDeclaration] @collection [[");
 		obdaFile.append("\n");
 
-		Map<String, String> predDictionary = readPredicates(propDictionary);
+
 		int mappingId = 0;
 		int asWKTsubproperty = 0;
 		for (String property : predDictionary.keySet()) {
 
 			if (property.equals("http://www.opengis.net/ont/geosparql#asWKT")) {
+				existsGeometryTable = true;
 				obdaFile.append("mappingId\tmapp");
 				obdaFile.append(mappingId);
 				mappingId++;
@@ -278,6 +280,7 @@ public class LocalQueryTranslator {
 
 		}
 		obdaFile.append("]]");
+		return existsGeometryTable;
 
 	}
 
