@@ -17,7 +17,7 @@ import java.util.Vector;
 import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.query.resultio.TupleQueryResultFormat;
-import org.openrdf.query.resultio.stSPARQLQueryResultFormat;
+import eu.earthobservatory.utils.stSPARQLQueryResultFormat;
 
 /**
  * @author Kallirroi Dogani <kallirroi@di.uoa.gr>

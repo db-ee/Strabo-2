@@ -20,6 +20,8 @@ package sesameWrapper;
  * limitations under the License.
  * #L%
  */
+import eu.earthobservatory.utils.Format;
+import eu.earthobservatory.utils.stSPARQLQueryResultToFormatAdapter;
 import info.aduna.iteration.CloseableIteration;
 import info.aduna.iteration.CloseableIteratorIteration;
 import info.aduna.iteration.Iteration;
@@ -28,11 +30,7 @@ import it.unibz.krdb.obda.owlrefplatform.core.QuestConstants;
 import it.unibz.krdb.obda.owlrefplatform.core.StrabonStatement;
 import it.unibz.krdb.obda.sesame.SesameRDFIterator;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
+import java.io.*;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.sql.SQLException;
@@ -54,20 +52,16 @@ import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.NamespaceImpl;
 import org.openrdf.model.impl.ValueFactoryImpl;
-import org.openrdf.query.BooleanQuery;
-import org.openrdf.query.GraphQuery;
-import org.openrdf.query.GraphQueryResult;
-import org.openrdf.query.MalformedQueryException;
-import org.openrdf.query.Query;
-import org.openrdf.query.QueryEvaluationException;
-import org.openrdf.query.QueryLanguage;
-import org.openrdf.query.TupleQuery;
-import org.openrdf.query.Update;
+import org.openrdf.query.*;
 import org.openrdf.query.parser.ParsedBooleanQuery;
 import org.openrdf.query.parser.ParsedGraphQuery;
 import org.openrdf.query.parser.ParsedQuery;
 import org.openrdf.query.parser.ParsedTupleQuery;
 import org.openrdf.query.parser.QueryParserUtil;
+import org.openrdf.query.resultio.BooleanQueryResultWriter;
+import org.openrdf.query.resultio.TupleQueryResultWriter;
+import org.openrdf.query.resultio.sparqlxml.SPARQLBooleanXMLWriter;
+import org.openrdf.query.resultio.text.BooleanTextWriter;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.RepositoryResult;
@@ -81,6 +75,8 @@ import org.openrdf.rio.RDFParser;
 import org.openrdf.rio.Rio;
 import org.openrdf.rio.UnsupportedRDFormatException;
 import org.openrdf.rio.helpers.BasicParserSettings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class StrabonRepoConnection implements org.openrdf.repository.RepositoryConnection, AutoCloseable {
 
@@ -91,6 +87,7 @@ public class StrabonRepoConnection implements org.openrdf.repository.RepositoryC
     private boolean isActive;
     private  RDFParser rdfParser;
     private StrabonStatement st;
+	private static Logger logger = LoggerFactory.getLogger(sesameWrapper.StrabonRepoConnection.class);
 	
 	public StrabonRepoConnection(SesameStrabonRepo rep, SparkSession sparkSession, StrabonStatement strabonSt) throws OBDAException
 	{
@@ -354,9 +351,145 @@ public class StrabonRepoConnection implements org.openrdf.repository.RepositoryC
         }*/
     }
 
+	public Object query(String queryString, Format resultsFormat, OutputStream out) throws MalformedQueryException, QueryEvaluationException, IOException, TupleQueryResultHandlerException {
+		boolean status = true;
 
-            
-          private class Insert implements Runnable{
+		logger.info("[Strabon.query] Executing query: {}", queryString);
+
+		// check for null stream
+		if (out == null) {
+			logger.error("[Strabon.query] Cannot write to null stream.");
+
+			return false;
+		}
+
+		TupleQuery tupleQuery = null;
+		BooleanQuery askQuery = null;
+		Boolean isAskQuery = false;
+		try {
+			tupleQuery = this.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
+		} catch (Exception e1) {
+			try {
+				askQuery = this.prepareBooleanQuery(QueryLanguage.SPARQL, queryString);
+				isAskQuery = true;
+			} catch (Exception e2) {
+				logger.error("[Strabon.query] Error in preparing tuple or ask query.", e2);
+				status = false;
+			}
+		}
+
+		if (logger.isDebugEnabled()) {
+			logger.debug("Serializing results ({})", resultsFormat.name());
+		}
+		if (!isAskQuery) {
+			TupleQueryResult result = null;
+			switch (resultsFormat) {
+				case EXP:
+					long results = 0;
+
+					long t1 = System.nanoTime();
+					result = tupleQuery.evaluate();
+					long t2 = System.nanoTime();
+
+					while (result.hasNext()) {
+						results++;
+						result.next();
+					}
+
+					long t3 = System.nanoTime();
+
+					logger.info((t2-t1)+" + "+(t3-t2)+" = "+(t3-t1)+" | "+results);
+					return new long[]{t2-t1, t3-t2, t3-t1, results};
+				//				break;
+
+				case TUQU:
+
+					return tupleQuery;
+				//				break;
+				case PIECHART:
+					return tupleQuery.evaluate();
+
+				case AREACHART:
+					return tupleQuery.evaluate();
+
+				case COLUMNCHART:
+					return tupleQuery.evaluate();
+
+				default:
+					// get the writer for the specified format
+					TupleQueryResultWriter resultWriter = stSPARQLQueryResultToFormatAdapter.createstSPARQLQueryResultWriter(resultsFormat, out);
+
+					// check for null format
+					if (resultWriter == null) {
+						logger.error("[Strabon.query] Invalid format.");
+						return false;
+					}
+
+					tupleQuery.evaluate(resultWriter);
+			}
+		} else {
+			Boolean result = false;
+			switch (resultsFormat) {
+				case EXP:
+					long results = 0;
+					long t1 = System.nanoTime();
+					result = askQuery.evaluate();
+					long t2 = System.nanoTime();
+					long t3 = System.nanoTime();
+
+					logger.info((t2-t1)+" + "+(t3-t2)+" = "+(t3-t1)+" | "+"1");
+					return new long[]{t2-t1, t3-t2, t3-t1, results};
+				case TUQU:
+					return askQuery;
+				case PIECHART:
+					return askQuery.evaluate();
+
+				case AREACHART:
+					return askQuery.evaluate();
+
+				case COLUMNCHART:
+					return askQuery.evaluate();
+
+				default:
+					result = askQuery.evaluate();
+					BooleanQueryResultWriter writer = null;
+					String output = null;
+					switch(resultsFormat) {
+						case SESAME_JSON:
+							output = "{\n \"head\": {},\n \"boolean\":" + String.valueOf(result) + "\n}";
+							out.write(output.getBytes());
+							break;
+						case XML:
+						case SESAME_XML:
+							writer = new SPARQLBooleanXMLWriter(out);
+							writer.write(result);
+							break;
+						case TSV:
+						case DEFAULT:
+						case SESAME_CSV:
+						case SESAME_TSV:
+							output = "\"bool\"\n" + (result ? "1" : "0") + "\n";
+							out.write(output.getBytes());
+							break;
+						case HTML:
+							writer = new BooleanTextWriter(out);
+							writer.write(result);
+							break;
+						case SESAME_BINARY:
+							output = (result ? "1" : "0");
+							out.write(output.getBytes());
+							break;
+						default:
+							logger.error("[Strabon.query] Invalid format.");
+							return false;
+					}
+			}
+		}
+
+		return status;
+	}
+
+	private class Insert implements Runnable{
         	  private RDFParser rdfParser;
         	  private InputStream inputStreamOrReader;
         	  private String baseURI;

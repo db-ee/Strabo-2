@@ -70,7 +70,8 @@
     	<module>endpoint2</module>
     	<module>endpoint2-client</module>
     	<module>endpoint2-exec</module>
-</modules>
+        <!-- <module>resultio-spatial</module> -->
+    </modules>
 
 	<profiles>
 		<profile>

@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.openrdf.query.resultio.TupleQueryResultFormat;
-import org.openrdf.query.resultio.stSPARQLQueryResultFormat;
+import eu.earthobservatory.utils.stSPARQLQueryResultFormat;
 import org.openrdf.rio.RDFFormat;
 
 /**

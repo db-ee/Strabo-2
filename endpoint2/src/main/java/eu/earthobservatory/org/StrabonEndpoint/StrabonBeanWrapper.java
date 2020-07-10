@@ -229,8 +229,9 @@ public class StrabonBeanWrapper implements org.springframework.beans.factory.Dis
         }
         if (answerFormatStrabon.equalsIgnoreCase(Format.PIECHART.toString()) || answerFormatStrabon.equalsIgnoreCase(Format.AREACHART.toString())
                 || answerFormatStrabon.equalsIgnoreCase(Format.COLUMNCHART.toString())) {
-            TupleQuery tq = con.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
-            TupleQueryResult result = tq.evaluate();
+            //TupleQuery tq = con.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
+            //TupleQueryResult result = tq.evaluate();
+            TupleQueryResult result = (TupleQueryResult) con.query(queryString, Format.fromString(answerFormatStrabon), out);
             //(TupleQueryResult) strabon.query(queryString, Format.fromString(answerFormatStrabon), strabon, out);
             List<String> bindingNames = result.getBindingNames();
             if (bindingNames.size() != 2 && answerFormatStrabon.equalsIgnoreCase(Format.PIECHART.toString())) {
@@ -303,9 +304,10 @@ public class StrabonBeanWrapper implements org.springframework.beans.factory.Dis
 
             }
         } else {
-            TupleQuery tq = con.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
-            TupleQueryResult result = tq.evaluate();
-            //TODO strabon.query(queryString, Format.fromString(answerFormatStrabon), strabon.getSailRepoConnection(), out);
+            con.query(queryString, Format.fromString(answerFormatStrabon), out);
+            //TupleQuery tq = con.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
+            //TupleQueryResult result = tq.evaluate();
+            //strabon.query(queryString, Format.fromString(answerFormatStrabon), strabon.getSailRepoConnection(), out);
         }
 
     }

@@ -26,7 +26,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.xerces.impl.dv.util.Base64;
 import org.openrdf.query.resultio.TupleQueryResultFormat;
-import org.openrdf.query.resultio.stSPARQLQueryResultFormat;
+import eu.earthobservatory.utils.stSPARQLQueryResultFormat;
 import org.openrdf.rio.RDFFormat;
 
 /**

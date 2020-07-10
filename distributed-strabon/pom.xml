@@ -352,7 +352,61 @@
 			<artifactId>cglib</artifactId>
 			<version>3.1</version>
 		</dependency>
-
+       <!--  <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-queryresultio-spatial-sparqlgeojson</artifactId>
+            <version>1.16.1</version>
+            <scope>compile</scope>
+        </dependency>
+		<dependency>
+			<groupId>org.openrdf.sesame</groupId>
+			<artifactId>sesame-queryresultio-spatial-sparqlhtml</artifactId>
+			<version>1.16.1</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.openrdf.sesame</groupId>
+			<artifactId>sesame-queryresultio-spatial-sparqlkml</artifactId>
+			<version>1.16.1</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.openrdf.sesame</groupId>
+			<artifactId>sesame-queryresultio-spatial-sparqlxml</artifactId>
+			<version>1.16.1</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.openrdf.sesame</groupId>
+			<artifactId>sesame-queryresultio-spatial-text</artifactId>
+			<version>1.16.1</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.openrdf.sesame</groupId>
+			<artifactId>sesame-queryresultio-spatial-sparqlgeojson</artifactId>
+			<version>1.16.1</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.openrdf.sesame</groupId>
+			<artifactId>sesame-queryresultio-spatial-sparqlgeojson</artifactId>
+			<version>1.16.1</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.openrdf.sesame</groupId>
+			<artifactId>sesame-queryresultio-spatial-sparqlgeojson</artifactId>
+			<version>1.16.1</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.openrdf.sesame</groupId>
+			<artifactId>sesame-queryresultio-spatial-sparqlgeojson</artifactId>
+			<version>1.16.1</version>
+			<scope>compile</scope>
+		</dependency>
+-->
 	</dependencies>
 
 
