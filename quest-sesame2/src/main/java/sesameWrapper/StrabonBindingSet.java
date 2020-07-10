@@ -87,7 +87,7 @@ public class StrabonBindingSet implements BindingSet {
 		
 			for(int i=0;i<this.bindingnames.size();i++) {
 				if(this.bindingnames.get(i).equals(bindingName)){
-					value=fact.createLiteral(row.getString(i));
+					value=fact.createLiteral(row.get(i).toString());
 					break;
 				}
 			}
