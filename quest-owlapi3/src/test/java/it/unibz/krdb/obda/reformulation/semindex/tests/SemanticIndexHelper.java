@@ -47,7 +47,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.h2.jdbcx.JdbcDataSource;
+//import org.h2.jdbcx.JdbcDataSource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,7 +77,7 @@ public class SemanticIndexHelper {
     private String owl_inverse_exists = "::__inverse__exists__::";
     private String owl_inverse = "::__inverse__::";
 
-    public SemanticIndexHelper() {
+    /*public SemanticIndexHelper() {
         JdbcDataSource ds = new JdbcDataSource();
         ds.setURL("jdbc:h2:mem:db1");
         try {
@@ -86,7 +86,7 @@ public class SemanticIndexHelper {
             log.error("Error creating test database");
             e.printStackTrace();
         }
-    }
+    }*/
 
     public Ontology load_onto(String ontoname) throws Exception {
         String owlfile = owlloc + ontoname + ".owl";
