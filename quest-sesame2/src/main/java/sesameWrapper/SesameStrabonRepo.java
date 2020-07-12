@@ -140,11 +140,11 @@ public class SesameStrabonRepo implements Repository {
 
 
 
-			spark.sql("SET spark.sql.hive.metastore.version = 2.3.3");
+			//spark.sql("SET spark.sql.hive.metastore.version = 2.3.3");
 			//spark.sql("SET spark.sql.warehouse.dir = hdfs://pyravlos3:9001/user/hive/warehouse");
-			spark.sql("SET spark.sql.hive.metastore.jars = /home/hadoop/SingleNodeYarnSparkHiveHDFSCluster/hive/lib/*");
-			spark.sql("SET spark.hadoop.datanucleus.fixedDatastore = true");
-			spark.sql("SET  spark.hadoop.datanucleus.autoCreateSchema =false");
+			//spark.sql("SET spark.sql.hive.metastore.jars = /home/hadoop/SingleNodeYarnSparkHiveHDFSCluster/hive/lib/*");
+			//spark.sql("SET spark.hadoop.datanucleus.fixedDatastore = true");
+			//spark.sql("SET  spark.hadoop.datanucleus.autoCreateSchema =false");
 
 
 			spark.sql("USE " + database);
