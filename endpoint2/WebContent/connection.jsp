@@ -73,11 +73,11 @@
 	</TR>
 	<TR> 
 		<TD valign="top" class="style4">Username:</TD>
-		<TD><input type="text" name="username" value="<%=request.getAttribute("username")%>"/></TD>
+		<TD><input type="text" name="geoSparkJars" value="<%=request.getAttribute("geoSparkJars")%>"/></TD>
 	</TR>
 		<TR> 
 		<TD valign="top" class="style4">Password:</TD>
-		<TD><input type="password" name="password" value="<%=request.getAttribute("password")%>"/></TD>
+		<TD><input type="password" name="hadoopHomeDir" value="<%=request.getAttribute("hadoopHomeDir")%>"/></TD>
 	</TR>
 	<TR> 
 		<TD valign="top" class="style4">Port:</TD>
@@ -85,7 +85,7 @@
 	</TR>
 	<TR> 
 		<TD valign="top" class="style4">Hostname:</TD>
-		<TD><input type="text" name="hostname" value="<%=request.getAttribute("hostname")%>"/></TD>
+		<TD><input type="text" name="sparkAddress" value="<%=request.getAttribute("sparkAddress")%>"/></TD>
 	</TR>
 	<TR> 
 		<TD valign="top" class="style4">Database Backend:</TD>

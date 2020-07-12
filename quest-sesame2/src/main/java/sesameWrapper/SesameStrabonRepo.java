@@ -50,13 +50,16 @@ public class SesameStrabonRepo implements Repository {
 	static String database;
 	static String statfile;
 	static String asWKTTablesFile;
+	private String sparkAddress;
+	private String geoSparkJars;
+	private String hadoopHomeDir;
 	private SparkSession spark;
 	private static Map<String, String> asWKTSubpropertiesToTables;
 	private StrabonStatement st;
 	private Map<String, String> namespaces;
 	private boolean isInitialized;
 
-	public SesameStrabonRepo(String propDictionary, String database, String statFile, String asWKTTablesFile)
+	public SesameStrabonRepo(String propDictionary, String database, String statFile, String asWKTTablesFile, String sparkAddress, String geoSparkJars, String hadoopHomeDir)
 			throws Exception {
 		super();
 		this.propDictionary=propDictionary;
@@ -68,6 +71,9 @@ public class SesameStrabonRepo implements Repository {
 		this.st = null;
 		this.spark = null;
 		this.isInitialized = false;
+		this.sparkAddress = sparkAddress;
+		this.geoSparkJars = geoSparkJars;
+		this.hadoopHomeDir = hadoopHomeDir;
 	}
 
 	@Override
@@ -85,24 +91,32 @@ public class SesameStrabonRepo implements Repository {
 			String jarDirectory = new File(SesameStrabonRepo.class.getProtectionDomain().getCodeSource().getLocation()
 					.toURI()).getParentFile().getPath();
 			
-			log.debug("Setting hadoop.home.dir ---> /home/hadoop/SingleNodeYarnSparkHiveHDFSCluster/hadoop");
-			System.setProperty("hadoop.home.dir", "/home/hadoop/SingleNodeYarnSparkHiveHDFSCluster/hadoop");
+			log.debug("Setting hadoop.home.dir ---> "+this.hadoopHomeDir);
+			System.setProperty("hadoop.home.dir", this.hadoopHomeDir);
 			//System.setProperty("spark.sql.warehouse.dir", "/opt/tomcat");
-			
+			String[] jars = geoSparkJars.split(",");
 			log.debug("Geospark jars will be loaded from "+ jarDirectory );
+			log.debug("Geospark jars:" +jars);
+			StringBuilder sb = new StringBuilder();
+			String comma="";
+			for(String jar:jars){
+				sb.append(comma);
+				sb.append(jarDirectory);
+				sb.append("/");
+				sb.append(jar);
+				comma=",";
+			}
 			spark = SparkSession.builder()
 					//.master("local[*]") // Delete this if run in cluster mode
-					.master("spark://pyravlos3:7078")
+					.master(this.sparkAddress)
 					.appName("strabonQuery") // Change this to a proper name
 					// Enable GeoSpark custom Kryo serializer
 					.config("spark.serializer", KryoSerializer.class.getName())
 					.config("spark.kryo.registrator", GeoSparkVizKryoRegistrator.class.getName())
 					.config("spark.sql.inMemoryColumnarStorage.compressed", true)
 					.config("hive.exec.dynamic.partition", true).config("spark.sql.parquet.filterPushdown", true)
-					.config("hadoop.home.dir", "/home/hadoop/SingleNodeYarnSparkHiveHDFSCluster/hadoop")
-					.config("spark.jars", jarDirectory+"/geospark-1.3.1.jar,"+
-						jarDirectory+"/geospark-sql_2.3-1.3.1.jar,"+
-						jarDirectory+"/geospark-viz_2.3-1.3.1.jar")
+					//.config("hadoop.home.dir", "/home/hadoop/SingleNodeYarnSparkHiveHDFSCluster/hadoop")
+					.config("spark.jars", sb.toString())
 					//.config("spark.jars", "webapps/endpoint2-1.16.1/WEB-INF/lib/geospark*.jar")
 					//.config("spark.hadoop.hive.metastore.warehouse.dir", "/opt/tomcat")
 					//.config("spark.sql.warehouse.dir", "/opt/tomcat")

@@ -18,7 +18,7 @@ import it.unibz.krdb.obda.model.impl.URITemplatePredicateImpl;
 
 import java.util.List;
 
-import org.h2.engine.FunctionAlias;
+//import org.h2.engine.FunctionAlias;
 
 import net.sf.jsqlparser.statement.select.FunctionItem;
 

@@ -35,12 +35,12 @@
 
         <constructor-arg type="java.lang.String" >
             <!-- Username -->
-            <value>${username}</value>
+            <value>${geosparkjars}</value>
         </constructor-arg>
 
         <constructor-arg type="java.lang.String" >
             <!-- Password -->
-            <value>${password}</value>
+            <value>${hadoophomedir}</value>
         </constructor-arg>
 
         <constructor-arg type="int" >
@@ -50,7 +50,7 @@
 
         <constructor-arg type="java.lang.String" >
             <!-- Database server -->
-            <value>${hostname}</value>
+            <value>${sparkaddress}</value>
         </constructor-arg>
 
         <constructor-arg type="boolean" >

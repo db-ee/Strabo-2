@@ -35,11 +35,10 @@ public class StrabonBeanWrapper implements org.springframework.beans.factory.Dis
 
     private static final String FILE_PROTOCOL = "file";
 
-    private String serverName;
     private int port;
     private String databaseName;
-    private String user;
-    private String password;
+    private String geoSparkJars;
+    private String hadoopHomeDir;
     private String dbBackend;
     private String googlemapskey;
     private int maxLimit;
@@ -55,11 +54,12 @@ public class StrabonBeanWrapper implements org.springframework.beans.factory.Dis
     private String dictFile;
     private String asWKTFile;
     private StrabonRepoConnection con;
+    private String sparkAddress;
 
-    public StrabonBeanWrapper(String databaseName, String user, String password,
-            int port, String serverName, boolean checkForLockTable, String dbBackend,
+    public StrabonBeanWrapper(String databaseName, String geoSparkJars, String hadoopHomeDir,
+            int port, String sparkAddress, boolean checkForLockTable, String dbBackend,
             String googlemapskey, String statFile, String dictFile, String asWKTFile, int maxLimit, boolean loadFromFile, String prefixes, List<List<String>> args) {
-        setConnectionDetails(databaseName, user, password, String.valueOf(port), serverName, dbBackend, googlemapskey, statFile, dictFile, asWKTFile);
+        setConnectionDetails(databaseName, geoSparkJars, hadoopHomeDir, String.valueOf(port), sparkAddress, dbBackend, googlemapskey, statFile, dictFile, asWKTFile);
         this.checkForLockTable = checkForLockTable;
         this.maxLimit = maxLimit;
         this.loadFromFile = loadFromFile;
@@ -131,7 +131,7 @@ public class StrabonBeanWrapper implements org.springframework.beans.factory.Dis
                 logger.warn("[StrabonEndpoint] Strabon not initialized yet.");
                 logger.warn("[StrabonEndpoint] Initializing Strabon.");
                 //logger.info("[StrabonEndpoint] Connection details:\n" + this.getDetails());
-                strabon = new SesameStrabonRepo(dictFile, databaseName, statFile, asWKTFile);
+                strabon = new SesameStrabonRepo(dictFile, databaseName, statFile, asWKTFile, sparkAddress, geoSparkJars, hadoopHomeDir);
                 if(!strabon.isInitialized())
                     strabon.initialize();
                 con = strabon.getConnection();
@@ -391,7 +391,7 @@ public class StrabonBeanWrapper implements org.springframework.beans.factory.Dis
         return true;
     }
 
-    public void setConnectionDetails(String databaseName, String user, String password, String port, String serverName, String dbBackend, String googlemapskey, String statFile, String dictFile, String asWKTFile) {
+    public void setConnectionDetails(String databaseName, String geoSparkJars, String hadoopHomeDir, String port, String sparkAddress, String dbBackend, String googlemapskey, String statFile, String dictFile, String asWKTFile) {
         /* validate-sanitize certain Strabon connection properties
         ** dbBackend - must be one of the supported Db engines, or set it to PostGIS
         ** port - must be an integer, or set it to dbBackend's default port
@@ -410,20 +410,20 @@ public class StrabonBeanWrapper implements org.springframework.beans.factory.Dis
         ** any of the Strabon connection properties have changed
          */
         this.strabonConnectionDetailsHaveBeenModified = !(dbBackend.equalsIgnoreCase(this.dbBackend)
-                && serverName.equalsIgnoreCase(this.serverName)
+                && sparkAddress.equalsIgnoreCase(this.sparkAddress)
                 && port.equalsIgnoreCase(String.valueOf(this.port))
                 && databaseName.equals(this.databaseName)
-                && user.equalsIgnoreCase(this.user)
-                && password.equals(this.password)
+                && geoSparkJars.equalsIgnoreCase(this.geoSparkJars)
+                && hadoopHomeDir.equals(this.hadoopHomeDir)
                 && dictFile.equals(this.dictFile)
                 && statFile.equals(this.statFile)
                 && asWKTFile.equals(this.asWKTFile));
         this.dbBackend = dbBackend;
-        this.serverName = serverName;
+        this.sparkAddress = sparkAddress;
         this.port = Integer.parseInt(port);
         this.databaseName = databaseName;
-        this.user = user;
-        this.password = password;
+        this.geoSparkJars = geoSparkJars;
+        this.hadoopHomeDir = hadoopHomeDir;
         this.googlemapskey = googlemapskey;
         this.checkForLockTable = true;
         this.dictFile = dictFile;
@@ -431,12 +431,12 @@ public class StrabonBeanWrapper implements org.springframework.beans.factory.Dis
         this.asWKTFile = asWKTFile;
     }
 
-    public String getUsername() {
-        return user;
+    public String getGeoSparkJars() {
+        return geoSparkJars;
     }
 
-    public String getPassword() {
-        return password;
+    public String getHadoopHomeDir() {
+        return hadoopHomeDir;
     }
 
     public String getDatabaseName() {
@@ -451,17 +451,17 @@ public class StrabonBeanWrapper implements org.springframework.beans.factory.Dis
         return port;
     }
 
-    public String getHostName() {
-        return serverName;
+    public String getSparkAddress() {
+        return sparkAddress;
     }
 
     private String getDetails() {
         String details = "-----------------------------------------\n";
-        details += "host     : " + serverName + "\n";
+        details += "host     : " + sparkAddress + "\n";
         details += "port     : " + port + "\n";
         details += "database : " + databaseName + "\n";
-        details += "user     : " + user + "\n";
-        details += "password : " + password + "\n";
+        details += "user     : " + geoSparkJars + "\n";
+        details += "password : " + hadoopHomeDir + "\n";
         details += "dbengine : " + dbBackend + "\n";
         details += "googlemapskey : " + googlemapskey + "\n";
         details += "dictFile : " + dictFile + "\n";

@@ -122,10 +122,10 @@ public class ConnectionBean extends HttpServlet {
 	   	else {	 		
 	   	// set new connection details
 	 		strabonWrapper.setConnectionDetails(request.getParameter("dbname"), 
-	 											request.getParameter("username"), 
-	 											request.getParameter("password"), 
+	 											request.getParameter("geoSparkJars"),
+	 											request.getParameter("hadoopHomeDir"),
 	 											request.getParameter("port"),
-	 											request.getParameter("hostname"), 
+	 											request.getParameter("sparkAddress"),
 	 											request.getParameter("dbengine"),
 												request.getParameter("googlemapskey"),
 												request.getParameter("statisticsfile"),
@@ -150,10 +150,10 @@ public class ConnectionBean extends HttpServlet {
 	 			
 	 			// save the new connection details
 	 			saveNewConnectionDetails(request.getParameter("dbname"),
-	 									 request.getParameter("username"), 
+	 									 request.getParameter("hadoopHomeDir"),
 	 									 request.getParameter("password"), 
 	 									 request.getParameter("port"), 
-	 									 request.getParameter("hostname"), 
+	 									 request.getParameter("sparkAddress"),
 	 									 request.getParameter("dbengine"),
                                                                                  request.getParameter("googlemapskey"),
 						request.getParameter("statisticsfile"),
@@ -174,10 +174,10 @@ public class ConnectionBean extends HttpServlet {
 	 			
 	 			// pass the current details of the connection
 	 			request.setAttribute("dbname", 	 request.getParameter("dbname"));
-	 			request.setAttribute("username", request.getParameter("username"));
-	 			request.setAttribute("password", request.getParameter("password"));
+	 			request.setAttribute("geoSparkJars", request.getParameter("geoSparkJars"));
+	 			request.setAttribute("hadoopHomeDir", request.getParameter("hadoopHomeDir"));
 	 			request.setAttribute("port", 	 request.getParameter("port"));
-	 			request.setAttribute("hostname", request.getParameter("hostname"));
+	 			request.setAttribute("sparkAddress", request.getParameter("sparkAddress"));
 	 			request.setAttribute("dbengine", request.getParameter("dbengine"));
                                 request.setAttribute("googlemapskey", request.getParameter("googlemapskey"));
 				request.setAttribute("statisticsfile", request.getParameter("statisticsfile"));
@@ -193,8 +193,8 @@ public class ConnectionBean extends HttpServlet {
 			
 	}
 
-	private void saveNewConnectionDetails(String dbname, String username, String password,
-										  String port, String hostname, String dbengine, String googlemapskey, String statisticsfile, String dictionaryfile, String asWKTfile) throws IOException {
+	private void saveNewConnectionDetails(String dbname, String geoSparkJars, String hadoopHomeDir,
+										  String port, String sparkAddress, String dbengine, String googlemapskey, String statisticsfile, String dictionaryfile, String asWKTfile) throws IOException {
 		Properties properties = new Properties();
 		
 		synchronized (lock) {
@@ -206,10 +206,10 @@ public class ConnectionBean extends HttpServlet {
 			
 			// update them
 			properties.setProperty("dbname", 	dbname);
-			properties.setProperty("username", 	username);
-			properties.setProperty("password", 	password);
+			properties.setProperty("geoSparkJars", 	geoSparkJars);
+			properties.setProperty("hadoopHomeDir", 	hadoopHomeDir);
 			properties.setProperty("port", 		port);
-			properties.setProperty("hostname", 	hostname);
+			properties.setProperty("sparkAddress", 	sparkAddress);
 			properties.setProperty("dbengine", 	dbengine);
                         properties.setProperty("googlemapskey", googlemapskey);
 			properties.setProperty("statisticsfile", 	statisticsfile);
