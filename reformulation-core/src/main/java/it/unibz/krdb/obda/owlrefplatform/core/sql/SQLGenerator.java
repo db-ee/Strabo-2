@@ -858,6 +858,10 @@ public class SQLGenerator implements SQLQueryGenerator {
 		} else if (ht == OBDAVocabulary.NULL) {
 			mainColumn = "NULL";
 		}
+		else if (ht instanceof Variable) {
+			Variable v = (Variable) ht;
+			mainColumn = sqladapter.sqlCast(getSQLString(ht, index, false), Types.VARCHAR);
+		}
 		else if (ht instanceof Function) {
 		
 			/*
