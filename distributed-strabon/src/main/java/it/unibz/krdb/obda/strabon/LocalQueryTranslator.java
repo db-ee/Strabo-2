@@ -314,18 +314,14 @@ public class LocalQueryTranslator {
 		return files.toArray(new String[files.size()]);
 	}
 
-	public static String readFile(String filename) {
+	public static String readFile(String filename) throws Exception {
 		String file = "";
-		try {
+	
 			BufferedReader reader = new BufferedReader(new FileReader(filename));
 			String line = null;
 			while ((line = reader.readLine()) != null) {
 				file += line + "\n";
 			}
-		} catch (Exception e) {
-			System.err.println("Error reading file: " + filename);
-			e.printStackTrace();
-		}
 		return file;
 	}
 

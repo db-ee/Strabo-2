@@ -187,7 +187,7 @@ public class SesameStrabonRepo implements Repository {
 
 			for (String asWKTsubprop : asWKTSubpropertiesToTables.keySet()) {
 				String tblName = asWKTSubpropertiesToTables.get(asWKTsubprop);
-				log.debug("preloading asWKT subproperty tables");
+				log.debug("preloading asWKT subproperty tables: " + asWKTSubpropertiesToTables.toString());
 				Dataset<Row> geoms = spark
 						.sql("Select s, ST_GeomFromWKT(o) as o FROM " + predDictionary.get(asWKTsubprop) + " ");
 				geoms.createOrReplaceGlobalTempView(tblName);
