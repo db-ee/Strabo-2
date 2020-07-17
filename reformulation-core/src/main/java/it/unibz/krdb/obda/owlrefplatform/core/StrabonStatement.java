@@ -71,6 +71,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 
+//additions for DH
+import it.unibz.krdb.obda.model.impl.FunctionalTermImpl;
+import it.unibz.krdb.obda.model.impl.URIConstantImpl;
+import it.unibz.krdb.obda.model.impl.ValueConstantImpl;
+import java.util.Map;
+import java.util.Arrays;
+
 //import org.sqlite.SQLiteConfig;
 
 /**
@@ -103,6 +110,12 @@ public class StrabonStatement implements OBDAStatement {
 
 	private SesameConstructTemplate templ;
 
+	//additions by DH
+	private Map<String, String> decoder;
+	public void setDecoder(Map<String, String>  dec) {
+		this.decoder = dec;
+	}
+
 	private static final Logger log = LoggerFactory.getLogger(StrabonStatement.class);
 
 	/*
@@ -125,6 +138,8 @@ public class StrabonStatement implements OBDAStatement {
 		this.nse = nse;
 
 	}
+
+	
 
 	private class QueryExecutionThread extends Thread {
 
@@ -647,7 +662,8 @@ public class StrabonStatement implements OBDAStatement {
 				} catch (Exception e) {
 					log.error("Error while optimizing query. Using default translation. " + e.getMessage());
 				}
-
+				if (decoder != null)
+					findCostantURIs(programAfterSplittingSpatialJoin);
 				sql = getSQL(programAfterSplittingSpatialJoin, signatureContainer);
 				// cacheQueryAndProperties(strquery, sql);
 				questInstance.cacheSQL(strquery, sql);
@@ -662,6 +678,63 @@ public class StrabonStatement implements OBDAStatement {
 		}
 		return sql;
 	}
+	//additions by DH
+
+	private void findCostantURIs(DatalogProgram prog) {
+		if (decoder == null)
+			return ;
+		//System.out.println("~~~~~~~~~~~~`");
+		for (CQIE cq : prog.getRules()) {
+			for (Function f : cq.getBody()) {
+
+				// if (!(f instanceof FunctionalTermImpl))
+				// 	continue;
+				for (int i =0; i < f.getTerms().size(); i++) {
+					if (!(f.getTerms().get(i) instanceof ValueConstantImpl ))
+						continue;
+					ValueConstantImpl uri = (ValueConstantImpl )f.getTerms().get(i);
+					String uriString = uri.getValue();
+					List<String> ls = splitURI(uriString);
+					String prefix = reconURI(ls, 1, 4, "http:/");
+					String rest = reconURI(ls, 5, -1, "");
+					System.out.println(prefix);
+					if (decoder.get(prefix) != null) {
+						String newstring = decoder.get(prefix)+"/"+rest;
+						System.out.println(newstring);
+						f.getTerms().set(i, fac.getConstantLiteral(newstring));
+					}
+					ValueConstantImpl uri2 = (ValueConstantImpl )f.getTerms().get(i);
+					System.out.println(uri2.getValue());
+
+				}
+			}
+		}
+		//System.out.println("`````````");
+
+	}
+
+	public static List<String> splitURI(String URI) {
+        if (!URI.startsWith("http"))
+            return new ArrayList<String>();
+        List<String> arr = Arrays.asList(URI.split("/", 0));
+        //TODO comment this!
+        //Collections.reverse(arr);
+        return arr;
+
+	}
+	public static String reconURI(List<String> ls, int start, int end, String prefix) {
+		int i;
+		if (end == -1)
+			end = 0xffffff;
+        for (i = start; (i < end && i < ls.size() - 1) ; i++) {
+            prefix = prefix + ls.get(i) + "/";
+        }
+        if (i < ls.size())
+            return prefix + ls.get(i);
+        return prefix;
+    }
+
+
 
 	private DatalogProgram splitSpatialJoin(DatalogProgram program) {
 		DatalogProgram result = program.clone();

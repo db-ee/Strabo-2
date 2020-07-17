@@ -53,6 +53,7 @@ public class QueryExecutor {
 	static String database;
 	static String statfile;
 	static String asWKTTablesFile;
+	static String encoderDictionary;
 	private static Map<String, String> asWKTSubpropertiesToTables;
 
 	public static void main(String[] args) throws Exception {
@@ -62,6 +63,7 @@ public class QueryExecutor {
 			database = args[2];
 			statfile = args[3];
 			asWKTTablesFile = args[4];
+			encoderDictionary = args[5];
 			asWKTSubpropertiesToTables = new HashMap<String, String>();
 			try {
 
@@ -99,6 +101,8 @@ public class QueryExecutor {
 				}
 
 				Map<String, String> predDictionary = readPredicatesFromHadoop(propDictionary, fs);
+				Map<String, String> encoder = readPredicatesFromHadoop(encoderDictionary, fs);
+
 				boolean existDefaultGeometrytable = createObdaFile(predDictionary);
 
 				if (existDefaultGeometrytable) {
@@ -167,6 +171,7 @@ public class QueryExecutor {
 					e.printStackTrace();
 				}
 				StrabonStatement st = reasoner.createStrabonStatement(nse);
+				st.setDecoder(encoder);
 				List<String> sparqlQueries = new ArrayList<String>();
 
 				Path path = new Path(queriesPath);

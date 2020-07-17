@@ -66,6 +66,10 @@ public class LocalQueryTranslator {
 	static String queriesPath;
 	static String statfile;
 	static String asWKTTablesFile;
+	static String dictionaryFile;
+	
+
+	private static Map<String, String> dictionary;
 	private static Map<String, String> asWKTSubpropertiesToTables;
 
 	public static void main(String[] args) throws Exception {
@@ -75,6 +79,7 @@ public class LocalQueryTranslator {
 			statfile = args[2];
 			asWKTTablesFile = args[3];
 			asWKTSubpropertiesToTables = new HashMap<String, String>();
+			dictionaryFile = args[4];
 
 			try {
 				String asWKTFile = readFile(asWKTTablesFile);
@@ -87,6 +92,8 @@ public class LocalQueryTranslator {
 			}
 
 			try {
+
+				dictionary = readPredicates(dictionaryFile);
 
 				createObdaFile(readPredicates(propDictionary));
 				OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
@@ -132,6 +139,7 @@ public class LocalQueryTranslator {
 					e.printStackTrace();
 				}
 				StrabonStatement st = reasoner.createStrabonStatement(nse);
+				st.setDecoder(dictionary);
 				List<String> sparqlQueries = new ArrayList<String>();
 
 				String[] query_files = readFilesFromDir(queriesPath);
