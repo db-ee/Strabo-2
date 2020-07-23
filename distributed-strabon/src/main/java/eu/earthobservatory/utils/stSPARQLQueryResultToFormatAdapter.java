@@ -74,6 +74,10 @@ public class stSPARQLQueryResultToFormatAdapter {
                 writer = tsv.getWriter(out);
                 break;
             */
+            case XML:
+                writer = QueryResultIO.createWriter(TupleQueryResultFormat.SPARQL, out);
+                break;
+
             case SESAME_XML:
                 writer = QueryResultIO.createWriter(TupleQueryResultFormat.SPARQL, out);
                 break;
