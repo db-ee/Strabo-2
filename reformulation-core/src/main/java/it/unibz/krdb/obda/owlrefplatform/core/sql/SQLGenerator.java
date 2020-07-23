@@ -124,6 +124,7 @@ public class SQLGenerator implements SQLQueryGenerator {
 	 */
 	private static final String VIEW_NAME = "QVIEW%s";
 	private static final String VIEW_NAME_PREFIX = "QVIEW";
+	private static final String IN_OPERATOR = "%s IN (%s, %s)";
 
 	private final DBMetadata metadata;
 	private final SQLDialectAdapter sqladapter;
@@ -391,6 +392,20 @@ public class SQLGenerator implements SQLQueryGenerator {
 			return String.format(expressionFormat, column);
 		} else if (isBinary(atom)) {
 			if (atom.isBooleanFunction()) {
+				if(functionSymbol.equals(OBDAVocabulary.SPARQL_IN)){
+					StringBuffer sb=new StringBuffer();
+					Term first = atom.getTerm(0);
+					sb.append(getSQLString(first, index, false));
+					sb.append(" IN (");
+					String comma="";
+					for(int i=1;i<atom.getTerms().size();i++){
+						sb.append(comma);
+						sb.append(getSQLString(atom.getTerm(i), index, false));
+						comma=", ";
+					}
+					sb.append(")");
+					return sb.toString();
+				}
 				// For binary boolean operators, e.g., AND, OR, EQ, GT, LT, etc. _
 				String expressionFormat = getBooleanOperatorString(functionSymbol);
 				Term left = atom.getTerm(0);
@@ -1884,7 +1899,6 @@ public class SQLGenerator implements SQLQueryGenerator {
 				operator = GEOMFROMWKT_OPERATOR;
 		} else if (functionSymbol.equals(OBDAVocabulary.SPARQL_LIKE)) {
 			operator = LIKE_OPERATOR;
-			operator = LIKE_OPERATOR;
 		} else if (functionSymbol.equals(OBDAVocabulary.SPARQL_REGEX)) {
 			operator = ""; //we do not need the operator for regex, it should not be used, because the sql adapter will take care of this
 		} else if (functionSymbol.equals(OBDAVocabulary.STR_STARTS)) {
@@ -1892,7 +1906,11 @@ public class SQLGenerator implements SQLQueryGenerator {
 		} else if (functionSymbol.equals(OBDAVocabulary.STR_ENDS)) {
 			operator = sqladapter.strEndsOperator();
 		} else if (functionSymbol.equals(OBDAVocabulary.CONTAINS)) {
-				operator = sqladapter.strContainsOperator();}
+				operator = sqladapter.strContainsOperator();
+		}
+		else if (functionSymbol.equals(OBDAVocabulary.SPARQL_IN)) {
+			operator = IN_OPERATOR;
+		}
 		else {
 			throw new RuntimeException("Unknown boolean operator: " + functionSymbol);
 		}

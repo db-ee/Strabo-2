@@ -296,7 +296,10 @@ public class ExpressionEvaluator {
 			return term;
 		} else if (pred == OBDAVocabulary.CONTAINS) {
 			return term;
-		} else {
+		} else if (pred == OBDAVocabulary.SPARQL_IN) {
+			return term;
+		}
+		else {
 			throw new RuntimeException(
 					"Evaluation of expression not supported: "
 							+ term.toString());

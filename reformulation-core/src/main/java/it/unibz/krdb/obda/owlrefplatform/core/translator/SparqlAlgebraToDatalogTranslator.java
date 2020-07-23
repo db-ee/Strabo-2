@@ -761,7 +761,16 @@ public class SparqlAlgebraToDatalogTranslator {
 		else if (expr instanceof FunctionCall) {
 			//spatial function calls here
             return getFunctionCallTerm((FunctionCall)expr);
-		} 
+		}
+		else if (expr instanceof ListMemberOperator) {
+			ListMemberOperator list = (ListMemberOperator) expr;
+			List<Term> terms=new ArrayList<Term>();
+			for(int i=0; i<list.getArguments().size();i++){
+				ValueExpr argNext = list.getArguments().get(i); // get the first argument
+				terms.add(getExpression(argNext));
+			}
+			return ofac.getFunctionIN(terms);
+		}
 		throw new RuntimeException("The expression " + expr + " is not supported yet!");
 	}
 

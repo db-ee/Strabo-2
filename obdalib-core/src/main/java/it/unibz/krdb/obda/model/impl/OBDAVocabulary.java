@@ -401,6 +401,5 @@ public class OBDAVocabulary {
 			"regex", 3);
 	public static final BooleanOperationPredicate SPARQL_LIKE = new BooleanOperationPredicateImpl(
 			"like", 2);
-	
-
+    public static final Predicate SPARQL_IN = new BooleanOperationPredicateImpl("in", 2);
 }

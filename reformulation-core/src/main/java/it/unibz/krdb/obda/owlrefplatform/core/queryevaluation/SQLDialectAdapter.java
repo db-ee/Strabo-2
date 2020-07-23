@@ -134,5 +134,4 @@ public interface SQLDialectAdapter {
 	public String rand();
 
 	public String strEncodeForSpatialDistance(String leftOp, String rightOp, Term term3);
-
 }
