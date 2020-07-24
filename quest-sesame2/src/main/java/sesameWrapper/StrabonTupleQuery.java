@@ -26,6 +26,7 @@ import it.unibz.krdb.obda.owlrefplatform.core.SQLResult;
 import it.unibz.krdb.obda.owlrefplatform.core.StrabonStatement;
 import it.unibz.krdb.obda.strabon.QueryExecutor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.spark.SparkContext;
@@ -63,24 +64,36 @@ public class StrabonTupleQuery implements TupleQuery {
 	// needed by TupleQuery interface
 	public TupleQueryResult evaluate() throws QueryEvaluationException {
 		//TupleResultSet res = null;
-		
+		List<String> tempTables = new ArrayList<String>();
 		try {
 			// String sparql = readFile(queryfile);
 			log.debug("Start Executing SPARQL query: "+queryString);
 			SQLResult sql = st.getUnfolding(queryString);
 			log.debug("Query unfolded:" + sql.getTextResult() + "\n");
-			log.debug("Strating execution");
+			log.debug("Starting execution");
 			long start = System.currentTimeMillis();
 			// List<String> tempnames=new ArrayList<String>();
+			boolean emptyResult=false;
 			for (int k = 0; k < sql.getTempQueries().size(); k++) {
 				String temp = sql.getTempQueries().get(k).replaceAll("\"", "");
 				log.debug("creating temp table " + sql.getTempName(k) + " with query: " + temp);
 				org.apache.spark.sql.Dataset<Row> tempDataset = spark.sql(temp);
 				tempDataset.createOrReplaceGlobalTempView(sql.getTempName(k));
+				tempDataset.cache();
+				if(tempDataset.isEmpty()){
+					log.debug("empty temp query: "+sql.getTempName(k));
+					//return empty result
+					log.debug("Execution finished in " + (System.currentTimeMillis() - start) + " with 0 results.");
+					emptyResult=true;
+					break;
+				}
+				tempTables.add(sql.getTempName(k));
 			}
 			org.apache.spark.sql.Dataset<Row> result = spark.sql(sql.getMainQuery().replaceAll("\"", ""));
 			result.cache();
 			StrabonTupleQueryResult tuples= new StrabonTupleQueryResult(result.toLocalIterator(), sql.getSignature());
+			tuples.setSparkSession(spark);
+			tuples.setTempTables(tempTables);
 			return tuples;
 			//long resultSize = result.count();
 			

@@ -63,6 +63,7 @@ public class QueryExecutor {
 			statfile = args[3];
 			asWKTTablesFile = args[4];
 			asWKTSubpropertiesToTables = new HashMap<String, String>();
+			List<String> tempTables = new ArrayList<String>();
 			try {
 
 				final SparkSession spark = SparkSession.builder()
@@ -71,6 +72,10 @@ public class QueryExecutor {
 						// Enable GeoSpark custom Kryo serializer
 						.config("spark.serializer", KryoSerializer.class.getName())
 						.config("spark.kryo.registrator", GeoSparkVizKryoRegistrator.class.getName())
+						//.config("geospark.join.numpartition",2000)
+						//.config("spark.default.parallelism", "800")
+						//.config("spark.sql.shuffle.partitions", "800")
+						.config("geospark.join.spatitionside", "none")
 						.config("spark.sql.inMemoryColumnarStorage.compressed", true)
 						.config("hive.exec.dynamic.partition", true).config("spark.sql.parquet.filterPushdown", true)
 						.config("spark.sql.inMemoryColumnarStorage.batchSize", 20000).enableHiveSupport().getOrCreate();
@@ -88,6 +93,7 @@ public class QueryExecutor {
 				FileSystem fs = FileSystem.get(spark.sparkContext().hadoopConfiguration());
 
 				try {
+					log.debug("Reading file: "+asWKTTablesFile);
 					Path asWKT = new Path(asWKTTablesFile);
 					String asWKTFile = readHadoopFile(asWKT, fs);
 					for (String nextProp : asWKTFile.split("\n")) {
@@ -99,6 +105,7 @@ public class QueryExecutor {
 				}
 
 				Map<String, String> predDictionary = readPredicatesFromHadoop(propDictionary, fs);
+				log.debug("property dictionary: "+predDictionary.toString());
 				boolean existDefaultGeometrytable = createObdaFile(predDictionary);
 
 				if (existDefaultGeometrytable) {
@@ -110,8 +117,10 @@ public class QueryExecutor {
 							+ StrabonParameters.GEOMETRIES_THIRD_COLUMN + " FROM geometries where "+
 							StrabonParameters.GEOMETRIES_THIRD_COLUMN + " IS NOT NULL");
 					geoms.createOrReplaceGlobalTempView(StrabonParameters.GEOMETRIES_TABLE);
-					geoms.count();
 					geoms.cache();
+					long count=geoms.count();
+					log.debug("Geometry table "+StrabonParameters.GEOMETRIES_TABLE+" created with "+count+" rows");
+
 				}
 
 				for (String asWKTsubprop : asWKTSubpropertiesToTables.keySet()) {
@@ -120,8 +129,10 @@ public class QueryExecutor {
 					Dataset<Row> geoms = spark
 							.sql("Select s, ST_GeomFromWKT(o) as o FROM " + predDictionary.get(asWKTsubprop) + " ");
 					geoms.createOrReplaceGlobalTempView(tblName);
-					geoms.count();
 					geoms.cache();
+					long count = geoms.count();
+					log.debug("Geometry table "+tblName+" created with "+count+" rows");
+
 				}
 
 				OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
@@ -186,6 +197,17 @@ public class QueryExecutor {
 				// readFilesFromDir("/home/dimitris/spatialdbs/queries/");
 				for (String sparql : sparqlQueries) {
 					try {
+						//delete old temp tables
+						for (int k = 0; k < tempTables.size(); k++) {
+							try{
+								spark.sql("DROP VIEW globaltemp."+tempTables.get(k));
+							}
+							catch(Exception ex){
+								log.error("Could not delete table "+tempTables.get(k)+". ");
+								ex.printStackTrace();
+							}
+						}
+						tempTables.clear();
 						// String sparql = readFile(queryfile);
 						log.debug("Start Executing SPARQL query: "+sparql);
 						SQLResult sql = st.getUnfolding(sparql);
@@ -193,23 +215,40 @@ public class QueryExecutor {
 						log.debug("Strating execution");
 						long start = System.currentTimeMillis();
 						// List<String> tempnames=new ArrayList<String>();
+						boolean emptyResult=false;
 						for (int k = 0; k < sql.getTempQueries().size(); k++) {
 							String temp = sql.getTempQueries().get(k).replaceAll("\"", "");
 							log.debug("creating temp table " + sql.getTempName(k) + " with query: " + temp);
 							Dataset<Row> tempDataset = spark.sql(temp);
 							tempDataset.createOrReplaceGlobalTempView(sql.getTempName(k));
+							tempDataset.cache();
+							if(tempDataset.isEmpty()){
+								log.debug("empty temp query: "+sql.getTempName(k));
+								//return empty result
+								log.debug("Execution finished in " + (System.currentTimeMillis() - start) + " with 0 results.");
+								emptyResult=true;
+								break;
+							}
+							//long c = tempDataset.count();
+							//log.debug("temp table " + sql.getTempName(k) + "had " + c + " results");
+							tempTables.add(sql.getTempName(k));
+						}
+						if(emptyResult){
+							continue;
 						}
 						Dataset<Row> result = spark.sql(sql.getMainQuery().replaceAll("\"", ""));
+						//result.cache();
 						long resultSize = result.count();
 						
 						log.debug("Execution finished in " + (System.currentTimeMillis() - start) + " with "
 								+ resultSize + " results.");
-						result.show(false);
+						//result.show(false);
 						for (int k = 0; k < sql.getTempQueries().size(); k++) {
 							//spark.sql("DROP VIEW globaltemp."+sql.getTempName(k));
 						}
 					} catch (Exception ex) {
 						log.error("Could not execute query " + sparql + "\nException: " + ex.getMessage());
+						ex.printStackTrace();
 					}
 
 				}
@@ -261,7 +300,6 @@ public class QueryExecutor {
 		int mappingId = 0;
 
 		for (String property : predDictionary.keySet()) {
-
 			if (property.equals("http://www.opengis.net/ont/geosparql#asWKT")) {
 				existsGeometryTable = true;
 				obdaFile.append("mappingId\tmapp");
@@ -401,7 +439,11 @@ public class QueryExecutor {
 
 				line = br.readLine();
 			}
-		} finally {
+		} catch(Exception ex) 
+        	{ 
+            		System.out.println("Exception while reading file:"+ex.getMessage()); 
+        	} 
+		finally {
 			br.close();
 		}
 		return file;

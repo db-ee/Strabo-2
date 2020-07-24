@@ -144,6 +144,8 @@ public interface OBDADataFactory extends Serializable {
 	public Function getFunctionIsNotNull(Term term);
 
 	public Function getLANGMATCHESFunction(Term term1, Term term2);
+
+	public Function getFunctionIN(List<Term> terms);
 	
 	/*GeoSPARQL geometry topology functions*/
 	public Function getFunctionOverlaps(Term term1, Term term2);

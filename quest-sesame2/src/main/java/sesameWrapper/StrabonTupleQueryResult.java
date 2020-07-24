@@ -30,16 +30,22 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.spark.sql.Row;
+import org.apache.spark.sql.SparkSession;
 import org.openrdf.query.Binding;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.TupleQueryResult;
 import org.openrdf.query.impl.MapBindingSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class StrabonTupleQueryResult implements TupleQueryResult {
 
-	Iterator<Row> res;
-	List<String> signature;
+	private Iterator<Row> res;
+	private List<String> signature;
+	private List<String> tempTables; //the temp tables that have been created for this query. To delete on close
+	private SparkSession spark;
+	private static final Logger log = LoggerFactory.getLogger(StrabonTupleQueryResult.class);
 	
 	StrabonTupleQueryResult(Iterator<Row> iterator, List<String> signature){
 		if(iterator == null)
@@ -50,7 +56,15 @@ public class StrabonTupleQueryResult implements TupleQueryResult {
 	
 	@Override
 	public void close() throws QueryEvaluationException {
-		//nothing to do
+		for (int k = 0; k < tempTables.size(); k++) {
+			try{
+				spark.sql("DROP VIEW globaltemp."+tempTables.get(k));
+			}
+			catch(Exception ex){
+				log.error("Could not delete table "+tempTables.get(k)+". ");
+				ex.printStackTrace();
+			}
+		}
 	}
 
 	@Override
@@ -88,4 +102,13 @@ public class StrabonTupleQueryResult implements TupleQueryResult {
 		return this.signature;
 	}
 
+	public void setTempTables(StrabonTupleQueryResult tuples) {
+	}
+
+	public void setTempTables(List<String> temp) {
+		this.tempTables = temp;
+	}
+
+	public void setSparkSession(SparkSession spark) {
+	}
 }

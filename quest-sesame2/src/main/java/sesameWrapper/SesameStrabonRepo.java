@@ -115,6 +115,10 @@ public class SesameStrabonRepo implements Repository {
 					.config("spark.kryo.registrator", GeoSparkVizKryoRegistrator.class.getName())
 					.config("spark.sql.inMemoryColumnarStorage.compressed", true)
 					.config("hive.exec.dynamic.partition", true).config("spark.sql.parquet.filterPushdown", true)
+					//.config("geospark.join.numpartition",2000)
+					//.config("spark.default.parallelism", "800")
+					//.config("spark.sql.shuffle.partitions", "800")
+					.config("geospark.join.spatitionside", "none")
 					//.config("hadoop.home.dir", "/home/hadoop/SingleNodeYarnSparkHiveHDFSCluster/hadoop")
 					.config("spark.jars", sb.toString())
 					//.config("spark.jars", "webapps/endpoint2-1.16.1/WEB-INF/lib/geospark*.jar")
@@ -170,6 +174,7 @@ public class SesameStrabonRepo implements Repository {
 			// TODO Auto-generated method stub
 			log.debug("Reading dictionary from file "+propDictionary);
 			Map<String, String> predDictionary = LocalQueryTranslator.readPredicates(propDictionary);
+			log.debug("property dictionary: "+predDictionary.toString());
 			boolean existDefaultGeometrytable = createObdaFile(predDictionary);
 
 			if (existDefaultGeometrytable) {
@@ -181,8 +186,9 @@ public class SesameStrabonRepo implements Repository {
 						+ StrabonParameters.GEOMETRIES_THIRD_COLUMN + " FROM geometries where "+
 						StrabonParameters.GEOMETRIES_THIRD_COLUMN + " IS NOT NULL");
 				geoms.createOrReplaceGlobalTempView(StrabonParameters.GEOMETRIES_TABLE);
-				geoms.count();
 				geoms.cache();
+				long count = geoms.count();
+				log.debug("Geometry table "+StrabonParameters.GEOMETRIES_TABLE+" created with "+count+" rows");
 			}
 
 			for (String asWKTsubprop : asWKTSubpropertiesToTables.keySet()) {
@@ -191,8 +197,9 @@ public class SesameStrabonRepo implements Repository {
 				Dataset<Row> geoms = spark
 						.sql("Select s, ST_GeomFromWKT(o) as o FROM " + predDictionary.get(asWKTsubprop) + " ");
 				geoms.createOrReplaceGlobalTempView(tblName);
-				geoms.count();
 				geoms.cache();
+				long count = geoms.count();
+				log.debug("Geometry table "+tblName+" created with "+count+" rows");
 			}
 
 			OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
