@@ -948,8 +948,20 @@ public class SQLGenerator implements SQLQueryGenerator {
                     mainColumn = String.format("(" + expressionFormat + ")", leftOp);
             	}
             	else if (ov.getArity()==3) {
+
+					if(ov.getFunctionSymbol().getName().equals(OBDAVocabulary.SFDISTANCE.getName())) {
+						//check if arg is constant and add ST_GeomFromWKT
+						if(ov.getTerms().get(0) instanceof ValueConstant){
+							ov.setTerm(0, OBDADataFactoryImpl.getInstance().getFunctionGeomFromWKT(ov.getTerms().get(0)));
+						}
+						if(ov.getTerms().get(1) instanceof ValueConstant){
+							ov.setTerm(1, OBDADataFactoryImpl.getInstance().getFunctionGeomFromWKT(ov.getTerms().get(1)));
+						}
+					}
+
             		Term term1 = ov.getTerms().get(0);
             		Term term2 = ov.getTerms().get(1);
+
 					String rightOp = getSQLString(term2, index, true);
 					String leftOp = getSQLString(term1, index, true);
 					Term term3 = ov.getTerms().get(2);

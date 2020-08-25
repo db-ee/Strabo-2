@@ -259,17 +259,17 @@ public class ExpressionEvaluator {
 				pred == OBDAVocabulary.EHINSIDE)  {
 			return evalSpatialOverlap(term);
 		} else if (pred == OBDAVocabulary.GT) {
-			return term;
+			return evalLTGT(term);
 		} else if (pred == OBDAVocabulary.GTE) {
-			return term;
+			return evalLTGT(term);
 		} else if (pred == OBDAVocabulary.IS_NOT_NULL) {
 			return evalIsNullNotNull(term, false);
 		} else if (pred == OBDAVocabulary.IS_NULL) {
 			return evalIsNullNotNull(term, true);
 		} else if (pred == OBDAVocabulary.LT) {
-			return term;
+			return evalLTGT(term);
 		} else if (pred == OBDAVocabulary.LTE) {
-			return term;
+			return evalLTGT(term);
 		} else if (pred == OBDAVocabulary.NEQ) {
 			return evalEqNeq(term, false);
 		} else if (pred == OBDAVocabulary.NOT) {
@@ -304,6 +304,21 @@ public class ExpressionEvaluator {
 					"Evaluation of expression not supported: "
 							+ term.toString());
 		}
+	}
+
+	private Term evalLTGT(Function term) {
+		Predicate pred = term.getFunctionSymbol();
+		for(int i=0;i<term.getTerms().size();i++){
+			Term t=term.getTerm(i);
+			if(t instanceof  Function){
+				Function f = (Function) t;
+				if(f.getFunctionSymbol() == OBDAVocabulary.SFDISTANCE){
+					term.setTerm(i, evalSpatialOverlap(f));
+				}
+			}
+
+		}
+		return term;
 	}
 
 	private Term evalNonBoolean(Function term) {
@@ -798,7 +813,7 @@ public class ExpressionEvaluator {
 				if (teval1 == null) {
 					return OBDAVocabulary.FALSE;
 				}
-			} else {
+			} else { //TODO spatial distance?
 				teval1 = term.getTerm(0);
 			}
 		} else {
@@ -817,7 +832,7 @@ public class ExpressionEvaluator {
 				if (teval2 == null) {
 					return OBDAVocabulary.FALSE;
 				}
-			} else {
+			} else { //TODO spatial distance?
 				teval2 = term.getTerm(1);
 			}
 		} else {
