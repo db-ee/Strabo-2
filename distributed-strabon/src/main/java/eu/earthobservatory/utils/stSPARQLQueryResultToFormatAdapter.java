@@ -74,7 +74,7 @@ public class stSPARQLQueryResultToFormatAdapter {
                 writer = tsv.getWriter(out);
                 break;
             */
-            case XML:
+            case XML: //temporary
                 writer = QueryResultIO.createWriter(TupleQueryResultFormat.SPARQL, out);
                 break;
 
