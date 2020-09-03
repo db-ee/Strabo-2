@@ -363,7 +363,7 @@ public class QueryExecutor {
 				obdaFile.append(StrabonParameters.GEOMETRIES_SCHEMA + "." + tablename);
 				obdaFile.append("\n");
 				obdaFile.append("\n");
-			} else if (property.contains("hasKey")) {
+			} else if (property.contains("hasKey") || property.contains("hasCropTypeName") ) {
 				obdaFile.append("mappingId\tmapp");
 				obdaFile.append(mappingId);
 				mappingId++;

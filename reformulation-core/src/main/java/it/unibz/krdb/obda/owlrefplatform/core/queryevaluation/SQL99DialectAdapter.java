@@ -454,8 +454,8 @@ public class SQL99DialectAdapter implements SQLDialectAdapter {
 				if(f.getTerm(1) instanceof ValueConstant) {
 					ValueConstant vc=(ValueConstant)f.getTerm(1);
 					if(vc.getValue().equals("http://www.opengis.net/def/uom/OGC/1.0/metre")) {
-						//transform to 3857 to return metres???
-						return "ST_Distance( ST_Transform("+left+", 'epsg:4326','epsg:3857'), ST_Transform("+right+", 'epsg:4326','epsg:3857'))";
+						//transform to 3035 to return metres???
+						return "ST_Distance( ST_Transform("+left+", 'epsg:4326','epsg:3035'), ST_Transform("+right+", 'epsg:4326','epsg:3035'))";
 					}
 					else if(vc.getValue().equals("http://www.opengis.net/def/uom/OGC/1.0/degree")) {
 						return "ST_Distance("+left+", "+right+")";

@@ -247,7 +247,7 @@ public class LocalQueryTranslator {
 				obdaFile.append(predDictionary.get(property));
 				obdaFile.append("\n");
 				obdaFile.append("\n");
-			} else if (property.contains("hasKey")) {
+			} else if (property.contains("hasKey") || property.contains("hasCropTypeName") ) {
 				obdaFile.append("mappingId\tmapp");
 				obdaFile.append(mappingId);
 				mappingId++;
