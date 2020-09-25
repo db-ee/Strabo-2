@@ -28,6 +28,8 @@ import it.unibz.krdb.obda.strabon.QueryExecutor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashSet;
+import java.util.Iterator;
 
 import org.apache.spark.SparkContext;
 import org.apache.spark.sql.Row;
@@ -89,6 +91,15 @@ public class StrabonTupleQuery implements TupleQuery {
 				}
 				tempTables.add(sql.getTempName(k));
 			}
+			
+			if(emptyResult){
+				Iterator<Row> empty = (new HashSet<Row>()).iterator();
+				StrabonTupleQueryResult tuples= new StrabonTupleQueryResult(empty, sql.getSignature());
+				tuples.setSparkSession(spark);
+				tuples.setTempTables(tempTables);
+				return tuples;
+			}
+			
 			org.apache.spark.sql.Dataset<Row> result = spark.sql(sql.getMainQuery().replaceAll("\"", ""));
 			result.cache();
 			StrabonTupleQueryResult tuples= new StrabonTupleQueryResult(result.toLocalIterator(), sql.getSignature());

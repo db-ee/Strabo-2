@@ -233,7 +233,7 @@ public class LocalQueryTranslator {
 				obdaFile.append(StrabonParameters.GEOMETRIES_SCHEMA + "." + StrabonParameters.GEOMETRIES_TABLE);
 				obdaFile.append("\n");
 				obdaFile.append("\n");
-			} else if (property.contains("has_code")) {
+			} else if (property.contains("has_code") || property.contains("hasDN")) {
 				obdaFile.append("mappingId\tmapp");
 				obdaFile.append(mappingId);
 				mappingId++;
@@ -247,7 +247,7 @@ public class LocalQueryTranslator {
 				obdaFile.append(predDictionary.get(property));
 				obdaFile.append("\n");
 				obdaFile.append("\n");
-			} else if (property.contains("hasKey") || property.contains("hasCropTypeName") ) {
+			} else if (property.contains("hasKey") || property.contains("hasCropTypeName")|| property.contains("hasName")) {
 				obdaFile.append("mappingId\tmapp");
 				obdaFile.append(mappingId);
 				mappingId++;
@@ -261,7 +261,23 @@ public class LocalQueryTranslator {
 				obdaFile.append(predDictionary.get(property));
 				obdaFile.append("\n");
 				obdaFile.append("\n");
-			} else {
+			}
+				else if (property.contains("hasRECDATE")) {
+					                               obdaFile.append("mappingId\tmapp");
+					                                obdaFile.append(mappingId);
+					                                mappingId++;
+					                                obdaFile.append("\n");
+					                                obdaFile.append("target\t");
+					                               obdaFile.append("<{s}> ");
+					                                obdaFile.append("<" + property + ">");
+					                                obdaFile.append(" {o}^^xsd:dateTime .\n");
+					                                obdaFile.append("source\t");
+					                               obdaFile.append("select s, o from ");
+					                                obdaFile.append(predDictionary.get(property));
+					                                obdaFile.append("\n");
+					                                obdaFile.append("\n");
+					                        }
+			else {
 				obdaFile.append("mappingId\tmapp");
 				obdaFile.append(mappingId);
 				mappingId++;

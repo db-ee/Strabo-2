@@ -665,9 +665,13 @@ public class StrabonStatement implements OBDAStatement {
 
 	private DatalogProgram splitSpatialJoin(DatalogProgram program) {
 		DatalogProgram result = program.clone();
-
+		Set<Predicate> processed = new HashSet<Predicate>();
+		
 		for (int k = 0; k < result.getRules().size(); k++) {
 			CQIE initial = result.getRules().get(k);
+			if(!processed.add(initial.getHead().getFunctionSymbol())){
+				continue;
+			}
 			List<Function> spatialJoins = new ArrayList<Function>(1); 
 			Set<Variable> varsInSpatial = new HashSet<>();
 
@@ -764,8 +768,9 @@ public class StrabonStatement implements OBDAStatement {
 						for(Variable spatialVar:varsInSpatial) {
 							if(v2a.getVars().contains(spatialVar)) {
 								initial.getBody().removeAll(v2a.getAtoms());
-								result.addFirstRuleRule(createTempTable(v2a, initial, existentialVars, varsInSpatial));
-								k++;
+								//result.addFirstRuleRule(createTempTable(v2a, initial, existentialVars, varsInSpatial));
+								//k++;
+								result.appendRule(createTempTable(v2a, initial, existentialVars, varsInSpatial), k);
 							}
 						}
 					}
@@ -773,7 +778,8 @@ public class StrabonStatement implements OBDAStatement {
 				if(!containsSpatialJoin)
 					continue;
 
-			
+					//contains spatial join, try to also split the produced queries
+					k--;
 			
 			
 			//initial.getBody().addAll(toRemove);

@@ -9,4 +9,8 @@ public class SparkDialectAdapter extends SQL99DialectAdapter {
 		return value;
 	}
 
+	public String getSQLLexicalFormDatetime(String v) {
+		return "'"+v+"'";
+	}
+
 }

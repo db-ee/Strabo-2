@@ -126,7 +126,7 @@ public class DatalogProgramImpl implements DatalogProgram {
 	}
 
 	@Override
-	public void addFirstRuleRule(CQIE rule) {
+	public void appendRule(CQIE rule, int position) {
 		if (rule == null) {
 			throw new IllegalArgumentException("DatalogProgram: Recieved a null rule.");
 		}
@@ -134,7 +134,7 @@ public class DatalogProgramImpl implements DatalogProgram {
 			return; // Skip if the rule already exists!
 		}
 
-		rules.add(0, rule);
+		rules.add(position, rule);
 
 		Function head = rule.getHead();
 		if (head != null) {

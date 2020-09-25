@@ -1,5 +1,6 @@
 package it.unibz.krdb.obda.strabon;
 
+import org.apache.hadoop.fs.FSDataOutputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.FileReader;
@@ -192,7 +193,7 @@ public class QueryExecutor {
 
 					}
 				}
-
+				String exec="";
 				// String[] query_files =
 				// readFilesFromDir("/home/dimitris/spatialdbs/queries/");
 				for (String sparql : sparqlQueries) {
@@ -210,6 +211,7 @@ public class QueryExecutor {
 						tempTables.clear();
 						// String sparql = readFile(queryfile);
 						log.debug("Start Executing SPARQL query: "+sparql);
+						exec+="Executing SPARQL query: "+sparql +"\n";
 						SQLResult sql = st.getUnfolding(sparql);
 						log.debug("Query unfolded:" + sql.getTextResult() + "\n");
 						log.debug("Strating execution");
@@ -226,6 +228,7 @@ public class QueryExecutor {
 								log.debug("empty temp query: "+sql.getTempName(k));
 								//return empty result
 								log.debug("Execution finished in " + (System.currentTimeMillis() - start) + " with 0 results.");
+								exec+="Execution finished in " + (System.currentTimeMillis() - start) + " with 0 results.\n";
 								emptyResult=true;
 								break;
 							}
@@ -242,12 +245,15 @@ public class QueryExecutor {
 						
 						log.debug("Execution finished in " + (System.currentTimeMillis() - start) + " with "
 								+ resultSize + " results.");
+						exec+="Execution finished in " + (System.currentTimeMillis() - start) + " with "
+                                                                + resultSize + " results. \n";
 						//result.show(false);
 						for (int k = 0; k < sql.getTempQueries().size(); k++) {
 							//spark.sql("DROP VIEW globaltemp."+sql.getTempName(k));
 						}
 					} catch (Exception ex) {
 						log.error("Could not execute query " + sparql + "\nException: " + ex.getMessage());
+						exec+="Could not execute query " + sparql + "\nException: " + ex.getMessage() +"\n";
 						ex.printStackTrace();
 					}
 
@@ -259,7 +265,7 @@ public class QueryExecutor {
 				// tupleQuery.evaluate(handler);
 
 				System.out.println("Closing...");
-
+				save_exec(exec, fs);
 			} catch (Exception e1) {
 				log.debug("Error: " + e1.getMessage());
 				throw (e1);
@@ -448,4 +454,16 @@ public class QueryExecutor {
 		}
 		return file;
 	}
+private static void save_exec(String executionFinished, FileSystem fs) throws IllegalArgumentException, IOException {
+                //logger.info("Saving Times");
+                //Configuration conf = new Configuration();
+                //FileSystem fs = FileSystem.get(conf);
+               FSDataOutputStream out = fs.create(new Path(statfile+".exec"));
+                        byte[] bytes = executionFinished.getBytes();
+                        out.write(bytes, 0, bytes.length);
+               
+                out.close();
+
+        }
+
 }

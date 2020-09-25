@@ -30,7 +30,7 @@ public interface DatalogProgram extends Serializable {
 
 	public void appendRule(CQIE rule);
 	
-	public void addFirstRuleRule(CQIE rule);
+	public void appendRule(CQIE rule, int position);
 
 	public void appendRule(Collection<CQIE> rule);
 
