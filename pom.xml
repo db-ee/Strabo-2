@@ -65,13 +65,12 @@
 		<module>quest-owlapi3</module>
 		<module>quest-distribution</module>
 		<module>distributed-strabon</module>
-		<module>ontop-docker-test-env</module>
 		<module>quest-sesame2</module>
-    	<module>endpoint2</module>
-    	<module>endpoint2-client</module>
-    	<module>endpoint2-exec</module>
-        <!-- <module>resultio-spatial</module> -->
-    </modules>
+    		<module>endpoint2</module>
+    		<module>endpoint2-client</module>
+    		<module>endpoint2-exec</module>
+        	<!-- <module>resultio-spatial</module> -->
+    	</modules>
 
 	<profiles>
 		<profile>
