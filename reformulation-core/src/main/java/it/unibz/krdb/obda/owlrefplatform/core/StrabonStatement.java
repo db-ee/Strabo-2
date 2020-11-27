@@ -30,7 +30,6 @@ import it.unibz.krdb.obda.ontology.Assertion;
 import it.unibz.krdb.obda.owlrefplatform.core.abox.EquivalentTriplePredicateIterator;
 import it.unibz.krdb.obda.owlrefplatform.core.basicoperations.DatalogNormalizer;
 import it.unibz.krdb.obda.owlrefplatform.core.queryevaluation.SPARQLQueryUtility;
-import it.unibz.krdb.obda.owlrefplatform.core.reformulation.QueryConnectedComponent;
 import it.unibz.krdb.obda.owlrefplatform.core.resultset.*;
 import it.unibz.krdb.obda.owlrefplatform.core.translator.DatalogToSparqlTranslator;
 import it.unibz.krdb.obda.owlrefplatform.core.translator.SesameConstructTemplate;
@@ -39,11 +38,8 @@ import it.unibz.krdb.obda.owlrefplatform.core.unfolding.DatalogUnfolder;
 import it.unibz.krdb.obda.owlrefplatform.core.unfolding.ExpressionEvaluator;
 import it.unibz.krdb.obda.renderer.DatalogProgramRenderer;
 import it.unibz.krdb.obda.utils.StrabonParameters;
-import it.unibz.krdb.sql.DBMetadata;
 import it.unibz.krdb.sql.DatabaseRelationDefinition;
 import it.unibz.krdb.sql.RelationID;
-import madgik.exareme.master.queryProcessor.decomposer.dag.Node;
-import madgik.exareme.master.queryProcessor.decomposer.dag.NodeHashValues;
 import madgik.exareme.master.queryProcessor.decomposer.query.SQLQuery;
 import madgik.exareme.master.queryProcessor.decomposer.util.Util;
 import madgik.exareme.master.queryProcessor.decomposer.util.VarsToAtoms;
@@ -58,7 +54,6 @@ import org.openrdf.query.parser.QueryParserUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
@@ -254,7 +249,7 @@ public class StrabonStatement implements OBDAStatement {
 						Constant constant = res.getConstant(1);
 						if (constant instanceof URIConstant) {
 							// collect constants in list
-							constants.add(((URIConstant) constant).getURI());
+							constants.add(((URIConstant) constant).getIRI());
 						}
 					}
 				}

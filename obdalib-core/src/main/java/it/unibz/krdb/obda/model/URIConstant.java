@@ -31,5 +31,5 @@ public interface URIConstant extends ObjectConstant {
 	 *
 	 * @return the URI object.
 	 */
-	public String getURI();
+	public String getIRI();
 }

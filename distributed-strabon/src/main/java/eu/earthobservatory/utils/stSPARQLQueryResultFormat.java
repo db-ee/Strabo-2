@@ -89,7 +89,7 @@ public class stSPARQLQueryResultFormat extends TupleQueryResultFormat {
     /**
      * The available stSPARQLQuery Result Formats
      */
-    private static final List<stSPARQLQueryResultFormat> VALUES = new ArrayList<stSPARQLQueryResultFormat>(6);
+    private static final List<stSPARQLQueryResultFormat> VALUES = new ArrayList<stSPARQLQueryResultFormat>(9);
 
     // registers stSPARQL/GeoSPARQL formats
     static {
@@ -111,7 +111,7 @@ public class stSPARQLQueryResultFormat extends TupleQueryResultFormat {
      * @param format
      */
     public static void register(stSPARQLQueryResultFormat format) {
-        TupleQueryResultFormat.register(format);
+        //TupleQueryResultFormat.register(format);
         VALUES.add(format);
     }
 
@@ -134,18 +134,20 @@ public class stSPARQLQueryResultFormat extends TupleQueryResultFormat {
 
     /**
      * Returns all known/registered tuple query result formats.
+     * @return
      */
-    public static Collection<TupleQueryResultFormat> values() {
-        return TupleQueryResultFormat.values();
+    public static List<stSPARQLQueryResultFormat> values() {
+        return VALUES;
     }
 
     public static stSPARQLQueryResultFormat forMIMEType(String mimeType) {
-        return forMIMEType(mimeType, null);
+        //TODO handle
+        return XML;
     }
 
-    public static stSPARQLQueryResultFormat forMIMEType(String mimeType, stSPARQLQueryResultFormat fallback) {
-        return matchMIMEType(mimeType, VALUES, fallback);
-    }
+    //public static stSPARQLQueryResultFormat forMIMEType(String mimeType, stSPARQLQueryResultFormat fallback) {
+    //    return matchMIMEType(mimeType, VALUES, fallback);
+    //}
 
     public stSPARQLQueryResultFormat(String name, String mimeType, String fileExt) {
         super(name, mimeType, fileExt);

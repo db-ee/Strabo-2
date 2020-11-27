@@ -117,7 +117,7 @@ public class OBDADataFactoryImpl implements OBDADataFactory {
 	@Override
 	@Deprecated
 	public URIConstant getConstantURI(String uriString) {
-		return new URIConstantImpl(uriString);
+		return new IRIConstantImpl(uriString);
 	}
 	
 	@Override

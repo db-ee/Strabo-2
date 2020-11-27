@@ -26,7 +26,7 @@ import it.unibz.krdb.obda.model.DatalogProgram;
 import it.unibz.krdb.obda.model.Term;
 import it.unibz.krdb.obda.model.Variable;
 import it.unibz.krdb.obda.model.impl.FunctionalTermImpl;
-import it.unibz.krdb.obda.model.impl.URIConstantImpl;
+import it.unibz.krdb.obda.model.impl.IRIConstantImpl;
 import it.unibz.krdb.obda.model.impl.ValueConstantImpl;
 
 import java.util.List;
@@ -384,9 +384,9 @@ public class DatalogParserTest extends TestCase {
 
 		term = terms.get(1);
 		assertTrue("Mismatch term type!",
-				term instanceof URIConstantImpl);
+				term instanceof IRIConstantImpl);
 		assertEquals("Mismatch variable name!",
-				((URIConstantImpl)term).getURI().toString(),
+				((IRIConstantImpl)term).getIRI().toString(),
 				"http://example.org/stuff/1.1/FUB");
 	}
 
@@ -503,9 +503,9 @@ public class DatalogParserTest extends TestCase {
 
 		term = terms.get(1);
 		assertTrue("Mismatch term type!",
-				term instanceof URIConstantImpl);
+				term instanceof IRIConstantImpl);
 		assertEquals("Mismatch variable name!",
-				((URIConstantImpl)term).getURI().toString(),
+				((IRIConstantImpl)term).getIRI().toString(),
 				"http://example.org/stuff/1.1/FUB");
 
 		//----------//
@@ -567,9 +567,9 @@ public class DatalogParserTest extends TestCase {
 
 		Term objVarTerm = objVarTerms.get(0);
 		assertTrue("Mismatch term type!",
-				objVarTerm instanceof URIConstantImpl);
+				objVarTerm instanceof IRIConstantImpl);
 		assertEquals("Mismatch variable name!",
-				((URIConstantImpl)objVarTerm).getURI().toString(),
+				((IRIConstantImpl)objVarTerm).getIRI().toString(),
 				"http://example.org/stuff/1.2/Occupation");
 
 		objVarTerm = objVarTerms.get(1);
@@ -651,9 +651,9 @@ public class DatalogParserTest extends TestCase {
 
 		Term objVarTerm = objVarTerms.get(0);
 		assertTrue("Mismatch term type!",
-				objVarTerm instanceof URIConstantImpl);
+				objVarTerm instanceof IRIConstantImpl);
 		assertEquals("Mismatch variable name!",
-				((URIConstantImpl)objVarTerm).getURI().toString(),
+				((IRIConstantImpl)objVarTerm).getIRI().toString(),
 				"http://example.org/stuff/1.1/FUB");
 
 		objVarTerm = objVarTerms.get(1);
@@ -670,9 +670,9 @@ public class DatalogParserTest extends TestCase {
 
 		objVarTerm = objVarTerms.get(0);
 		assertTrue("Mismatch term type!",
-				objVarTerm instanceof URIConstantImpl);
+				objVarTerm instanceof IRIConstantImpl);
 		assertEquals("Mismatch variable name!",
-				((URIConstantImpl)objVarTerm).getURI().toString(),
+				((IRIConstantImpl)objVarTerm).getIRI().toString(),
 				"http://example.org/stuff/1.2/Occupation");
 
 		objVarTerm = objVarTerms.get(1);
@@ -689,9 +689,9 @@ public class DatalogParserTest extends TestCase {
 
 		objVarTerm = objVarTerms.get(0);
 		assertTrue("Mismatch term type!",
-				objVarTerm instanceof URIConstantImpl);
+				objVarTerm instanceof IRIConstantImpl);
 		assertEquals("Mismatch variable name!",
-				((URIConstantImpl)objVarTerm).getURI().toString(),
+				((IRIConstantImpl)objVarTerm).getIRI().toString(),
 				"http://example.org/stuff/1.3/Degree");
 
 		objVarTerm = objVarTerms.get(1);
@@ -1120,9 +1120,9 @@ public class DatalogParserTest extends TestCase {
 
 		term = terms.get(1);
 		assertTrue("Mismatch term type!",
-				term instanceof URIConstantImpl);
+				term instanceof IRIConstantImpl);
 		assertEquals("Mismatch variable name!",
-				((URIConstantImpl)term).getURI().toString(),
+				((IRIConstantImpl)term).getIRI().toString(),
 				"http://example.org/stuff/1.1/FUB");
 	}
 }

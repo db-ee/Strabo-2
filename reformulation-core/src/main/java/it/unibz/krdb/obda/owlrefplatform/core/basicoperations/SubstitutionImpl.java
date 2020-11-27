@@ -230,7 +230,7 @@ public class SubstitutionImpl implements Substitution {
             // equal, in which case there the substitution is empty
 
             if (/*(term1 instanceof VariableImpl) ||*/ (term1 instanceof FunctionalTermImpl)
-                    || (term1 instanceof ValueConstantImpl) || (term1 instanceof URIConstantImpl)) {
+                    || (term1 instanceof ValueConstantImpl) || (term1 instanceof IRIConstantImpl)) {
 
                 // ROMAN: why is BNodeConstantImpl not mentioned?
 
@@ -263,7 +263,7 @@ public class SubstitutionImpl implements Substitution {
             else
                 return new SingletonSubstitution(t1, t2);
         }
-        else if ((t2 instanceof ValueConstantImpl) || (t2 instanceof URIConstantImpl)) {
+        else if ((t2 instanceof ValueConstantImpl) || (t2 instanceof IRIConstantImpl)) {
             return new SingletonSubstitution(t1, t2);
         }
         else if (t2 instanceof FunctionalTermImpl) {

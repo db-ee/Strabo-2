@@ -11,6 +11,7 @@ package eu.earthobservatory.org.StrabonEndpoint;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Optional;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
@@ -23,6 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringEscapeUtils; 
 import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.Rio;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -116,7 +118,7 @@ public class DescribeBean extends HttpServlet{
 		
 		String format = request.getParameter("format");
 		String handle = request.getParameter("handle");
-		RDFFormat rdfFormat = RDFFormat.valueOf(format);
+		RDFFormat rdfFormat = Common.getFormatForName(format);
 
 		if (format == null || query == null || rdfFormat == null) {
 			request.setAttribute(ERROR, PARAM_ERROR);
@@ -179,13 +181,13 @@ public class DescribeBean extends HttpServlet{
 		ServletOutputStream out = response.getOutputStream();
 		
 		// get the RDF format (we check only the Accept header)
-        RDFFormat format = RDFFormat.forMIMEType(request.getHeader("accept"));
+        Optional<RDFFormat> format = Rio.getParserFormatForMIMEType(request.getHeader("accept"));
         
         // get the query
 		String query = request.getParameter("query");
     	
     	// check for required parameters
-    	if (format == null || query == null) {
+    	if (!format.isPresent() || query == null) {
     		response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			out.print(ResponseMessages.getXMLHeader());
 			out.print(ResponseMessages.getXMLException(PARAM_ERROR));
@@ -195,12 +197,12 @@ public class DescribeBean extends HttpServlet{
     		// do not decode the SPARQL query (see bugs #65 and #49)
     		//query = URLDecoder.decode(request.getParameter("query"), "UTF-8");
     		
-	    	response.setContentType(format.getDefaultMIMEType());
+	    	response.setContentType(format.get().getDefaultMIMEType());
 		    response.setHeader("Content-Disposition", 
-		    		"attachment; filename=describe." + format.getDefaultFileExtension() + "; " + format.getCharset());
+		    		"attachment; filename=describe." + format.get().getDefaultFileExtension() + "; " + format.get().getCharset());
 		    
 			try {
-				strabonWrapper.describe(query, format.getName(), out);
+				strabonWrapper.describe(query, format.get().getName(), out);
 				response.setStatus(HttpServletResponse.SC_OK);
 				
 			} catch (Exception e) {

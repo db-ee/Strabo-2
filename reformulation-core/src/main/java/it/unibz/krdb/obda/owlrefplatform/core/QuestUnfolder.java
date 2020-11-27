@@ -21,7 +21,6 @@ import it.unibz.krdb.obda.owlrefplatform.core.unfolding.UnfoldingMechanism;
 import it.unibz.krdb.obda.parser.PreprocessProjection;
 import it.unibz.krdb.obda.utils.Mapping2DatalogConverter;
 import it.unibz.krdb.obda.utils.MappingSplitter;
-import it.unibz.krdb.obda.utils.MetaMappingExpander;
 import it.unibz.krdb.sql.Attribute;
 import it.unibz.krdb.sql.DBMetadata;
 import it.unibz.krdb.sql.RelationID;
@@ -275,7 +274,7 @@ public class QuestUnfolder {
 			URIConstant c = (URIConstant)ca.getIndividual();
 			Predicate p = ca.getConcept().getPredicate();
 			Function head = fac.getFunction(p, 
-							fac.getUriTemplate(fac.getConstantLiteral(c.getURI())));
+							fac.getUriTemplate(fac.getConstantLiteral(c.getIRI())));
 			CQIE rule = fac.getCQIE(head, Collections.<Function> emptyList());
 				
 			unfoldingProgram.add(rule);
@@ -293,8 +292,8 @@ public class QuestUnfolder {
 			URIConstant o = (URIConstant)pa.getObject();
 			Predicate p = pa.getProperty().getPredicate();
 			Function head = fac.getFunction(p, 
-							fac.getUriTemplate(fac.getConstantLiteral(s.getURI())), 
-							fac.getUriTemplate(fac.getConstantLiteral(o.getURI())));
+							fac.getUriTemplate(fac.getConstantLiteral(s.getIRI())),
+							fac.getUriTemplate(fac.getConstantLiteral(o.getIRI())));
 			CQIE rule = fac.getCQIE(head, Collections.<Function> emptyList());
 				
 			unfoldingProgram.add(rule);

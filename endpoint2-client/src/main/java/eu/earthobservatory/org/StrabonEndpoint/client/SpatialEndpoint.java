@@ -53,7 +53,7 @@ public class SpatialEndpoint extends SPARQLEndpoint {
 		String xml = xmlResult.getResponse();
 		
 		InputStream inputStream = new ByteArrayInputStream(xml.getBytes("UTF-8"));  
-		TupleQueryResult results = QueryResultIO.parse(inputStream, TupleQueryResultFormat.SPARQL);
+		TupleQueryResult results = QueryResultIO.parseTuple(inputStream, TupleQueryResultFormat.SPARQL);
 		
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		/*TODO

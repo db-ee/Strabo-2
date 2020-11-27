@@ -429,7 +429,7 @@ public class ExpressionEvaluator {
 				else {
 					return fac.getTypedTerm(
 							fac.getFunctionCast(fac.getVariable(parameter.toString()),
-									fac.getConstantLiteral(dtfac.getDatatypeURI(COL_TYPE.LITERAL).stringValue())),
+									fac.getConstantLiteral(dtfac.getDatatypeIRI(COL_TYPE.LITERAL).stringValue())),
 										COL_TYPE.LITERAL);
 				}
 			} 
@@ -468,12 +468,12 @@ public class ExpressionEvaluator {
 			return null;
 		} 
 		else if (predicate instanceof AlgebraOperatorPredicate){
-			return fac.getUriTemplateForDatatype(dtfac.getDatatypeURI(COL_TYPE.BOOLEAN).stringValue());
+			return fac.getUriTemplateForDatatype(dtfac.getDatatypeIRI(COL_TYPE.BOOLEAN).stringValue());
 		} 
 		else if (predicate instanceof OperationPredicate){
 			if (predicate instanceof BooleanOperationPredicate) {
 				//return boolean uri
-				return fac.getUriTemplateForDatatype(dtfac.getDatatypeURI(COL_TYPE.BOOLEAN).stringValue());
+				return fac.getUriTemplateForDatatype(dtfac.getDatatypeIRI(COL_TYPE.BOOLEAN).stringValue());
 			}
 			else if (predicate instanceof NumericalOperationPredicate)
 			{

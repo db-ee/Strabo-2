@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import it.unibz.krdb.obda.model.DatatypePredicate;
-import org.openrdf.model.URI;
+import org.openrdf.model.IRI;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.RDFS;
@@ -36,7 +36,7 @@ public class DatatypeFactoryImpl implements DatatypeFactory {
 	private final DatatypePredicate  GEOSPARQL_WKT;
 	
 	private final Map<String, COL_TYPE> mapURItoCOLTYPE = new HashMap<>();
-	private final Map<COL_TYPE, URI> mapCOLTYPEtoURI = new HashMap<>();
+	private final Map<COL_TYPE, IRI> mapCOLTYPEtoURI = new HashMap<>();
 	private final Map<COL_TYPE, DatatypePredicate> mapCOLTYPEtoPredicate = new HashMap<>();
 	private final List<Predicate> predicateList = new LinkedList<>();
 	
@@ -48,7 +48,7 @@ public class DatatypeFactoryImpl implements DatatypeFactory {
 		XSD_STRING = registerType(XMLSchema.STRING, COL_TYPE.STRING);  // 7 "http://www.w3.org/2001/XMLSchema#string"
 		XSD_DATETIME = registerType(XMLSchema.DATETIME, COL_TYPE.DATETIME); // 8 "http://www.w3.org/2001/XMLSchema#dateTime"
 		ValueFactory factory = new ValueFactoryImpl();
-		URI datetimestamp = factory.createURI("http://www.w3.org/2001/XMLSchema#dateTimeStamp"); // value datetime stamp is missing in XMLSchema
+		IRI datetimestamp = factory.createIRI("http://www.w3.org/2001/XMLSchema#dateTimeStamp"); // value datetime stamp is missing in XMLSchema
 		XSD_DATETIME_STAMP = registerType(datetimestamp, COL_TYPE.DATETIME_STAMP);
 		XSD_BOOLEAN = registerType(XMLSchema.BOOLEAN, COL_TYPE.BOOLEAN);  // 9 "http://www.w3.org/2001/XMLSchema#boolean"
 		XSD_DATE = registerType(XMLSchema.DATE, COL_TYPE.DATE);  // 10 "http://www.w3.org/2001/XMLSchema#date";
@@ -62,7 +62,7 @@ public class DatatypeFactoryImpl implements DatatypeFactory {
 		XSD_NON_POSITIVE_INTEGER = registerType(XMLSchema.NON_POSITIVE_INTEGER, COL_TYPE.NON_POSITIVE_INTEGER); // 18 "http://www.w3.org/2001/XMLSchema#nonPositiveInteger"
 		XSD_INT = registerType(XMLSchema.INT, COL_TYPE.INT);  // 19 "http://www.w3.org/2001/XMLSchema#int"
 		XSD_UNSIGNED_INT = registerType(XMLSchema.UNSIGNED_INT, COL_TYPE.UNSIGNED_INT);   // 20 "http://www.w3.org/2001/XMLSchema#unsignedInt"
-		GEOSPARQL_WKT = registerType(new ValueFactoryImpl().createURI(OBDAVocabulary.GEOSPARQL_WKT_LITERAL_DATATYPE), COL_TYPE.GEOMETRY);
+		GEOSPARQL_WKT = registerType(new ValueFactoryImpl().createIRI(OBDAVocabulary.GEOSPARQL_WKT_LITERAL_DATATYPE), COL_TYPE.GEOMETRY);
 
 		
 		// special case
@@ -72,7 +72,7 @@ public class DatatypeFactoryImpl implements DatatypeFactory {
 
 	}
 	
-	private DatatypePredicate registerType(org.openrdf.model.URI uri, COL_TYPE type) {
+	private DatatypePredicate registerType(org.openrdf.model.IRI uri, COL_TYPE type) {
 		String sURI = uri.toString();
 		mapURItoCOLTYPE.put(sURI, type);  
 		mapCOLTYPEtoURI.put(type, uri); 
@@ -88,12 +88,12 @@ public class DatatypeFactoryImpl implements DatatypeFactory {
 	}
 	
 	@Override
-	public COL_TYPE getDatatype(URI uri) {
+	public COL_TYPE getDatatype(IRI uri) {
 		return mapURItoCOLTYPE.get(uri.stringValue());
 	}
 	
 	@Override
-	public URI getDatatypeURI(COL_TYPE type) {
+	public IRI getDatatypeIRI(COL_TYPE type) {
 		return mapCOLTYPEtoURI.get(type);
 	}
 	

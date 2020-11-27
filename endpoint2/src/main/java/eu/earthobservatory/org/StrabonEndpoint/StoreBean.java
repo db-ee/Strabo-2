@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
+import java.util.Optional;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
@@ -24,6 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParseException;
+import org.openrdf.rio.Rio;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.context.WebApplicationContext;
@@ -159,7 +161,7 @@ public class StoreBean extends HttpServlet {
     	System.out.println(data);
     			
     	// the format of the data
-    	RDFFormat format = (request.getParameter(Common.PARAM_FORMAT) != null) ? RDFFormat.valueOf(request.getParameter(Common.PARAM_FORMAT)):null;
+    	RDFFormat format = (request.getParameter(Common.PARAM_FORMAT) != null) ? Common.getFormatForName(request.getParameter(Common.PARAM_FORMAT)):null;
 
       	// graph
     	String graph = (request.getParameter(Common.PARAM_GRAPH) != null) ? request.getParameter(Common.PARAM_GRAPH):null;
@@ -214,9 +216,9 @@ public class StoreBean extends HttpServlet {
 		}
     	
     	// the format of the data
-    	RDFFormat format = RDFFormat.forMIMEType(request.getHeader("accept"));
-    	
-		if (format == null) { // unknown format
+    	Optional<RDFFormat> format = Rio.getParserFormatForMIMEType(request.getHeader("accept"));
+
+		if (!format.isPresent()) { // unknown format
 			response.sendError(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
 			return ;
 		}
@@ -224,7 +226,7 @@ public class StoreBean extends HttpServlet {
 		// store data
 		try {
 			
-			strabon.store(data, graph, format.getName(), inference, !input);
+			strabon.store(data, graph, format.get().getName(), inference, !input);
 
 			// store was successful, return the respective message
 			response.sendError(HttpServletResponse.SC_OK);

@@ -75,27 +75,27 @@ public class stSPARQLQueryResultToFormatAdapter {
                 break;
             */
             case XML: //temporary
-                writer = QueryResultIO.createWriter(TupleQueryResultFormat.SPARQL, out);
+                writer = QueryResultIO.createTupleWriter(TupleQueryResultFormat.SPARQL, out);
                 break;
 
             case SESAME_XML:
-                writer = QueryResultIO.createWriter(TupleQueryResultFormat.SPARQL, out);
+                writer = QueryResultIO.createTupleWriter(TupleQueryResultFormat.SPARQL, out);
                 break;
 
             case SESAME_BINARY:
-                writer = QueryResultIO.createWriter(TupleQueryResultFormat.BINARY, out);
+                writer = QueryResultIO.createTupleWriter(TupleQueryResultFormat.BINARY, out);
                 break;
 
             case SESAME_JSON:
-                writer = QueryResultIO.createWriter(TupleQueryResultFormat.JSON, out);
+                writer = QueryResultIO.createTupleWriter(TupleQueryResultFormat.JSON, out);
                 break;
 
             case SESAME_CSV:
-                writer = QueryResultIO.createWriter(TupleQueryResultFormat.CSV, out);
+                writer = QueryResultIO.createTupleWriter(TupleQueryResultFormat.CSV, out);
                 break;
 
             case SESAME_TSV:
-                writer = QueryResultIO.createWriter(TupleQueryResultFormat.TSV, out);
+                writer = QueryResultIO.createTupleWriter(TupleQueryResultFormat.TSV, out);
                 break;
 
             default:

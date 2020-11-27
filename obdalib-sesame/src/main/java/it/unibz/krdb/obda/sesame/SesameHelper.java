@@ -8,10 +8,7 @@ import it.unibz.krdb.obda.model.ValueConstant;
 import it.unibz.krdb.obda.model.Predicate.COL_TYPE;
 import it.unibz.krdb.obda.model.impl.OBDADataFactoryImpl;
 
-import org.openrdf.model.Literal;
-import org.openrdf.model.Resource;
-import org.openrdf.model.URI;
-import org.openrdf.model.ValueFactory;
+import org.openrdf.model.*;
 import org.openrdf.model.impl.ValueFactoryImpl;
 
 public class SesameHelper {
@@ -23,7 +20,7 @@ public class SesameHelper {
 		if (obj instanceof BNode)
 			return fact.createBNode(((BNode)obj).getName());
 		else if (obj instanceof URIConstant)
-			return fact.createURI(((URIConstant)obj).getURI());
+			return fact.createURI(((URIConstant)obj).getIRI());
 		else 
 			throw new RuntimeException("Invalid constant as subject!" + obj);		
 	}
@@ -35,11 +32,11 @@ public class SesameHelper {
 			return value;
 		}
 		else if (literal.getType() == COL_TYPE.OBJECT) {
-			Literal value = fact.createLiteral(literal.getValue(), dtfac.getDatatypeURI(COL_TYPE.STRING));
+			Literal value = fact.createLiteral(literal.getValue(), dtfac.getDatatypeIRI(COL_TYPE.STRING));
 			return value;
 		}	
 		else {
-			URI datatype = dtfac.getDatatypeURI(literal.getType());
+			IRI datatype = dtfac.getDatatypeIRI(literal.getType());
 			if (datatype == null)
 				throw new RuntimeException("Found unknown TYPE for constant: " + literal + " with COL_TYPE="+ literal.getType());
 			
@@ -48,8 +45,8 @@ public class SesameHelper {
 		}
 	}
 
-	public URI createURI(String uri) {
-		return fact.createURI(uri);
+	public IRI createIRI(String iri) {
+		return fact.createIRI(iri);
 	}
 
 

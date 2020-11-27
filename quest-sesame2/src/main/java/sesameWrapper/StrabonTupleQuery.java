@@ -192,4 +192,14 @@ public class StrabonTupleQuery implements TupleQuery {
 		// TODO Auto-generated method stub
 		return false;
 	}
+
+	@Override
+	public void setMaxExecutionTime(int i) {
+		queryTimeout = i;
+	}
+
+	@Override
+	public int getMaxExecutionTime() {
+		return queryTimeout;
+	}
 }

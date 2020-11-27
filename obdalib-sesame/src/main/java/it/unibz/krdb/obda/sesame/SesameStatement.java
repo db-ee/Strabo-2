@@ -21,7 +21,6 @@ package it.unibz.krdb.obda.sesame;
  */
 
 import it.unibz.krdb.obda.model.ObjectConstant;
-import it.unibz.krdb.obda.model.Predicate;
 import it.unibz.krdb.obda.model.ValueConstant;
 import it.unibz.krdb.obda.model.impl.OBDAVocabulary;
 import it.unibz.krdb.obda.ontology.Assertion;
@@ -29,16 +28,13 @@ import it.unibz.krdb.obda.ontology.ClassAssertion;
 import it.unibz.krdb.obda.ontology.DataPropertyAssertion;
 import it.unibz.krdb.obda.ontology.ObjectPropertyAssertion;
 
-import org.openrdf.model.Resource;
-import org.openrdf.model.Statement;
-import org.openrdf.model.URI;
-import org.openrdf.model.Value;
+import org.openrdf.model.*;
 
 public class SesameStatement implements Statement {
     private static final long serialVersionUID = 3398547980791013746L;
     
 	private Resource subject = null;
-	private URI predicate = null;
+	private IRI predicate = null;
 	private Value object = null;
 	private Resource context = null;
 
@@ -55,7 +51,7 @@ public class SesameStatement implements Statement {
 			
 			// convert string into respective type
 			subject = helper.getResource(subj);
-			predicate = helper.createURI(pred); // URI	
+			predicate = helper.createIRI(pred); // URI
 			object = helper.getResource(obj);
 		} 
 		else if (assertion instanceof DataPropertyAssertion) {
@@ -67,7 +63,7 @@ public class SesameStatement implements Statement {
 			
 			// convert string into respective type
 			subject = helper.getResource(subj);	
-			predicate = helper.createURI(pred); // URI
+			predicate = helper.createIRI(pred); // URI
 			
 			if (obj instanceof ValueConstant)
 				object = helper.getLiteral((ValueConstant)obj);		
@@ -82,8 +78,8 @@ public class SesameStatement implements Statement {
 			
 			// convert string into respective type
 			subject = helper.getResource(subj);
-			predicate = helper.createURI(OBDAVocabulary.RDF_TYPE); // URI
-			object = helper.createURI(obj);	
+			predicate = helper.createIRI(OBDAVocabulary.RDF_TYPE); // URI
+			object = helper.createIRI(obj);
 		}
 	}
 	
@@ -92,7 +88,7 @@ public class SesameStatement implements Statement {
 		return subject;
 	}
 
-	public URI getPredicate() {
+	public IRI getPredicate() {
 		return predicate;
 	}
 
@@ -116,7 +112,7 @@ public class SesameStatement implements Statement {
         if (context != null ? !context.equals(thatContext) : thatContext != null) return false;
         Value thatObject = that.getObject();
         if (object != null ? !object.equals(thatObject) : thatObject != null) return false;
-        URI thatPredicate = that.getPredicate();
+        IRI thatPredicate = that.getPredicate();
         if (predicate != null ? !predicate.equals(thatPredicate) : thatPredicate != null) return false;
         Resource thatSubject = that.getSubject();
         if (subject != null ? !subject.equals(thatSubject) : thatSubject != null) return false;

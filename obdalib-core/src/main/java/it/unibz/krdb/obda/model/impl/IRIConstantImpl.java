@@ -26,24 +26,24 @@ import it.unibz.krdb.obda.model.URIConstant;
 /**
  * Provides a storage to put the URI constant.
  */
-public class URIConstantImpl implements URIConstant {
+public class IRIConstantImpl implements URIConstant {
 
 	private static final long serialVersionUID = -1263974895010238519L;
 	
 	private final int identifier;
 	private final String iristr;
 
-	protected URIConstantImpl(String iri) {
+	protected IRIConstantImpl(String iri) {
 		this.iristr = iri;
 		this.identifier = iri.hashCode();
 	}
 	
 	@Override
 	public boolean equals(Object obj) {
-		if (obj == null || !(obj instanceof URIConstantImpl)) {
+		if (obj == null || !(obj instanceof IRIConstantImpl)) {
 			return false;
 		}
-		URIConstantImpl uri2 = (URIConstantImpl) obj;
+		IRIConstantImpl uri2 = (IRIConstantImpl) obj;
 		return this.identifier == uri2.identifier;
 	}
 
@@ -53,7 +53,7 @@ public class URIConstantImpl implements URIConstant {
 	}
 
 	@Override
-	public String getURI() {
+	public String getIRI() {
 		return iristr;
 	}
 

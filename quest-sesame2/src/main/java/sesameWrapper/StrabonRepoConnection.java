@@ -43,13 +43,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.spark.sql.SparkSession;
+import org.openrdf.IsolationLevel;
+import org.openrdf.IsolationLevels;
 import org.openrdf.OpenRDFUtil;
-import org.openrdf.model.Namespace;
-import org.openrdf.model.Resource;
-import org.openrdf.model.Statement;
-import org.openrdf.model.URI;
-import org.openrdf.model.Value;
-import org.openrdf.model.ValueFactory;
+import org.openrdf.model.*;
 import org.openrdf.model.impl.NamespaceImpl;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.query.*;
@@ -237,14 +234,14 @@ public class StrabonRepoConnection implements org.openrdf.repository.RepositoryC
          addInputStreamOrReader(reader, baseURI, dataFormat, contexts);
      }
 
-	public void add(Resource subject, org.openrdf.model.URI predicate, Value object, Resource... contexts)
+	public void add(Resource subject, IRI predicate, Value object, Resource... contexts)
 			throws RepositoryException {
 		//Adds a statement with the specified subject, predicate and object to this repository, 
 		//optionally to one or more named contexts. 
 		OpenRDFUtil.verifyContextNotNull(contexts);
 		ValueFactory vf = new ValueFactoryImpl();
 		
-		Statement st = vf.createStatement(subject, vf.createURI(predicate.toString()), object);
+		Statement st = vf.createStatement(subject, vf.createIRI(predicate.toString()), object);
 		
 		add(st, contexts);
 		
@@ -561,7 +558,7 @@ throw new RuntimeException(e);
     }
 
     protected void removeWithoutCommit(Resource subject,
-    		org.openrdf.model.URI predicate, Value object, Resource... contexts)
+    		IRI predicate, Value object, Resource... contexts)
     	throws RepositoryException{
     	
     	throw new RepositoryException("Removal not supported!");
@@ -611,7 +608,7 @@ throw new RuntimeException(e);
         exportStatements(null, null, null, false, handler, contexts);
 	}
 
-	public void exportStatements(Resource subj,  org.openrdf.model.URI  pred, Value obj,
+	public void exportStatements(Resource subj,  IRI  pred, Value obj,
 			boolean includeInferred, RDFHandler handler, Resource... contexts)
 			throws RepositoryException, RDFHandlerException {
 		//Exports all statements with a specific subject, predicate 
@@ -673,7 +670,7 @@ throw new RuntimeException(e);
 		return this.repository;
 	}
 
-	public RepositoryResult<Statement> getStatements(Resource subj, org.openrdf.model.URI pred,
+	public RepositoryResult<Statement> getStatements(Resource subj, IRI pred,
 			Value obj, boolean includeInferred, Resource... contexts)
 			throws RepositoryException {
 		//Gets all statements with a specific subject, 
@@ -687,7 +684,7 @@ throw new RuntimeException(e);
 			s = "?s ";
 		else {		
 			s = subj.toString();
-			if (subj instanceof URI) {
+			if (subj instanceof IRI) {
 				s = "<" + s + ">";
 			}
 		}
@@ -699,7 +696,7 @@ throw new RuntimeException(e);
 		if (obj == null)
 			o = " ?o ";
 		else {
-			if (obj instanceof URI) {
+			if (obj instanceof IRI) {
 				o = "<" + obj.stringValue() + ">";
 			} else {
 				o = obj.stringValue();
@@ -748,8 +745,8 @@ throw new RuntimeException(e);
                 .getObject(), includeInferred, contexts);
 	}
 
-	public boolean hasStatement(Resource subj, org.openrdf.model.URI pred, Value obj,
-			boolean includeInferred, Resource... contexts) throws RepositoryException {
+	public boolean hasStatement(Resource subj, IRI pred, Value obj,
+								boolean includeInferred, Resource... contexts) throws RepositoryException {
 		//Checks whether the repository contains statements with a specific subject, 
 		//predicate and/or object, optionally in the specified contexts. 
 		    RepositoryResult<Statement> stIter = getStatements(subj, pred,
@@ -937,7 +934,7 @@ throw new RuntimeException(e);
 
 	}
 
-	public void remove(Resource subject, org.openrdf.model.URI predicate, Value object, Resource... contexts)
+	public void remove(Resource subject, IRI predicate, Value object, Resource... contexts)
 			throws RepositoryException {
 		//Removes the statement(s) with the specified subject, predicate and object 
 		//from the repository, optionally restricted to the specified contexts. 
@@ -1026,11 +1023,15 @@ throw new RuntimeException(e);
 	 */
 	@Override
 	public void begin() throws RepositoryException {
-		// TODO Auto-generated method stub
 		if (!isOpen()) {
 				throw new RepositoryException("Connection was closed.");
 		}
 		isActive = true;
+	}
+
+	@Override
+	public void begin(IsolationLevel isolationLevel) throws RepositoryException {
+
 	}
 
 
@@ -1044,9 +1045,15 @@ throw new RuntimeException(e);
 		return this.isActive;
 	}
 
+	@Override
+	public void setIsolationLevel(IsolationLevel isolationLevel) throws IllegalStateException {
+		return;
+	}
 
-
-	
+	@Override
+	public IsolationLevel getIsolationLevel() {
+		return IsolationLevels.NONE;
+	}
 
 
 }

@@ -324,7 +324,7 @@ public class QuestStatement implements OBDAStatement {
 						Constant constant = res.getConstant(1);
 						if (constant instanceof URIConstant) {
 							// collect constants in list
-							constants.add(((URIConstant)constant).getURI());
+							constants.add(((URIConstant)constant).getIRI());
 						}
 					}
 				}

@@ -15,6 +15,8 @@ import java.util.List;
 import org.openrdf.query.resultio.TupleQueryResultFormat;
 import eu.earthobservatory.utils.stSPARQLQueryResultFormat;
 import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.RDFParserRegistry;
+import org.openrdf.rio.Rio;
 
 /**
  * Keeps common variables shared by beans and .jsp pages.
@@ -62,7 +64,7 @@ public class Common {
 	
 	// initialize registered and available formats
 	static {
-		for (RDFFormat format : RDFFormat.values()) {
+		for (RDFFormat format : RDFParserRegistry.getInstance().getKeys()) {
 			registeredFormats.add(format.getName());
 		}
 	}
@@ -96,5 +98,35 @@ public class Common {
 	 */
 	public static final String getHTMLFormat() {
 		return stSPARQLQueryResultFormat.HTML.getName();
+	}
+
+	public static RDFFormat getFormatForName(String name) {
+		RDFFormat result;
+		switch (name) {
+			case "RDF/XML":
+				result = RDFFormat.RDFXML;
+				break;
+			case "N-Triples":
+				result = RDFFormat.NTRIPLES;
+				break;
+			case "Turtle":
+				result = RDFFormat.TURTLE;
+				break;
+			case "N3":
+				result = RDFFormat.N3;
+				break;
+			case "TriX":
+				result = RDFFormat.TRIX;
+				break;
+			case "TriG":
+				result = RDFFormat.TRIG;
+				break;
+			case "BinayRDF":
+				result = RDFFormat.BINARY;
+				break;
+			default:
+				result = null;
+		}
+		return result;
 	}
 }

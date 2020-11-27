@@ -26,14 +26,15 @@ import it.unibz.krdb.obda.model.ValueConstant;
 import it.unibz.krdb.obda.model.impl.*;
 import it.unibz.krdb.obda.owlrefplatform.core.abox.SemanticIndexURIMap;
 import it.unibz.krdb.obda.owlrefplatform.core.basicoperations.UriTemplateMatcher;
+import org.openrdf.model.IRI;
 import org.openrdf.model.Literal;
-import org.openrdf.model.URI;
+//import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.datatypes.XMLDatatypeUtil;
-import org.openrdf.model.vocabulary.RDF;
+//import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.algebra.*;
-import org.openrdf.query.algebra.evaluation.function.FunctionRegistry;
+//import org.openrdf.query.algebra.evaluation.function.FunctionRegistry;
 import org.openrdf.query.parser.ParsedGraphQuery;
 import org.openrdf.query.parser.ParsedQuery;
 import org.openrdf.query.parser.ParsedTupleQuery;
@@ -531,7 +532,7 @@ public class SparqlAlgebraToDatalogTranslator {
 		Var pred = triple.getPredicateVar();		
 		Value p = pred.getValue();
 		
-		if (!(p instanceof URI || (p == null))) {
+		if (!(p instanceof IRI || (p == null))) {
 			// if predicate is a variable or literal
 			throw new RuntimeException("Unsupported query syntax");
 		}
@@ -587,7 +588,7 @@ public class SparqlAlgebraToDatalogTranslator {
 		} 
 		else if (s instanceof Literal) {
 			Literal object = (Literal) s;
-			URI type = object.getDatatype();
+			IRI type = object.getDatatype();
 			String value = object.getLabel();
 	
 			// Validating that the value is correct (lexically) with respect to the
@@ -619,9 +620,10 @@ public class SparqlAlgebraToDatalogTranslator {
 			// constant is defined using a functional symbol.
 			if (objectType == COL_TYPE.LITERAL) {
 				// if the object has type LITERAL, check any language tag!
-				String lang = object.getLanguage();
-				if (lang != null && !lang.equals("")) {
-					result = ofac.getTypedTerm(constant, lang.toLowerCase());
+				Optional<String> lang = object.getLanguage();
+
+				if (lang.isPresent()) {
+					result = ofac.getTypedTerm(constant, lang.get().toLowerCase());
 				} 
 				else {
 					result =  ofac.getTypedTerm(constant, objectType);
@@ -631,7 +633,7 @@ public class SparqlAlgebraToDatalogTranslator {
 				result = ofac.getTypedTerm(constant, objectType);
 			}
 		} 
-		else if (s instanceof URI) {
+		else if (s instanceof IRI) {
 			if (uriRef != null) {
 				// if in the Semantic Index mode 
 				int id = uriRef.getId(s.stringValue());
@@ -1377,7 +1379,7 @@ public class SparqlAlgebraToDatalogTranslator {
 
 		if (v instanceof Literal) {
 			Literal lit = (Literal)v;
-			URI type = lit.getDatatype();
+			IRI type = lit.getDatatype();
 			COL_TYPE tp;
 			if (type == null) {
 				tp = COL_TYPE.LITERAL;
@@ -1438,7 +1440,7 @@ public class SparqlAlgebraToDatalogTranslator {
 			ValueConstant constant = ofac.getConstantLiteral(constantString, tp);
 			return ofac.getTypedTerm(constant, tp);	
 		} 
-		else if (v instanceof URI) {
+		else if (v instanceof IRI) {
             Function constantFunction = uriTemplateMatcher.generateURIFunction(v.stringValue());
             if (constantFunction.getArity() == 1)
                 constantFunction = ofac.getUriTemplateForDatatype(v.stringValue());

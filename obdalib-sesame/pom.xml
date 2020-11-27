@@ -42,17 +42,17 @@
 		<dependency>
 			<groupId>org.openrdf.sesame</groupId>
 			<artifactId>sesame-model</artifactId>
-			<version>2.7.10</version>
+
 		</dependency>
 		<dependency>
 			<groupId>org.openrdf.sesame</groupId>
 			<artifactId>sesame-http-client</artifactId>
-			<version>2.7.10</version>
+
 		</dependency>
 		<dependency>
 			<groupId>org.openrdf.sesame</groupId>
 			<artifactId>sesame-http-protocol</artifactId>
-			<version>2.7.10</version>
+
 		</dependency>
 		<dependency>
 			<groupId>org.openrdf.sesame</groupId>
@@ -61,68 +61,68 @@
 		<dependency>
 			<groupId>org.openrdf.sesame</groupId>
 			<artifactId>sesame-rio-turtle</artifactId>
-			<version>2.7.10</version>
+
 		</dependency>
 		<dependency>
 			<groupId>org.openrdf.sesame</groupId>
 			<artifactId>sesame-rio-binary</artifactId>
-			<version>2.7.10</version>
+
 		</dependency>
 		<dependency>
 			<groupId>org.openrdf.sesame</groupId>
 			<artifactId>sesame-rio-datatypes</artifactId>
-			<version>2.7.10</version>
+
 		</dependency>
 		<dependency>
 			<groupId>org.openrdf.sesame</groupId>
 			<artifactId>sesame-rio-languages</artifactId>
-			<version>2.7.10</version>
+
 		</dependency>
 		<dependency>
 			<groupId>org.openrdf.sesame</groupId>
 			<artifactId>sesame-rio-n3</artifactId>
-			<version>2.7.10</version>
+
 		</dependency>
 		<dependency>
 			<groupId>org.openrdf.sesame</groupId>
 			<artifactId>sesame-rio-nquads</artifactId>
-			<version>2.7.10</version>
+
 		</dependency>
 		<dependency>
 			<groupId>org.openrdf.sesame</groupId>
 			<artifactId>sesame-rio-ntriples</artifactId>
-			<version>2.7.10</version>
+
 		</dependency>
 		<dependency>
 			<groupId>org.openrdf.sesame</groupId>
 			<artifactId>sesame-rio-rdfjson</artifactId>
-			<version>2.7.10</version>
+
 		</dependency>
 		<dependency>
 			<groupId>org.openrdf.sesame</groupId>
 			<artifactId>sesame-rio-rdfxml</artifactId>
-			<version>2.7.10</version>
+
 		</dependency>
 		<dependency>
 			<groupId>org.openrdf.sesame</groupId>
 			<artifactId>sesame-rio-trig</artifactId>
-			<version>2.7.10</version>
+
 		</dependency>
 		<dependency>
 			<groupId>org.openrdf.sesame</groupId>
 			<artifactId>sesame-rio-trix</artifactId>
-			<version>2.7.10</version>
+
 		</dependency>
 		<dependency>
 			<groupId>org.openrdf.sesame</groupId>
 			<artifactId>sesame-rio-turtle</artifactId>
-			<version>2.7.10</version>
+
 		</dependency>
 
 		<dependency>
   			<groupId>org.openrdf.sesame</groupId>
   			<artifactId>sesame-repository-api</artifactId>
-  			<version>2.7.10</version>
+
 		</dependency>
 		<dependency>
   			<groupId>org.openrdf.sesame</groupId>
@@ -131,47 +131,47 @@
 		<dependency>
   			<groupId>org.openrdf.sesame</groupId>
   			<artifactId>sesame-repository-contextaware</artifactId>
-  			<version>2.7.10</version>
+
 		</dependency>
 		<dependency>
   			<groupId>org.openrdf.sesame</groupId>
   			<artifactId>sesame-repository-dataset</artifactId>
-  			<version>2.7.10</version>
+
 		</dependency>
 		<dependency>
   			<groupId>org.openrdf.sesame</groupId>
   			<artifactId>sesame-repository-http</artifactId>
-  			<version>2.7.10</version>
+
 		</dependency>
 		<dependency>
   			<groupId>org.openrdf.sesame</groupId>
   			<artifactId>sesame-repository-manager</artifactId>
-  			<version>2.7.10</version>
+
 		</dependency>
 		<dependency>
   			<groupId>org.openrdf.sesame</groupId>
   			<artifactId>sesame-repository-sail</artifactId>
-  			<version>2.7.10</version>
+
 		</dependency>
 		<dependency>
   			<groupId>org.openrdf.sesame</groupId>
   			<artifactId>sesame-repository-sparql</artifactId>
-  			<version>2.7.10</version>
+
 		</dependency>
 		<dependency>
   			<groupId>org.openrdf.sesame</groupId>
   			<artifactId>sesame-sail-nativerdf</artifactId>
-  			<version>2.7.10</version>
+
 		</dependency>
 		<dependency>
   			<groupId>org.openrdf.sesame</groupId>
   			<artifactId>sesame-sail-federation</artifactId>
-  			<version>2.7.10</version>
+
 		</dependency>
 		<dependency>
   			<groupId>org.openrdf.sesame</groupId>
   			<artifactId>sesame-config</artifactId>
-  			<version>2.7.10</version>
+
 		</dependency>
 		<dependency>
 			<groupId>commons-fileupload</groupId>
@@ -218,6 +218,14 @@
           			<skipTests>true</skipTests>
         		</configuration>
       		</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>8</source>
+					<target>8</target>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 </project>

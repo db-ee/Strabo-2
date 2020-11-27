@@ -68,7 +68,7 @@ public class URIToFunctionMatcher implements Serializable {
 	 * @return
 	 */
 	public Function getPossibleFunctionalTermMatch(URIConstant uri) {
-		String uristr = uri.getURI().toString();
+		String uristr = uri.getIRI().toString();
 		int pos = uristr.lastIndexOf('#');
 		if (pos == -1) {
 			/*
