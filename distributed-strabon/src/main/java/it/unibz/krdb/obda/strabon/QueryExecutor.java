@@ -135,7 +135,7 @@ public class QueryExecutor {
 					log.debug("Geometry table "+tblName+" created with "+count+" rows");
 
 				}
-
+				
 				OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 				OWLOntology ontology = manager.createOntology(); // empty ontology
 
@@ -201,7 +201,7 @@ public class QueryExecutor {
 						//delete old temp tables
 						for (int k = 0; k < tempTables.size(); k++) {
 							try{
-								spark.sql("DROP VIEW globaltemp."+tempTables.get(k));
+								spark.sql("DROP VIEW global_temp."+tempTables.get(k));
 							}
 							catch(Exception ex){
 								log.error("Could not delete table "+tempTables.get(k)+". ");
