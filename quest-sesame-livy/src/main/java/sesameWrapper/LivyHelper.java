@@ -43,9 +43,7 @@ public class LivyHelper {
     protected static String createSession() throws IOException {
 
         OkHttpClient client = new OkHttpClient();
-        String createResponse = null;
-
-        post(livyUrl, create, client);
+        String createResponse = post(livyUrl, create, client);
 
         //System.out.println(createResponse.files.values());
         int id = JsonPath.parse(createResponse).read("id");
