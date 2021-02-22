@@ -74,8 +74,8 @@ public class StrabonLivyTupleQueryResult implements TupleQueryResult {
         if (resultParser.hasNext()){
             nextResult = resultParser.next();
             int noOfResults = 0;
+            nextConsumed = true;
             if (nextResult == JsonParser.Event.END_ARRAY) {
-                nextConsumed = true;
                 return false;
             }
             else{

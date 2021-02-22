@@ -66,7 +66,7 @@ public class StrabonLivyTupleQuery implements TupleQuery {
             for (int k = 0; k < sql.getTempQueries().size(); k++) {
                 String temp = sql.getTempQueries().get(k).replaceAll("\"", "").replaceAll("\n", " ");
                 log.debug("creating temp table " + sql.getTempName(k) + " with query: " + temp);
-                LivyHelper.sendCommandAndPrint("Create temporary view "+sql.getTempName(k)+ "AS ("+temp+") ", sessionUrl, client);
+                LivyHelper.sendCommandAndPrint("Create temporary view "+sql.getTempName(k)+ "AS ("+LivyHelper.getSQLQuery(temp)+") ", sessionUrl, client);
                 LivyHelper.sendCommandAndPrint("CACHE TABLE "+sql.getTempName(k), sessionUrl, client);
                 LivyHelper.sendCommandAndPrint("SELECT COUNT(*) FROM "+sql.getTempName(k), sessionUrl, client);
 
