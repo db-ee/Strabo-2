@@ -139,17 +139,17 @@ public class StrabonLivyRepo implements Repository {
                         + StrabonParameters.GEOMETRIES_THIRD_COLUMN + " FROM geometries where " +
                         StrabonParameters.GEOMETRIES_THIRD_COLUMN + " IS NOT NULL)";
                 LivyHelper.sendCommandAndPrint(createGeometriesTable, statementsURL, client);
-                LivyHelper.sendCommandAndPrint("CACHE TABLE "+StrabonParameters.GEOMETRIES_TABLE, statementsURL, client);
-                LivyHelper.sendCommandAndPrint("SELECT COUNT(*) FROM "+StrabonParameters.GEOMETRIES_TABLE, statementsURL, client);
+                LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("CACHE TABLE "+StrabonParameters.GEOMETRIES_TABLE), statementsURL, client);
+                LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("SELECT COUNT(*) FROM "+StrabonParameters.GEOMETRIES_TABLE), statementsURL, client);
 
             }
-
+            log.debug("preloading asWKT subproperty tables: " + asWKTSubpropertiesToTables.toString());
             for (String asWKTsubprop : asWKTSubpropertiesToTables.keySet()) {
                 String tblName = asWKTSubpropertiesToTables.get(asWKTsubprop);
-                log.debug("preloading asWKT subproperty tables: " + asWKTSubpropertiesToTables.toString());
-                LivyHelper.sendCommandAndPrint("Create temporary view "+tblName+ "AS (Select s, ST_GeomFromWKT(o) as o FROM " + predDictionary.get(asWKTsubprop) + ") ", statementsURL, client);
-                LivyHelper.sendCommandAndPrint("CACHE TABLE "+tblName, statementsURL, client);
-                LivyHelper.sendCommandAndPrint("SELECT COUNT(*) FROM "+tblName, statementsURL, client);
+
+                LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("Create temporary view "+tblName+ "AS (Select s, ST_GeomFromWKT(o) as o FROM " + predDictionary.get(asWKTsubprop) + ") "), statementsURL, client);
+                LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("CACHE TABLE "+tblName), statementsURL, client);
+                LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("SELECT COUNT(*) FROM "+tblName), statementsURL, client);
 
             }
 
