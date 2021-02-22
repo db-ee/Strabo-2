@@ -64,7 +64,7 @@ public class StrabonLivyTupleQuery implements TupleQuery {
             boolean emptyResult=false;
             OkHttpClient client = new OkHttpClient();
             for (int k = 0; k < sql.getTempQueries().size(); k++) {
-                String temp = sql.getTempQueries().get(k).replaceAll("\"", "");
+                String temp = sql.getTempQueries().get(k).replaceAll("\"", "").replaceAll("\n", " ");
                 log.debug("creating temp table " + sql.getTempName(k) + " with query: " + temp);
                 LivyHelper.sendCommandAndPrint("Create temporary view "+sql.getTempName(k)+ "AS ("+temp+") ", sessionUrl, client);
                 LivyHelper.sendCommandAndPrint("CACHE TABLE "+sql.getTempName(k), sessionUrl, client);
@@ -88,7 +88,7 @@ public class StrabonLivyTupleQuery implements TupleQuery {
                 tuples.setTempTables(tempTables);
                 return tuples;
             }
-            JsonParser parser = LivyHelper.sendCommandAndGetBuffer(LivyHelper.getSQLQuery(sql.getMainQuery().replaceAll("\"", "")), sessionUrl, client);
+            JsonParser parser = LivyHelper.sendCommandAndGetBuffer(LivyHelper.getSQLQuery(sql.getMainQuery().replaceAll("\"", "").replaceAll("\n", " ")), sessionUrl, client);
             if(parser == null)
                 throw new NullPointerException();
 
