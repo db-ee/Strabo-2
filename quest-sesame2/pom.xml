@@ -238,6 +238,8 @@
 			<artifactId>geospark-viz_2.3</artifactId>
 			<!--<version>1.3.1</version>-->
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp -->
+
 
 
 	</dependencies>

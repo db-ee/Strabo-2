@@ -20,18 +20,14 @@ package sesameWrapper;
  * #L%
  */
 
-import it.unibz.krdb.obda.model.OBDAException;
-import it.unibz.krdb.obda.model.TupleResultSet;
 import it.unibz.krdb.obda.owlrefplatform.core.SQLResult;
 import it.unibz.krdb.obda.owlrefplatform.core.StrabonStatement;
-import it.unibz.krdb.obda.strabon.QueryExecutor;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.HashSet;
 import java.util.Iterator;
 
-import org.apache.spark.SparkContext;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import org.openrdf.model.Value;
@@ -55,7 +51,7 @@ public class StrabonTupleQuery implements TupleQuery {
 	private int queryTimeout;
 	private String queryString;
 
-	public StrabonTupleQuery(String queryString, String baseURI, StrabonStatement st, SparkSession spark2) 
+	public StrabonTupleQuery(String queryString, String baseURI, StrabonStatement st, SparkSession spark2)
 			throws MalformedQueryException {
         this.spark=spark2;
         this.st=st;
@@ -70,7 +66,7 @@ public class StrabonTupleQuery implements TupleQuery {
 		try {
 			// String sparql = readFile(queryfile);
 			log.debug("Start Executing SPARQL query: "+queryString);
-			SQLResult sql = st.getUnfolding(queryString);
+			SQLResult sql = st.getUnfolding(queryString, true);
 			log.debug("Query unfolded:" + sql.getTextResult() + "\n");
 			log.debug("Starting execution");
 			long start = System.currentTimeMillis();

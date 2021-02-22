@@ -66,7 +66,9 @@
 		<module>quest-distribution</module>
 		<module>distributed-strabon</module>
 		<module>quest-sesame2</module>
-    		<module>endpoint2</module>
+		<module>quest-sesame-livy</module>
+    		<module>endpoint</module>
+		<module>endpoint-livy</module>
     		<module>endpoint2-client</module>
     		<module>endpoint2-exec</module>
         	<!-- <module>resultio-spatial</module> -->
@@ -236,11 +238,38 @@
 				<artifactId>junit</artifactId>
 				<version>4.11</version>
 			</dependency>
+
 			<dependency>
 				<groupId>org.slf4j</groupId>
 				<artifactId>slf4j-api</artifactId>
 				<version>1.7.13</version>
 			</dependency>
+
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>jul-to-slf4j</artifactId>
+				<version>1.7.13</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>jcl-over-slf4j</artifactId>
+				<version>1.7.13</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>log4j-over-slf4j</artifactId>
+				<version>1.7.13</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-jdk14</artifactId>
+				<version>1.7.13</version>
+			</dependency>
+
+
 			<dependency>
 				<groupId>ch.qos.logback</groupId>
 				<artifactId>logback-classic</artifactId>
@@ -414,11 +443,7 @@
 				<version>0.9.3</version>
 			</dependency>
 
-			<dependency>
-				<groupId>org.slf4j</groupId>
-				<artifactId>log4j-over-slf4j</artifactId>
-				<version>1.7.13</version>
-			</dependency>
+
 			<dependency>
 				<groupId>commons-logging</groupId>
 				<artifactId>commons-logging</artifactId>

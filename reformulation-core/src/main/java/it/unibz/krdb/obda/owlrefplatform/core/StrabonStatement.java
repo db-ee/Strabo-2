@@ -543,10 +543,11 @@ public class StrabonStatement implements OBDAStatement {
 	 * If the query is not already cached, it will be cached in this process.
 	 * 
 	 * @param strquery
+	 * @param aFalse
 	 * @return
 	 * @throws Exception
 	 */
-	public SQLResult getUnfolding(String strquery) throws Exception {
+	public SQLResult getUnfolding(String strquery, boolean splitSpatialJoin) throws Exception {
 		SQLResult sql;
 
 		// Check the cache first if the system has processed the query string
@@ -626,11 +627,15 @@ public class StrabonStatement implements OBDAStatement {
 				final long startTime = System.currentTimeMillis();
 				programAfterUnfolding = getUnfolding(programAfterRewriting);
 				unfoldingTime = System.currentTimeMillis() - startTime;
-
-				try {
-					programAfterSplittingSpatialJoin = splitSpatialJoin(programAfterUnfolding);
-				} catch (Exception e) {
-					log.error("Could not split query based on spatial join" + e.getMessage());
+				if(splitSpatialJoin) {
+					try {
+						programAfterSplittingSpatialJoin = splitSpatialJoin(programAfterUnfolding);
+					} catch (Exception e) {
+						log.error("Could not split query based on spatial join" + e.getMessage());
+						programAfterSplittingSpatialJoin = programAfterUnfolding;
+					}
+				}
+				else{
 					programAfterSplittingSpatialJoin = programAfterUnfolding;
 				}
 

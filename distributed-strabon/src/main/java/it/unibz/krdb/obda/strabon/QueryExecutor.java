@@ -54,6 +54,7 @@ public class QueryExecutor {
 	static String database;
 	static String statfile;
 	static String asWKTTablesFile;
+	static String splitSpatialJoin;
 	private static Map<String, String> asWKTSubpropertiesToTables;
 
 	public static void main(String[] args) throws Exception {
@@ -63,6 +64,7 @@ public class QueryExecutor {
 			database = args[2];
 			statfile = args[3];
 			asWKTTablesFile = args[4];
+			splitSpatialJoin = args[5];
 			asWKTSubpropertiesToTables = new HashMap<String, String>();
 			List<String> tempTables = new ArrayList<String>();
 			try {
@@ -180,6 +182,7 @@ public class QueryExecutor {
 				}
 				StrabonStatement st = reasoner.createStrabonStatement(nse);
 				List<String> sparqlQueries = new ArrayList<String>();
+				List<String> sqlQueries = new ArrayList<String>();
 
 				Path path = new Path(queriesPath);
 				log.debug("reading queries from " + queriesPath);
@@ -189,6 +192,9 @@ public class QueryExecutor {
 					for (FileStatus fileStatus : fileStatuses) {
 						if (fileStatus.isFile() && fileStatus.getPath().toString().endsWith(".q")) {
 							sparqlQueries.add(readHadoopFile(fileStatus.getPath(), fs));
+						}
+						if (fileStatus.isFile() && fileStatus.getPath().toString().endsWith(".sql")) {
+							sqlQueries.add(readHadoopFile(fileStatus.getPath(), fs));
 						}
 
 					}
@@ -212,7 +218,7 @@ public class QueryExecutor {
 						// String sparql = readFile(queryfile);
 						log.debug("Start Executing SPARQL query: "+sparql);
 						exec+="Executing SPARQL query: "+sparql +"\n";
-						SQLResult sql = st.getUnfolding(sparql);
+						SQLResult sql = st.getUnfolding(sparql, !splitSpatialJoin.equals("false"));
 						log.debug("Query unfolded:" + sql.getTextResult() + "\n");
 						log.debug("Strating execution");
 						long start = System.currentTimeMillis();
@@ -254,6 +260,32 @@ public class QueryExecutor {
 					} catch (Exception ex) {
 						log.error("Could not execute query " + sparql + "\nException: " + ex.getMessage());
 						exec+="Could not execute query " + sparql + "\nException: " + ex.getMessage() +"\n";
+						ex.printStackTrace();
+					}
+
+				}
+
+
+				for (String sql : sqlQueries) {
+					try {
+
+						log.debug("Start Executing SQL query: "+sql);
+						exec+="Executing SPARQL query: "+sql +"\n";
+						log.debug("Strating execution");
+						long start = System.currentTimeMillis();
+
+						Dataset<Row> result = spark.sql(sql.replaceAll("\"", ""));
+						//result.cache();
+						long resultSize = result.count();
+
+						log.debug("Execution finished in " + (System.currentTimeMillis() - start) + " with "
+								+ resultSize + " results.");
+						exec+="Execution finished in " + (System.currentTimeMillis() - start) + " with "
+						+ resultSize + " results. \n";
+
+					} catch (Exception ex) {
+						log.error("Could not execute query " + sql + "\nException: " + ex.getMessage());
+						exec+="Could not execute query " + sql + "\nException: " + ex.getMessage() +"\n";
 						ex.printStackTrace();
 					}
 
