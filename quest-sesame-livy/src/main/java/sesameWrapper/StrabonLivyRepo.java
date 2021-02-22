@@ -147,7 +147,7 @@ public class StrabonLivyRepo implements Repository {
             for (String asWKTsubprop : asWKTSubpropertiesToTables.keySet()) {
                 String tblName = asWKTSubpropertiesToTables.get(asWKTsubprop);
 
-                LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("Create temporary view "+tblName+ "AS (Select s, ST_GeomFromWKT(o) as o FROM " + predDictionary.get(asWKTsubprop) + ") "), statementsURL, client);
+                LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("Create temporary view "+tblName+ " AS (Select s, ST_GeomFromWKT(o) as o FROM " + predDictionary.get(asWKTsubprop) + ") "), statementsURL, client);
                 LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("CACHE TABLE "+tblName), statementsURL, client);
                 LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("SELECT COUNT(*) FROM "+tblName), statementsURL, client);
 
@@ -227,6 +227,7 @@ public class StrabonLivyRepo implements Repository {
         } catch (Exception e1) {
             log.debug("Error: " + e1.getMessage());
             e1.printStackTrace();
+            shutDown();
             throw new RepositoryException(e1.getMessage());
         }
     }
