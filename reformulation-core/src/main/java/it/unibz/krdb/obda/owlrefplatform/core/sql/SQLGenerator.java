@@ -33,6 +33,7 @@ import it.unibz.krdb.obda.owlrefplatform.core.basicoperations.DatalogNormalizer;
 import it.unibz.krdb.obda.owlrefplatform.core.basicoperations.EQNormalizer;
 import it.unibz.krdb.obda.owlrefplatform.core.queryevaluation.SQLDialectAdapter;
 import it.unibz.krdb.obda.owlrefplatform.core.srcquerygeneration.SQLQueryGenerator;
+import it.unibz.krdb.obda.utils.StrabonParameters;
 import it.unibz.krdb.sql.Attribute;
 import it.unibz.krdb.sql.DBMetadata;
 import it.unibz.krdb.sql.QualifiedAttributeID;
@@ -2059,7 +2060,7 @@ public class SQLGenerator implements SQLQueryGenerator {
 		 */
 		public String getViewDefinition(Function atom) {
 			if(atom.getFunctionSymbol().toString().startsWith(OBDAVocabulary.TEMP_VIEW_QUERY)) {
-				return "global_temp."+atom.getFunctionSymbol().toString() +" "+viewNames.get(atom).getSQLRendering();
+				return StrabonParameters.GEOMETRIES_SCHEMA + "."+atom.getFunctionSymbol().toString() +" "+viewNames.get(atom).getSQLRendering();
 			}
 			RelationDefinition def = dataDefinitions.get(atom);
 			if (def instanceof DatabaseRelationDefinition) {

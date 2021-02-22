@@ -340,7 +340,7 @@ public class StrabonLivyRepo implements Repository {
                 obdaFile.append("source\t");
                 obdaFile.append("select " + StrabonParameters.GEOMETRIES_SECOND_COLUMN + ", "
                         + StrabonParameters.GEOMETRIES_THIRD_COLUMN + " from ");
-                obdaFile.append(StrabonParameters.GEOMETRIES_SCHEMA + "." + StrabonParameters.GEOMETRIES_TABLE);
+                obdaFile.append(StrabonParameters.GEOMETRIES_TABLE);
                 obdaFile.append("\n");
                 obdaFile.append("\n");
             } else if (property.equals("http://www.opengis.net/ont/geosparql#hasGeometry")) {
@@ -355,7 +355,7 @@ public class StrabonLivyRepo implements Repository {
                 obdaFile.append("source\t");
                 obdaFile.append("select " + StrabonParameters.GEOMETRIES_FIRST_COLUMN + ", "
                         + StrabonParameters.GEOMETRIES_SECOND_COLUMN + " from ");
-                obdaFile.append(StrabonParameters.GEOMETRIES_SCHEMA + "." + StrabonParameters.GEOMETRIES_TABLE);
+                obdaFile.append( StrabonParameters.GEOMETRIES_TABLE);
                 obdaFile.append("\n");
                 obdaFile.append("\n");
             } else if (property.contains("has_code") || property.contains("hasDN")) {
@@ -387,7 +387,7 @@ public class StrabonLivyRepo implements Repository {
                 obdaFile.append(" {o}^^geo:wktLiteral .\n");
                 obdaFile.append("source\t");
                 obdaFile.append("select s, o from ");
-                obdaFile.append(StrabonParameters.GEOMETRIES_SCHEMA + "." + tablename);
+                obdaFile.append(tablename);
                 obdaFile.append("\n");
                 obdaFile.append("\n");
             } else if (property.contains("hasKey") || property.contains("hasCropTypeName") || property.contains("hasName")) {

@@ -207,7 +207,7 @@ public class QueryExecutor {
 						//delete old temp tables
 						for (int k = 0; k < tempTables.size(); k++) {
 							try{
-								spark.sql("DROP VIEW global_temp."+tempTables.get(k));
+								spark.sql("DROP VIEW "+StrabonParameters.GEOMETRIES_SCHEMA+"."+tempTables.get(k));
 							}
 							catch(Exception ex){
 								log.error("Could not delete table "+tempTables.get(k)+". ");
