@@ -14,7 +14,7 @@ public class StrabonParameters {
 	public static final String GEOMETRIES_FIRST_COLUMN = "entity";
 	public static final String GEOMETRIES_SECOND_COLUMN = "geom";
 	public static final String GEOMETRIES_THIRD_COLUMN = "wkt";
-	public static final boolean USE_TEMPORARY_SCHEMA_NAME = false;
+	public static final boolean USE_TEMPORARY_SCHEMA_NAME = true;
 	
 	public static boolean isSpatialJoin(Function atom) {
 		Predicate pred = atom.getFunctionSymbol();
