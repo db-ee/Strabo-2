@@ -149,6 +149,10 @@ public class LocalQueryTranslator {
 	}
 
 	public static boolean createObdaFile(Map<String, String> predDictionary) throws SQLException, IOException {
+		String schemaPrefix = "";
+		if(StrabonParameters.USE_TEMPORARY_SCHEMA_NAME){
+			schemaPrefix = StrabonParameters.TEMPORARY_SCHEMA_NAME + ".";
+		}
 		boolean existsGeometryTable = false;
 		obdaFile = new StringBuffer();
 		obdaFile.append("[PrefixDeclaration]");
@@ -192,7 +196,7 @@ public class LocalQueryTranslator {
 				obdaFile.append("source\t");
 				obdaFile.append("select " + StrabonParameters.GEOMETRIES_SECOND_COLUMN + ", "
 						+ StrabonParameters.GEOMETRIES_THIRD_COLUMN + " from ");
-				obdaFile.append(StrabonParameters.GEOMETRIES_SCHEMA + "." + StrabonParameters.GEOMETRIES_TABLE);
+				obdaFile.append(schemaPrefix + StrabonParameters.GEOMETRIES_TABLE);
 				obdaFile.append("\n");
 				obdaFile.append("\n");
 			} else if (asWKTSubpropertiesToTables.keySet().contains(property)) {
@@ -209,7 +213,7 @@ public class LocalQueryTranslator {
 				obdaFile.append(" {o}^^geo:wktLiteral .\n");
 				obdaFile.append("source\t");
 				obdaFile.append("select s, o from ");
-				obdaFile.append(StrabonParameters.GEOMETRIES_SCHEMA + "." + tablename);
+				obdaFile.append(schemaPrefix + tablename);
 				obdaFile.append("\n");
 				obdaFile.append("\n");
 			} else if (property.equals("http://www.opengis.net/ont/geosparql#hasGeometry")) {
@@ -224,7 +228,7 @@ public class LocalQueryTranslator {
 				obdaFile.append("source\t");
 				obdaFile.append("select " + StrabonParameters.GEOMETRIES_FIRST_COLUMN + ", "
 						+ StrabonParameters.GEOMETRIES_SECOND_COLUMN + " from ");
-				obdaFile.append(StrabonParameters.GEOMETRIES_SCHEMA + "." + StrabonParameters.GEOMETRIES_TABLE);
+				obdaFile.append(schemaPrefix  + StrabonParameters.GEOMETRIES_TABLE);
 				obdaFile.append("\n");
 				obdaFile.append("\n");
 			} else if (property.contains("has_code") || property.contains("hasDN")) {

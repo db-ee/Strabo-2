@@ -9,11 +9,12 @@ import it.unibz.krdb.obda.model.impl.OBDAVocabulary;
 
 public class StrabonParameters {
 	
-	public static final String GEOMETRIES_SCHEMA = "global_temp";
+	public static final String TEMPORARY_SCHEMA_NAME = "global_temp";
 	public static final String GEOMETRIES_TABLE = "geometries2";
 	public static final String GEOMETRIES_FIRST_COLUMN = "entity";
 	public static final String GEOMETRIES_SECOND_COLUMN = "geom";
 	public static final String GEOMETRIES_THIRD_COLUMN = "wkt";
+	public static final boolean USE_TEMPORARY_SCHEMA_NAME = false;
 	
 	public static boolean isSpatialJoin(Function atom) {
 		Predicate pred = atom.getFunctionSymbol();

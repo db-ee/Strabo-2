@@ -207,7 +207,7 @@ public class QueryExecutor {
 						//delete old temp tables
 						for (int k = 0; k < tempTables.size(); k++) {
 							try{
-								spark.sql("DROP VIEW "+StrabonParameters.GEOMETRIES_SCHEMA+"."+tempTables.get(k));
+								spark.sql("DROP VIEW "+StrabonParameters.TEMPORARY_SCHEMA_NAME +"."+tempTables.get(k));
 							}
 							catch(Exception ex){
 								log.error("Could not delete table "+tempTables.get(k)+". ");
@@ -351,7 +351,7 @@ public class QueryExecutor {
 				obdaFile.append("source\t");
 				obdaFile.append("select " + StrabonParameters.GEOMETRIES_SECOND_COLUMN + ", "
 						+ StrabonParameters.GEOMETRIES_THIRD_COLUMN + " from ");
-				obdaFile.append(StrabonParameters.GEOMETRIES_SCHEMA + "." + StrabonParameters.GEOMETRIES_TABLE);
+				obdaFile.append(StrabonParameters.TEMPORARY_SCHEMA_NAME + "." + StrabonParameters.GEOMETRIES_TABLE);
 				obdaFile.append("\n");
 				obdaFile.append("\n");
 			} else if (property.equals("http://www.opengis.net/ont/geosparql#hasGeometry")) {
@@ -366,7 +366,7 @@ public class QueryExecutor {
 				obdaFile.append("source\t");
 				obdaFile.append("select " + StrabonParameters.GEOMETRIES_FIRST_COLUMN + ", "
 						+ StrabonParameters.GEOMETRIES_SECOND_COLUMN + " from ");
-				obdaFile.append(StrabonParameters.GEOMETRIES_SCHEMA + "." + StrabonParameters.GEOMETRIES_TABLE);
+				obdaFile.append(StrabonParameters.TEMPORARY_SCHEMA_NAME + "." + StrabonParameters.GEOMETRIES_TABLE);
 				obdaFile.append("\n");
 				obdaFile.append("\n");
 			} else if (property.contains("has_code")) {
@@ -398,7 +398,7 @@ public class QueryExecutor {
 				obdaFile.append(" {o}^^geo:wktLiteral .\n");
 				obdaFile.append("source\t");
 				obdaFile.append("select s, o from ");
-				obdaFile.append(StrabonParameters.GEOMETRIES_SCHEMA + "." + tablename);
+				obdaFile.append(StrabonParameters.TEMPORARY_SCHEMA_NAME + "." + tablename);
 				obdaFile.append("\n");
 				obdaFile.append("\n");
 			} else if (property.contains("hasKey") || property.contains("hasCropTypeName") ) {

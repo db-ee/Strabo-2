@@ -10,7 +10,6 @@ import java.util.Map;
 import it.unibz.krdb.obda.owlrefplatform.core.StrabonStatement;
 import it.unibz.krdb.obda.strabon.LocalQueryTranslator;
 import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
 import org.apache.spark.serializer.KryoSerializer;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -37,7 +36,6 @@ import it.unibz.krdb.obda.owlrefplatform.core.QuestPreferences;
 import it.unibz.krdb.obda.owlrefplatform.owlapi3.QuestOWL;
 import it.unibz.krdb.obda.owlrefplatform.owlapi3.QuestOWLConfiguration;
 import it.unibz.krdb.obda.owlrefplatform.owlapi3.QuestOWLFactory;
-import it.unibz.krdb.obda.strabon.QueryExecutor;
 import it.unibz.krdb.obda.utils.StrabonParameters;
 import madgik.exareme.master.queryProcessor.estimator.NodeSelectivityEstimator;
 
@@ -374,6 +372,10 @@ public class SesameStrabonRepo implements Repository {
 
 	public static boolean createObdaFile(Map<String, String> predDictionary) throws SQLException, IOException {
 		boolean existsGeometryTable = false;
+		String schemaPrefix = "";
+		if(StrabonParameters.USE_TEMPORARY_SCHEMA_NAME){
+			schemaPrefix = StrabonParameters.TEMPORARY_SCHEMA_NAME + ".";
+		}
 		obdaFile = new StringBuffer();
 		obdaFile.append("[PrefixDeclaration]");
 		obdaFile.append("\n");
@@ -416,7 +418,7 @@ public class SesameStrabonRepo implements Repository {
 				obdaFile.append("source\t");
 				obdaFile.append("select " + StrabonParameters.GEOMETRIES_SECOND_COLUMN + ", "
 						+ StrabonParameters.GEOMETRIES_THIRD_COLUMN + " from ");
-				obdaFile.append(StrabonParameters.GEOMETRIES_SCHEMA + "." + StrabonParameters.GEOMETRIES_TABLE);
+				obdaFile.append(schemaPrefix + StrabonParameters.GEOMETRIES_TABLE);
 				obdaFile.append("\n");
 				obdaFile.append("\n");
 			} else if (property.equals("http://www.opengis.net/ont/geosparql#hasGeometry")) {
@@ -431,7 +433,7 @@ public class SesameStrabonRepo implements Repository {
 				obdaFile.append("source\t");
 				obdaFile.append("select " + StrabonParameters.GEOMETRIES_FIRST_COLUMN + ", "
 						+ StrabonParameters.GEOMETRIES_SECOND_COLUMN + " from ");
-				obdaFile.append(StrabonParameters.GEOMETRIES_SCHEMA + "." + StrabonParameters.GEOMETRIES_TABLE);
+				obdaFile.append(schemaPrefix + StrabonParameters.GEOMETRIES_TABLE);
 				obdaFile.append("\n");
 				obdaFile.append("\n");
 			} else if (property.contains("has_code") || property.contains("hasDN")) {
@@ -463,7 +465,7 @@ public class SesameStrabonRepo implements Repository {
 				obdaFile.append(" {o}^^geo:wktLiteral .\n");
 				obdaFile.append("source\t");
 				obdaFile.append("select s, o from ");
-				obdaFile.append(StrabonParameters.GEOMETRIES_SCHEMA + "." + tablename);
+				obdaFile.append(schemaPrefix + tablename);
 				obdaFile.append("\n");
 				obdaFile.append("\n");
 			} else if (property.contains("hasKey") || property.contains("hasCropTypeName")|| property.contains("hasName")) {

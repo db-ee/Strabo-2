@@ -137,12 +137,18 @@ public class SQLGenerator implements SQLQueryGenerator {
 	//private boolean isOrderBy = false;
 	private boolean isSI = false;
 	private SemanticIndexURIMap uriRefIds;
+
+	private String schemaPrefix;
 	
 	private final DatatypeFactory dtfac = OBDADataFactoryImpl.getInstance().getDatatypeFactory();
 
 	public SQLGenerator(DBMetadata metadata, SQLDialectAdapter sqladapter) {
 		this.metadata = metadata;
 		this.sqladapter = sqladapter;
+		schemaPrefix = "";
+		if(StrabonParameters.USE_TEMPORARY_SCHEMA_NAME) {
+			schemaPrefix = StrabonParameters.TEMPORARY_SCHEMA_NAME + ".";
+		}
 	}
 
 	/**
@@ -2060,7 +2066,7 @@ public class SQLGenerator implements SQLQueryGenerator {
 		 */
 		public String getViewDefinition(Function atom) {
 			if(atom.getFunctionSymbol().toString().startsWith(OBDAVocabulary.TEMP_VIEW_QUERY)) {
-				return StrabonParameters.GEOMETRIES_SCHEMA + "."+atom.getFunctionSymbol().toString() +" "+viewNames.get(atom).getSQLRendering();
+				return schemaPrefix + atom.getFunctionSymbol().toString() +" "+viewNames.get(atom).getSQLRendering();
 			}
 			RelationDefinition def = dataDefinitions.get(atom);
 			if (def instanceof DatabaseRelationDefinition) {
