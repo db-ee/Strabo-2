@@ -25,9 +25,6 @@ import it.unibz.krdb.obda.model.impl.OBDADataFactoryImpl;
 import it.unibz.krdb.obda.model.impl.RDBMSourceParameterConstants;
 import it.unibz.krdb.obda.ontology.ImmutableOntologyVocabulary;
 import it.unibz.krdb.obda.ontology.Ontology;
-import it.unibz.krdb.obda.owlrefplatform.core.abox.RDBMSSIRepositoryManager;
-import it.unibz.krdb.obda.owlrefplatform.core.abox.RepositoryChangedListener;
-import it.unibz.krdb.obda.owlrefplatform.core.abox.SemanticIndexURIMap;
 import it.unibz.krdb.obda.owlrefplatform.core.basicoperations.CQCUtilities;
 import it.unibz.krdb.obda.owlrefplatform.core.basicoperations.LinearInclusionDependencies;
 import it.unibz.krdb.obda.owlrefplatform.core.basicoperations.VocabularyValidator;
@@ -75,7 +72,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 //import org.sqlite.SQLiteConfig;
 
-public class Quest implements Serializable, RepositoryChangedListener {
+public class Quest implements Serializable {
 
 	private static final long serialVersionUID = -6074403119825754295L;
 
@@ -97,11 +94,6 @@ public class Quest implements Serializable, RepositoryChangedListener {
 	 * Internal components
 	 */
 
-	/*
-	 * The active ABox repository (is null if there is no Semantic Index, i.e., in
-	 * Virtual Mode)
-	 */
-	private RDBMSSIRepositoryManager dataRepository = null;
 
 	private VocabularyValidator vocabularyValidator;
 
@@ -355,7 +347,7 @@ public class Quest implements Serializable, RepositoryChangedListener {
 
 	public SparqlAlgebraToDatalogTranslator getSparqlAlgebraToDatalogTranslator() {
 		SparqlAlgebraToDatalogTranslator translator = new SparqlAlgebraToDatalogTranslator(
-				unfolder.getUriTemplateMatcher(), getUriMap());
+				unfolder.getUriTemplateMatcher());
 		return translator;
 	}
 
@@ -591,37 +583,6 @@ public class Quest implements Serializable, RepositoryChangedListener {
 				// setup connection pool
 				setupConnectionPool();
 
-				dataRepository = new RDBMSSIRepositoryManager(reformulationReasoner, inputOntology.getVocabulary());
-				dataRepository.addRepositoryChangedListener(this);
-
-				if (inmemory) {
-
-					/*
-					 * in this case we we work in memory (with H2), the database is clean and Quest
-					 * will insert new Abox assertions into the database.
-					 */
-					dataRepository.generateMetadata();
-
-					/* Creating the ABox repository */
-					dataRepository.createDBSchemaAndInsertMetadata(localConnection);
-				} else {
-					/*
-					 * Here we expect the repository to be already created in the database, we will
-					 * restore the repository and we will NOT insert any data in the repo, it should
-					 * have been inserted already.
-					 */
-					dataRepository.loadMetadata(localConnection);
-
-					// TODO add code to verify that the existing semantic index
-					// repository can be used
-					// with the current ontology, e.g., checking the vocabulary
-					// of URIs, checking the
-					// ranges w.r.t. to the ontology entailments, etc.
-
-				}
-
-				// getting OBDA mapping axioms
-				mappings = dataRepository.getMappings();
 			} else if (aboxMode.equals(QuestConstants.VIRTUAL)) {
 				// log.debug("Working in virtual mode");
 
@@ -712,8 +673,7 @@ public class Quest implements Serializable, RepositoryChangedListener {
 			SQLDialectAdapter sqladapter = SQLAdapterFactory.getSQLDialectAdapter(
 					obdaSource.getParameter(RDBMSourceParameterConstants.DATABASE_DRIVER), metadata.getDbmsVersion());
 
-			datasourceQueryGenerator = new SQLGenerator(metadata, sqladapter, sqlGenerateReplace, distinctResultSet,
-					getUriMap());
+			datasourceQueryGenerator = new SQLGenerator(metadata, sqladapter, sqlGenerateReplace, distinctResultSet);
 			datasourceQueryGenerator.setUseTemporarySchemaName(useTemporarySchemaName);
 
 			unfolder = new QuestUnfolder(mappings, metadata, localConnection);
@@ -802,10 +762,6 @@ public class Quest implements Serializable, RepositoryChangedListener {
 		return inputOntology.getVocabulary();
 	}
 
-	public void updateSemanticIndexMappings() throws OBDAException {
-		/* Setting up the OBDA model */
-		unfolder.updateSemanticIndexMappings(dataRepository.getMappings(), reformulationReasoner);
-	}
 
 	private void setupConnectionPool() {
 		String url = obdaSource.getParameter(RDBMSourceParameterConstants.DATABASE_URL);
@@ -934,17 +890,6 @@ public class Quest implements Serializable, RepositoryChangedListener {
 	public void repositoryChanged() {
 		// clear cache
 		this.querycache.clear();
-	}
-
-	public SemanticIndexURIMap getUriMap() {
-		if (dataRepository != null)
-			return dataRepository.getUriMap();
-		else
-			return null;
-	}
-
-	public RDBMSSIRepositoryManager getSemanticIndexRepository() {
-		return dataRepository;
 	}
 
 	public SQLQueryGenerator getDatasourceQueryGenerator() {

@@ -126,63 +126,6 @@ public class QuestOWLStatement implements AutoCloseable {
 		}
 	}
 
-	public int insertData(File owlFile, int commitSize, int batchsize, String baseURI) throws Exception {
-		return batchsize;
-
-		
-
-	}
-
-	private class Insert implements Runnable {
-		private RDFParser rdfParser;
-		private Reader inputStreamOrReader;
-		private String baseURI;
-
-		public Insert(RDFParser rdfParser, Reader inputStreamOrReader, String baseURI) {
-			this.rdfParser = rdfParser;
-			this.inputStreamOrReader = inputStreamOrReader;
-			this.baseURI = baseURI;
-		}
-
-		@Override
-		public void run() {
-			try {
-				rdfParser.parse(inputStreamOrReader, baseURI);
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-		}
-
-	}
-
-	private class Process implements Runnable {
-		private SesameRDFIterator iterator;
-		private QuestStatement questStmt;
-
-		int insertCount = -1;
-		private int commitsize;
-		private int batchsize;
-
-		public Process(SesameRDFIterator iterator, QuestStatement qstm, int commitsize, int batchsize) throws OBDAException {
-			this.iterator = iterator;
-			this.questStmt = qstm;
-			this.commitsize = commitsize;
-			this.batchsize = batchsize;
-		}
-
-		@Override
-		public void run() {
-			try {
-				insertCount = questStmt.insertData(iterator, commitsize, batchsize);
-			} catch (SQLException e) {
-				throw new RuntimeException(e);
-			}
-		}
-
-		public int getInsertCount() {
-			return insertCount;
-		}
-	}
 
 	public QuestOWLConnection getConnection() throws OWLException {
 		return conn;

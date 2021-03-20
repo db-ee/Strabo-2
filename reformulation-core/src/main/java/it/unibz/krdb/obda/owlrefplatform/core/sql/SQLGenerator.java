@@ -27,8 +27,6 @@ import it.unibz.krdb.obda.model.impl.OBDADataFactoryImpl;
 import it.unibz.krdb.obda.model.impl.OBDAVocabulary;
 import it.unibz.krdb.obda.model.impl.TermUtils;
 import it.unibz.krdb.obda.owlrefplatform.core.SQLResult;
-import it.unibz.krdb.obda.owlrefplatform.core.abox.SemanticIndexURIMap;
-import it.unibz.krdb.obda.owlrefplatform.core.abox.XsdDatatypeConverter;
 import it.unibz.krdb.obda.owlrefplatform.core.basicoperations.DatalogNormalizer;
 import it.unibz.krdb.obda.owlrefplatform.core.basicoperations.EQNormalizer;
 import it.unibz.krdb.obda.owlrefplatform.core.queryevaluation.SQLDialectAdapter;
@@ -133,11 +131,6 @@ public class SQLGenerator implements SQLQueryGenerator {
 	private boolean generatingREPLACE = true;
 	private boolean distinctResultSet = false;
 
-	//private boolean isDistinct = false;
-	//private boolean isOrderBy = false;
-	private boolean isSI = false;
-	private SemanticIndexURIMap uriRefIds;
-
 	private String schemaPrefix;
 	
 	private final DatatypeFactory dtfac = OBDADataFactoryImpl.getInstance().getDatatypeFactory();
@@ -157,17 +150,13 @@ public class SQLGenerator implements SQLQueryGenerator {
 	 * @param metadata
 	 * @param sqladapter
 	 * @param sqlGenerateReplace
-	 * @param uriid is null in case we are not in the SI mode
 	 */
 
-	public SQLGenerator(DBMetadata metadata, SQLDialectAdapter sqladapter, boolean sqlGenerateReplace, boolean distinctResultSet, SemanticIndexURIMap uriid) {
+	public SQLGenerator(DBMetadata metadata, SQLDialectAdapter sqladapter, boolean sqlGenerateReplace, boolean distinctResultSet) {
 		this(metadata, sqladapter);
 		this.generatingREPLACE = sqlGenerateReplace;
 		this.distinctResultSet = distinctResultSet;
-		if (uriid != null) {
-			this.isSI = true;
-			this.uriRefIds = uriid;
-		}
+
 	}
 
 
@@ -1414,7 +1403,7 @@ public class SQLGenerator implements SQLQueryGenerator {
 				/*
 				 * A URI function always returns a string, thus it is a string column type.
 				 */
-				return !isSI;
+				return true;
 			} 
 			else {
 				if (isUnary(function)) {
@@ -1510,21 +1499,11 @@ public class SQLGenerator implements SQLQueryGenerator {
 		}
 		if (term instanceof ValueConstant) {
 			ValueConstant ct = (ValueConstant) term;
-			if (isSI) {
-				if (ct.getType() == COL_TYPE.OBJECT || ct.getType() == COL_TYPE.LITERAL) {
-					int id = uriRefIds.getId(ct.getValue());
-					if (id >= 0)
-						return sqladapter.getSQLLexicalFormString(String.valueOf(id));
-				}
-			}
+
 			return getSQLLexicalForm(ct);
 		} 
 		else if (term instanceof URIConstant) {
-			if (isSI) {
-				String uri = term.toString();
-				int id = uriRefIds.getId(uri);
-				return sqladapter.getSQLLexicalFormString(String.valueOf(id));
-			}
+
 			URIConstant uc = (URIConstant) term;
 			return sqladapter.getSQLLexicalFormString(uc.toString());
 		} 
@@ -1832,7 +1811,7 @@ public class SQLGenerator implements SQLQueryGenerator {
 		} 
 		else if (constant.getType() == COL_TYPE.BOOLEAN) {
 			String value = constant.getValue();
-			boolean v = XsdDatatypeConverter.parseXsdBoolean(value);
+			boolean v = parseXsdBoolean(value);
 			sql = sqladapter.getSQLLexicalFormBoolean(v);
 		} 
 		else if (constant.getType() == COL_TYPE.DATETIME ) {
@@ -1855,6 +1834,23 @@ public class SQLGenerator implements SQLQueryGenerator {
 		return sql;
 
 	}
+
+	/**
+	 * @see http://www.w3.org/TR/xmlschema11-2/#boolean
+	 * @param value from the lexical space of xsd:boolean
+	 * @return boolean
+	 */
+
+	public static boolean parseXsdBoolean(String value) {
+
+		if (value.equals("true") || value.equals("1"))
+			return true;
+		else if (value.equals("false") || value.equals("0"))
+			return false;
+
+		throw new RuntimeException("Invalid lexical form for xsd:boolean. Found: " + value);
+	}
+
 
 
 	/**

@@ -30,32 +30,6 @@ public class SQLAdapterFactory {
 	public static SQLDialectAdapter getSQLDialectAdapter(String className, String databaseName) {
 
 		switch (className) {
-			case "org.postgresql.Driver":
-				return new PostgreSQLDialectAdapter();
-			case "com.mysql.jdbc.Driver":
-				return new Mysql2SQLDialectAdapter();
-			case "org.h2.Driver":
-				return new H2SQLDialectAdapter();
-			case "org.hsqldb.jdbc.JDBCDriver":
-				return new HSQLDBDialectAdapter();
-			case "com.ibm.db2.jcc.DB2Driver":
-				return new DB2SQLDialectAdapter();
-			case "oracle.jdbc.driver.OracleDriver":
-			case "oracle.jdbc.OracleDriver":
-				return new OracleSQLDialectAdapter(databaseName);
-			case "org.teiid.jdbc.TeiidDriver":
-				return new TeiidSQLDialectAdapter();
-			case "net.sourceforge.jtds.jdbc.Driver":
-			case "com.microsoft.sqlserver.jdbc.SQLServerDriver":
-				return new SQLServerSQLDialectAdapter();
-			case "madgik.adp.federatedjdbc.AdpDriver":
-				return new AdpSQLDialectAdapter();
-			case "madgik.exareme.utils.embedded.AdpEmbeddedDriver":
-				return  new AdpSQLDialectAdapter();
-            case "nl.cwi.monetdb.jdbc.MonetDriver":
-                return new MonetDBSQLDialectAdapter();
-            case "com.sap.db.jdbc.Driver":
-                return new SAPHANASQLDialectAdapter();
             case "madgik.exareme.jdbc.Spark":
             	return new SparkDialectAdapter();
 			default:

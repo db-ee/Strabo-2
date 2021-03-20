@@ -25,7 +25,6 @@ import it.unibz.krdb.obda.model.*;
 import it.unibz.krdb.obda.model.Predicate.COL_TYPE;
 import it.unibz.krdb.obda.model.impl.OBDADataFactoryImpl;
 import it.unibz.krdb.obda.owlrefplatform.core.QuestStatement;
-import it.unibz.krdb.obda.owlrefplatform.core.abox.SemanticIndexURIMap;
 import it.unibz.krdb.sql.DBMetadata;
 
 import java.net.URISyntaxException;
@@ -51,8 +50,7 @@ public class QuestResultset implements TupleResultSet {
 	private int bnodeCounter = 0;
 
 	private final OBDADataFactory fac = OBDADataFactoryImpl.getInstance();
-	private final SemanticIndexURIMap uriMap;
-	
+
 	private final String vendor;
 	private final boolean isOracle;
     private final boolean isMsSQL;
@@ -73,7 +71,6 @@ public class QuestResultset implements TupleResultSet {
 	public QuestResultset(ResultSet set, List<String> signature, QuestStatement st) throws OBDAException {
 		this.set = set;
 		this.st = st;
-		this.uriMap = st.questInstance.getUriMap();
 		this.signature = signature;
 		
 		columnMap = new HashMap<String, Integer>(signature.size() * 2);
@@ -167,18 +164,6 @@ public class QuestResultset implements TupleResultSet {
 				return null;
 			} else {
 				if (type == COL_TYPE.OBJECT) {
-					if (uriMap != null) {
-						try {
-							Integer id = Integer.parseInt(realValue);
-							realValue = uriMap.getURI(id);
-						} catch (NumberFormatException e) {
-							/*
-							 * If its not a number, then it has to be a URI, so
-							 * we leave realValue as it is.
-							 */
-						}
-					}
-
 					result = fac.getConstantURI(realValue.trim());
 
 				} else if (type == COL_TYPE.BNODE) {

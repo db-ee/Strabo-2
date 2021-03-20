@@ -131,15 +131,7 @@ public class QuestConnection implements OBDAConnection {
 
 	@Override
 	public boolean isReadOnly() throws OBDAException {
-		if (this.questinstance.getSemanticIndexRepository() == null)
 			return true;
-		try {
-			return conn.isReadOnly();
-		} catch (Exception e) {
-			OBDAException obdaException = new OBDAException(e.getMessage());
-			obdaException.setStackTrace(e.getStackTrace());
-			throw obdaException;
-		}
 	}
 
 	@Override

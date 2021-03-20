@@ -24,7 +24,6 @@ import it.unibz.krdb.obda.model.OBDAQueryModifiers.OrderCondition;
 import it.unibz.krdb.obda.model.Predicate.COL_TYPE;
 import it.unibz.krdb.obda.model.ValueConstant;
 import it.unibz.krdb.obda.model.impl.*;
-import it.unibz.krdb.obda.owlrefplatform.core.abox.SemanticIndexURIMap;
 import it.unibz.krdb.obda.owlrefplatform.core.basicoperations.UriTemplateMatcher;
 import org.openrdf.model.IRI;
 import org.openrdf.model.Literal;
@@ -62,7 +61,6 @@ public class SparqlAlgebraToDatalogTranslator {
 	private final DatatypeFactory dtfac = (DatatypeFactory) OBDADataFactoryImpl.getInstance().getDatatypeFactory();
 
 	private final UriTemplateMatcher uriTemplateMatcher;
-	private final SemanticIndexURIMap uriRef;  
 	private boolean nextIsNested;
 	//becomes true during the parsing of outer query, so if nested queries are present they can be identified as such
 	
@@ -79,12 +77,10 @@ public class SparqlAlgebraToDatalogTranslator {
 	/**
 	 * 
 	 * @param templateMatcher
-	 * @param uriRef is used only in the Semantic Index mode
 	 */
 	
-	public SparqlAlgebraToDatalogTranslator(UriTemplateMatcher templateMatcher, SemanticIndexURIMap uriRef) {
+	public SparqlAlgebraToDatalogTranslator(UriTemplateMatcher templateMatcher) {
 		uriTemplateMatcher = templateMatcher;
-		this.uriRef = uriRef;
 		nextIsNested=false;
 		//currentModifiers=new OBDAQueryModifiers();
 		modifiers=new LinkedList<OBDAQueryModifiers>();
@@ -634,15 +630,8 @@ public class SparqlAlgebraToDatalogTranslator {
 			}
 		} 
 		else if (s instanceof IRI) {
-			if (uriRef != null) {
-				// if in the Semantic Index mode 
-				int id = uriRef.getId(s.stringValue());
-				result = ofac.getUriTemplate(ofac.getConstantLiteral(String.valueOf(id), COL_TYPE.INTEGER));
-			} 
-			else {
-				String subject_URI = decodeURIEscapeCodes(s.stringValue());
-				result = uriTemplateMatcher.generateURIFunction(subject_URI);
-			}
+			String subject_URI = decodeURIEscapeCodes(s.stringValue());
+			result = uriTemplateMatcher.generateURIFunction(subject_URI);
 		}
 		
 		return result;

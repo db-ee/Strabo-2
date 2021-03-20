@@ -25,8 +25,6 @@ import com.google.common.collect.HashMultimap;
 import it.unibz.krdb.obda.model.*;
 import it.unibz.krdb.obda.model.impl.OBDADataFactoryImpl;
 import it.unibz.krdb.obda.model.impl.OBDAVocabulary;
-import it.unibz.krdb.obda.ontology.Assertion;
-import it.unibz.krdb.obda.owlrefplatform.core.abox.EquivalentTriplePredicateIterator;
 import it.unibz.krdb.obda.owlrefplatform.core.basicoperations.DatalogNormalizer;
 import it.unibz.krdb.obda.owlrefplatform.core.queryevaluation.SPARQLQueryUtility;
 import it.unibz.krdb.obda.owlrefplatform.core.resultset.*;
@@ -929,44 +927,6 @@ public class QuestStatement implements OBDAStatement {
 			}
 		}
 		return counter;
-	}
-	
-	/***
-	 * Inserts a stream of ABox assertions into the repository.
-	 * 
-	 * @param data
-	 * 
-	 * @throws SQLException
-	 */
-	public int insertData(Iterator<Assertion> data,  int commit, int batch) throws SQLException {
-		int result = -1;
-
-		EquivalentTriplePredicateIterator newData = new EquivalentTriplePredicateIterator(data, questInstance.getReasoner());
-
-//		if (!useFile) {
-
-			result = questInstance.getSemanticIndexRepository().insertData(conn.getConnection(), newData, commit, batch);
-//		} else {
-			//try {
-				// File temporalFile = new File("quest-copy.tmp");
-				// FileOutputStream os = new FileOutputStream(temporalFile);
-				// ROMAN: this called DOES NOTHING
-				// result = (int) questInstance.getSemanticIndexRepository().loadWithFile(conn.conn, newData);
-				// os.close();
-
-			//} catch (IOException e) {
-			//	log.error(e.getMessage());
-			//}
-//		}
-
-		try {
-			questInstance.updateSemanticIndexMappings();
-		} 
-		catch (Exception e) {
-			log.error("Error updating semantic index mappings after insert.", e);
-		}
-
-		return result;
 	}
 	
 }

@@ -28,8 +28,6 @@ import it.unibz.krdb.obda.ontology.*;
 import it.unibz.krdb.obda.owlapi3.OWLAPI3ABoxIterator;
 import it.unibz.krdb.obda.owlapi3.OWLAPI3TranslatorUtility;
 import it.unibz.krdb.obda.owlrefplatform.core.*;
-import it.unibz.krdb.obda.owlrefplatform.core.abox.EquivalentTriplePredicateIterator;
-import it.unibz.krdb.obda.owlrefplatform.core.abox.QuestMaterializer;
 import it.unibz.krdb.obda.owlrefplatform.core.mappingprocessing.TMappingExclusionConfig;
 import it.unibz.krdb.obda.utils.VersionInfo;
 import it.unibz.krdb.sql.ImplicitDBConstraintsReader;
@@ -314,41 +312,7 @@ public class QuestOWL extends OWLReasonerBase implements AutoCloseable {
 			owlconn = new QuestOWLConnection(conn);
 			// pm.reasonerTaskProgressChanged(3, 4);
 
-			// Preparing the data source
-			if (unfoldingMode.equals(QuestConstants.CLASSIC)) {
-				QuestStatement st = conn.createStatement();
-				if (bObtainFromOntology) {
-					// Retrieves the ABox from the ontology file.
-					log.debug("Loading data from Ontology into the database");
-					OWLAPI3ABoxIterator aBoxIter = new OWLAPI3ABoxIterator(importsClosure, questInstance.getVocabulary());
-					EquivalentTriplePredicateIterator aBoxNormalIter =
-							new EquivalentTriplePredicateIterator(aBoxIter, questInstance.getReasoner());
 
-					int count = st.insertData(aBoxNormalIter, 5000, 500);
-					log.debug("Inserted {} triples from the ontology.", count);
-				}
-				if (bObtainFromMappings) {
-					// Retrieves the ABox from the target database via mapping.
-					log.debug("Loading data from Mappings into the database");
-
-					OBDAModel obdaModelForMaterialization = questInstance.getOBDAModel();
-					obdaModelForMaterialization.getOntologyVocabulary().merge(translatedOntologyMerge.getVocabulary());
-
-					QuestMaterializer materializer = new QuestMaterializer(obdaModelForMaterialization, false);
-					Iterator<Assertion> assertionIter = materializer.getAssertionIterator();
-					int count = st.insertData(assertionIter, 5000, 500);
-					materializer.disconnect();
-					log.debug("Inserted {} triples from the mappings.", count);
-				}
-//				st.createIndexes();
-				st.close();
-				if (!conn.getAutoCommit())
-				conn.commit();
-
-				questInstance.updateSemanticIndexMappings();
-			} else {
-				// VIRTUAL MODE - NO-OP
-			}
 			questready = true;
 			log.debug("Quest has completed the setup and it is ready for query answering!");
 		} catch (Exception e) {
