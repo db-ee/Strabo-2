@@ -34,9 +34,6 @@ import it.unibz.krdb.obda.owlrefplatform.core.mappingprocessing.TMappingExclusio
 import it.unibz.krdb.obda.owlrefplatform.core.queryevaluation.EvaluationEngine;
 import it.unibz.krdb.obda.owlrefplatform.core.queryevaluation.SQLAdapterFactory;
 import it.unibz.krdb.obda.owlrefplatform.core.queryevaluation.SQLDialectAdapter;
-import it.unibz.krdb.obda.owlrefplatform.core.reformulation.DummyReformulator;
-import it.unibz.krdb.obda.owlrefplatform.core.reformulation.QueryRewriter;
-import it.unibz.krdb.obda.owlrefplatform.core.reformulation.TreeWitnessRewriter;
 import it.unibz.krdb.obda.owlrefplatform.core.sql.SQLGenerator;
 import it.unibz.krdb.obda.owlrefplatform.core.srcquerygeneration.SQLQueryGenerator;
 import it.unibz.krdb.obda.owlrefplatform.core.translator.MappingVocabularyRepair;
@@ -100,8 +97,6 @@ public class Quest implements Serializable {
 	/* The active connection used to get metadata from the DBMS */
 	private transient Connection localConnection = null;
 
-	/* The active query rewriter */
-	private QueryRewriter rewriter;
 
 	/* The active SQL generator */
 	private SQLQueryGenerator datasourceQueryGenerator = null;
@@ -319,20 +314,6 @@ public class Quest implements Serializable {
 
 	public TBoxReasoner getReasoner() {
 		return reformulationReasoner;
-	}
-
-	public DatalogProgram getRewriting(DatalogProgram cqie) throws OBDAException {
-		return rewriter.rewrite(cqie);
-	}
-
-	public DatalogProgram getOptimizedRewriting(DatalogProgram cqie) throws OBDAException {
-		// Query optimization w.r.t Sigma rules
-		for (CQIE cq : cqie.getRules())
-			CQCUtilities.optimizeQueryWithSigmaRules(cq.getBody(), sigma);
-		cqie = rewriter.rewrite(cqie);
-		for (CQIE cq : cqie.getRules())
-			CQCUtilities.optimizeQueryWithSigmaRules(cq.getBody(), sigma);
-		return cqie;
 	}
 
 	public QuestUnfolder getUnfolder() {
@@ -716,19 +697,6 @@ public class Quest implements Serializable {
 			// reasoner = TBoxReasonerImpl.create(reducer.getReducedOntology());
 			// }
 
-			// Setting up the reformulation engine
-			//we do not reformulate in Strabon!
-			rewriter = new DummyReformulator();
-//			if (reformulate == false) {
-//				rewriter = new DummyReformulator();
-//			} else if (QuestConstants.TW.equals(reformulationTechnique)) {
-//				rewriter = new TreeWitnessRewriter();
-//			} else {
-//				throw new IllegalArgumentException(
-//						"Invalid value for argument: " + QuestPreferences.REFORMULATION_TECHNIQUE);
-//			}
-
-			rewriter.setTBox(reformulationReasoner, inputOntology.getVocabulary(), sigma);
 
 			/*
 			 * Done, sending a new reasoner with the modules we just configured

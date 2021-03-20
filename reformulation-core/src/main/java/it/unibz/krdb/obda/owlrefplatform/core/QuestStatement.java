@@ -66,8 +66,6 @@ public class QuestStatement implements OBDAStatement {
 
 	private final Statement sqlstatement;
 
-
-	
 	
 	private boolean canceled = false;
 	
@@ -594,14 +592,11 @@ public class QuestStatement implements OBDAStatement {
 		System.out.println("QuestStatement.translateAndPreprocessed:"+ initialProgram.toString());
 
 		
-		// Perform the query rewriting
-		DatalogProgram programAfterRewriting = questInstance.getRewriting(initialProgram);
-		
 		// Translate the output datalog program back to SPARQL string
 		// TODO Re-enable the prefix manager using Sesame prefix manager
 //		PrefixManager prefixManager = new SparqlPrefixManager(query.getPrefixMapping());
 		DatalogToSparqlTranslator datalogTranslator = new DatalogToSparqlTranslator();
-		return datalogTranslator.translate(programAfterRewriting);
+		return datalogTranslator.translate(initialProgram);
 	}
 
 	/**
@@ -612,8 +607,7 @@ public class QuestStatement implements OBDAStatement {
 
 		DatalogProgram program = translateAndPreProcess(query);
 
-		DatalogProgram rewriting = questInstance.getRewriting(program);
-		return DatalogProgramRenderer.encode(rewriting);
+		return DatalogProgramRenderer.encode(program);
 	}
 	
 	
@@ -680,14 +674,10 @@ public class QuestStatement implements OBDAStatement {
 				if (program.getRules().size() < 1) 
 					throw new OBDAException("Error, the translation of the query generated 0 rules. This is not possible for any SELECT query (other queries are not supported by the translator).");
 
-				log.debug("Start the rewriting process...");
 
-				final long startTime0 = System.currentTimeMillis();
-				programAfterRewriting = questInstance.getOptimizedRewriting(program);
-				rewritingTime = System.currentTimeMillis() - startTime0;
 
 				final long startTime = System.currentTimeMillis();
-				programAfterUnfolding = getUnfolding(programAfterRewriting);
+				programAfterUnfolding = getUnfolding(program);
 				unfoldingTime = System.currentTimeMillis() - startTime;
 
 				

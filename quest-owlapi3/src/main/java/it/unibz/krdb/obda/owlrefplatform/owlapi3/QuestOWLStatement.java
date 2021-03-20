@@ -275,9 +275,5 @@ public class QuestOWLStatement implements AutoCloseable {
 	public int getUCQSizeAfterUnfolding(){
 		return st.getUCQSizeAfterUnfolding();
 	}
-	
-	public int getUCQSizeAfterRewriting(){
-		return st.getUCQSizeAfterRewriting();
-	}
 
 }

@@ -89,8 +89,6 @@ public class StrabonStatement implements OBDAStatement {
 
 	private QueryExecutionThread executionthread;
 
-	private DatalogProgram programAfterRewriting;
-
 	private DatalogProgram programAfterUnfolding;
 
 	private DatalogProgram programAfterSplittingSpatialJoin;
@@ -510,15 +508,12 @@ public class StrabonStatement implements OBDAStatement {
 		DatalogProgram initialProgram = translateAndPreProcess(query/* , signatureContainer */);
 		System.out.println("StrabonStatement.translateAndPreprocessed:" + initialProgram.toString());
 
-		// Perform the query rewriting
-		DatalogProgram programAfterRewriting = questInstance.getRewriting(initialProgram);
-
 		// Translate the output datalog program back to SPARQL string
 		// TODO Re-enable the prefix manager using Sesame prefix manager
 		// PrefixManager prefixManager = new
 		// SparqlPrefixManager(query.getPrefixMapping());
 		DatalogToSparqlTranslator datalogTranslator = new DatalogToSparqlTranslator();
-		return datalogTranslator.translate(programAfterRewriting);
+		return datalogTranslator.translate(initialProgram);
 	}
 
 	/**
@@ -529,8 +524,7 @@ public class StrabonStatement implements OBDAStatement {
 
 		DatalogProgram program = translateAndPreProcess(query);
 
-		DatalogProgram rewriting = questInstance.getRewriting(program);
-		return DatalogProgramRenderer.encode(rewriting);
+		return DatalogProgramRenderer.encode(program);
 	}
 
 	/***
@@ -616,14 +610,9 @@ public class StrabonStatement implements OBDAStatement {
 					throw new OBDAException(
 							"Error, the translation of the query generated 0 rules. This is not possible for any SELECT query (other queries are not supported by the translator).");
 
-				log.debug("Start the rewriting process...");
-
-				final long startTime0 = System.currentTimeMillis();
-				programAfterRewriting = questInstance.getOptimizedRewriting(program);
-				rewritingTime = System.currentTimeMillis() - startTime0;
 
 				final long startTime = System.currentTimeMillis();
-				programAfterUnfolding = getUnfolding(programAfterRewriting);
+				programAfterUnfolding = getUnfolding(program);
 				unfoldingTime = System.currentTimeMillis() - startTime;
 				if(splitSpatialJoin) {
 					try {
@@ -1000,36 +989,6 @@ public class StrabonStatement implements OBDAStatement {
 		return unfoldingTime;
 	}
 
-	public int getUCQSizeAfterRewriting() {
-		if (programAfterRewriting.getRules() != null)
-			return programAfterRewriting.getRules().size();
-		else
-			return 0;
-	}
-
-	public int getMinQuerySizeAfterRewriting() {
-		int toReturn = Integer.MAX_VALUE;
-		List<CQIE> rules = programAfterRewriting.getRules();
-		for (CQIE rule : rules) {
-			int querySize = getBodySize(rule.getBody());
-			if (querySize < toReturn) {
-				toReturn = querySize;
-			}
-		}
-		return toReturn;
-	}
-
-	public int getMaxQuerySizeAfterRewriting() {
-		int toReturn = Integer.MIN_VALUE;
-		List<CQIE> rules = programAfterRewriting.getRules();
-		for (CQIE rule : rules) {
-			int querySize = getBodySize(rule.getBody());
-			if (querySize > toReturn) {
-				toReturn = querySize;
-			}
-		}
-		return toReturn;
-	}
 
 	public int getUCQSizeAfterUnfolding() {
 		if (programAfterUnfolding.getRules() != null)
