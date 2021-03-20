@@ -128,7 +128,7 @@
 		<license.licenseName>apache_v2</license.licenseName>
 		<license.roots>src/main/java,src/test/java</license.roots>
 		<sesame.version>4.1.2</sesame.version>
-		<owlapi.version>4.2.5</owlapi.version>
+		<owlapi.version>4.5.19</owlapi.version>
 		<geotools.version>22.2</geotools.version>
 		<spring.version>2.5.6</spring.version>
 	</properties>

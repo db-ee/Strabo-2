@@ -102,8 +102,11 @@ public class StrabonLivyRepo implements Repository {
             LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("SET spark.sql.inMemoryColumnarStorage.compressed = true"), statementsURL, client);
             LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("SET spark.sql.crossJoin.enabled=true"), statementsURL, client);//for self-spatial joins on geometry table
             LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("SET spark.sql.parquet.filterPushdown = true"), statementsURL, client);
-            LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("geospark.join.spatitionside = none"), statementsURL, client);
-            LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("use "+LivyHelper.databaseName), statementsURL, client);
+            LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("SET geospark.join.spatitionside = none"), statementsURL, client);
+            LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("SET spark.sql.cbo.enabled = true"), statementsURL, client);
+            LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("SET spark.sql.cbo.joinReorder.enabled = true"), statementsURL, client);
+
+            LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("use "+ConnectionConstants.DATABASENAME), statementsURL, client);
             for (String udf : LivyHelper.udfs) {
                 String lib = "{\"code\":\"spark.sessionState.functionRegistry.createOrReplaceTempFunction(\\\"" + udf + "\\\",org.apache.spark.sql.geosparksql.expressions." + udf + ");\"}";
                 LivyHelper.sendCommandAndPrint(lib, statementsURL, client);
@@ -167,6 +170,7 @@ public class StrabonLivyRepo implements Repository {
             p.setCurrentValueOf(QuestPreferences.OBTAIN_FULL_METADATA, QuestConstants.FALSE);
             p.setCurrentValueOf(QuestPreferences.SQL_GENERATE_REPLACE, QuestConstants.FALSE);
             p.setCurrentValueOf(QuestPreferences.REWRITE, QuestConstants.FALSE);
+            p.setCurrentValueOf(QuestPreferences.USE_TEMPORARY_SCHEMA_NAME, QuestConstants.FALSE);
             // p.setCurrentValueOf(QuestPreferences.DBTYPE, QuestConstants.PANTELIS);
             // p.setCurrentValueOf(QuestPreferences.DISTINCT_RESULTSET,
             // QuestConstants.TRUE);
@@ -298,10 +302,7 @@ public class StrabonLivyRepo implements Repository {
 
     public static boolean createObdaFile(Map<String, String> predDictionary) throws SQLException, IOException {
         boolean existsGeometryTable = false;
-        String schemaPrefix = "";
-        if(StrabonParameters.USE_TEMPORARY_SCHEMA_NAME){
-            schemaPrefix = StrabonParameters.TEMPORARY_SCHEMA_NAME + ".";
-        }
+
         obdaFile = new StringBuffer();
         obdaFile.append("[PrefixDeclaration]");
         obdaFile.append("\n");
@@ -344,7 +345,7 @@ public class StrabonLivyRepo implements Repository {
                 obdaFile.append("source\t");
                 obdaFile.append("select " + StrabonParameters.GEOMETRIES_SECOND_COLUMN + ", "
                         + StrabonParameters.GEOMETRIES_THIRD_COLUMN + " from ");
-                obdaFile.append(schemaPrefix + StrabonParameters.GEOMETRIES_TABLE);
+                obdaFile.append(StrabonParameters.GEOMETRIES_TABLE);
                 obdaFile.append("\n");
                 obdaFile.append("\n");
             } else if (property.equals("http://www.opengis.net/ont/geosparql#hasGeometry")) {
@@ -359,7 +360,7 @@ public class StrabonLivyRepo implements Repository {
                 obdaFile.append("source\t");
                 obdaFile.append("select " + StrabonParameters.GEOMETRIES_FIRST_COLUMN + ", "
                         + StrabonParameters.GEOMETRIES_SECOND_COLUMN + " from ");
-                obdaFile.append(schemaPrefix +  StrabonParameters.GEOMETRIES_TABLE);
+                obdaFile.append(StrabonParameters.GEOMETRIES_TABLE);
                 obdaFile.append("\n");
                 obdaFile.append("\n");
             } else if (property.contains("has_code") || property.contains("hasDN")) {
@@ -391,7 +392,7 @@ public class StrabonLivyRepo implements Repository {
                 obdaFile.append(" {o}^^geo:wktLiteral .\n");
                 obdaFile.append("source\t");
                 obdaFile.append("select s, o from ");
-                obdaFile.append(schemaPrefix + tablename);
+                obdaFile.append(tablename);
                 obdaFile.append("\n");
                 obdaFile.append("\n");
             } else if (property.contains("hasKey") || property.contains("hasCropTypeName") || property.contains("hasName")) {

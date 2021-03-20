@@ -108,6 +108,7 @@ public class DBMetadata implements Serializable {
 			}
 			else {
 				System.err.println("DUPLICATE TABLE NAMES, USE QUALIFIED NAMES:\n" + td + "\nAND\n" + schema.get(noSchemaID));
+				schema.put(noSchemaID, td);
 				//schema.remove(noSchemaID);
 				// TODO (ROMAN 8 Oct 2015): think of a better way of resolving ambiguities 
 			}

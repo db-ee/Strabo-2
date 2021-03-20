@@ -179,6 +179,8 @@ public class Quest implements Serializable, RepositoryChangedListener {
 
 	private boolean sqlGenerateReplace = true;
 
+	private boolean useTemporarySchemaName = true;
+
 	private boolean distinctResultSet = false;
 
 	private String aboxMode = QuestConstants.CLASSIC;
@@ -429,6 +431,7 @@ public class Quest implements Serializable, RepositoryChangedListener {
 		printKeys = Boolean.valueOf((String) preferences.get(QuestPreferences.PRINT_KEYS));
 		distinctResultSet = Boolean.valueOf((String) preferences.get(QuestPreferences.DISTINCT_RESULTSET));
 		sqlGenerateReplace = Boolean.valueOf((String) preferences.get(QuestPreferences.SQL_GENERATE_REPLACE));
+		useTemporarySchemaName = Boolean.valueOf((String) preferences.get(QuestPreferences.USE_TEMPORARY_SCHEMA_NAME));
 
 		if (!inmemory) {
 			aboxJdbcURL = preferences.getProperty(QuestPreferences.JDBC_URL);
@@ -711,6 +714,7 @@ public class Quest implements Serializable, RepositoryChangedListener {
 
 			datasourceQueryGenerator = new SQLGenerator(metadata, sqladapter, sqlGenerateReplace, distinctResultSet,
 					getUriMap());
+			datasourceQueryGenerator.setUseTemporarySchemaName(useTemporarySchemaName);
 
 			unfolder = new QuestUnfolder(mappings, metadata, localConnection);
 

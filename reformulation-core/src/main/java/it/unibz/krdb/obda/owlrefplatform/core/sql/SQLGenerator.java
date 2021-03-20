@@ -141,12 +141,13 @@ public class SQLGenerator implements SQLQueryGenerator {
 	private String schemaPrefix;
 	
 	private final DatatypeFactory dtfac = OBDADataFactoryImpl.getInstance().getDatatypeFactory();
+	private boolean useTemporarySchemaName;
 
 	public SQLGenerator(DBMetadata metadata, SQLDialectAdapter sqladapter) {
 		this.metadata = metadata;
 		this.sqladapter = sqladapter;
 		schemaPrefix = "";
-		if(StrabonParameters.USE_TEMPORARY_SCHEMA_NAME) {
+		if(useTemporarySchemaName) {
 			schemaPrefix = StrabonParameters.TEMPORARY_SCHEMA_NAME + ".";
 		}
 	}
@@ -184,6 +185,14 @@ public class SQLGenerator implements SQLQueryGenerator {
 	@Override
 	public boolean hasDistinctResultSet() {
 		return distinctResultSet;
+	}
+
+	@Override
+	public void setUseTemporarySchemaName(boolean useTemporarySchemaName) {
+		this.useTemporarySchemaName = useTemporarySchemaName;
+		if(useTemporarySchemaName){
+			schemaPrefix = StrabonParameters.TEMPORARY_SCHEMA_NAME + ".";
+		}
 	}
 
 	private boolean hasSelectDistinctStatement(CQIE cq) {

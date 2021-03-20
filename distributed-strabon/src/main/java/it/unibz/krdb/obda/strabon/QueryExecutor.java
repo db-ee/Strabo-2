@@ -79,14 +79,18 @@ public class QueryExecutor {
 						//.config("spark.default.parallelism", "800")
 						//.config("spark.sql.shuffle.partitions", "800")
 						.config("geospark.join.spatitionside", "none")
+						.config("spark.sql.cbo.enabled", true)
+						.config("spark.sql.cbo.joinReorder.enabled", true)
 						.config("spark.sql.inMemoryColumnarStorage.compressed", true)
 						.config("hive.exec.dynamic.partition", true).config("spark.sql.parquet.filterPushdown", true)
 						.config("spark.sql.inMemoryColumnarStorage.batchSize", 20000).enableHiveSupport().getOrCreate();
 
+				spark.sql("SET spark.sql.cbo.enabled = true");
+				spark.sql("SET spark.sql.cbo.joinReorder.enabled = true");
 				spark.sql("SET hive.exec.dynamic.partition = true");
 				spark.sql("SET hive.exec.dynamic.partition.mode = nonstrict");
-				spark.sql("SET hive.exec.max.dynamic.partitions = 4000");
-				spark.sql("SET hive.exec.max.dynamic.partitions.pernode = 2000");
+				spark.sql("SET hive.exec.max.dynamic.partitions = 400");
+				spark.sql("SET hive.exec.max.dynamic.partitions.pernode = 200");
 				spark.sql("SET spark.sql.inMemoryColumnarStorage.compressed = true");
 				spark.sql("SET spark.sql.crossJoin.enabled=true");//for self-spatial joins on geometry table 
 				spark.sql("SET spark.sql.parquet.filterPushdown = true");
@@ -111,6 +115,8 @@ public class QueryExecutor {
 				log.debug("property dictionary: "+predDictionary.toString());
 				boolean existDefaultGeometrytable = createObdaFile(predDictionary);
 
+
+
 				if (existDefaultGeometrytable) {
 					// preload geometeries
 					log.debug("preloading geometries");
@@ -134,8 +140,15 @@ public class QueryExecutor {
 					geoms.createOrReplaceGlobalTempView(tblName);
 					geoms.cache();
 					long count = geoms.count();
+					//analyze is not suported in views...
+					//spark.sql(" ANALYZE TABLE " + tblName + " COMPUTE STATISTICS NOSCAN");
 					log.debug("Geometry table "+tblName+" created with "+count+" rows");
 
+				}
+
+				log.debug("Analyzing tables...");
+				for(String table:predDictionary.values()){
+					spark.sql(" ANALYZE TABLE " + table + " COMPUTE STATISTICS");
 				}
 				
 				OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
@@ -152,6 +165,7 @@ public class QueryExecutor {
 				p.setCurrentValueOf(QuestPreferences.OBTAIN_FULL_METADATA, QuestConstants.FALSE);
 				p.setCurrentValueOf(QuestPreferences.SQL_GENERATE_REPLACE, QuestConstants.FALSE);
 				p.setCurrentValueOf(QuestPreferences.REWRITE, QuestConstants.FALSE);
+				p.setCurrentValueOf(QuestPreferences.USE_TEMPORARY_SCHEMA_NAME, QuestConstants.TRUE);
 				// p.setCurrentValueOf(QuestPreferences.DBTYPE, QuestConstants.PANTELIS);
 				// p.setCurrentValueOf(QuestPreferences.DISTINCT_RESULTSET,
 				// QuestConstants.TRUE);

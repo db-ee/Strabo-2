@@ -43,12 +43,12 @@ public class LivyHelper {
     protected static String createSession() throws IOException {
 
         OkHttpClient client = new OkHttpClient();
-        String createResponse = post(livyUrl, create, client);
+        String createResponse = post(ConnectionConstants.LIVYURL, create, client);
 
         //System.out.println(createResponse.files.values());
         int id = JsonPath.parse(createResponse).read("id");
 
-        String sessionURL = livyUrl + "/" + id;
+        String sessionURL = ConnectionConstants.LIVYURL + "/" + id;
 
         Request request = new Request.Builder()
                 .url(sessionURL)
@@ -94,10 +94,12 @@ public class LivyHelper {
         //return "{ \"code\": \"println(spark.sql(\\\"" + query + "\\\").toJSON.collect.mkString(\\\"[\\\", \\\"\\\\n\\\", \\\"]\\\"))\"}";
     }
 
-    private static String proxyUser = "test__meb10000";
+  /*  private static String proxyUser = "test__meb10000";
     private static int numExecutors = 1;
-    private static String sparkDriverExtraClassPath = "{{PWD}}:/srv/hops/spark/jars/*:/srv/hops/spark/hopsworks-jars/*:/tmp/geospark*";
-    private static String sparkExecutorExtraClassPath = "{{PWD}}:/srv/hops/spark/jars/*:/srv/hops/spark/hopsworks-jars/*:/tmp/geospark*";
+    private static int executorCores = 2;
+    private static String executorMemory = "5G";
+    private static String sparkDriverExtraClassPath = "{{PWD}}:/srv/hops/spark/jars/*:/srv/hops/spark/hopsworks-jars/*";
+    private static String sparkExecutorExtraClassPath = "{{PWD}}:/srv/hops/spark/jars/*:/srv/hops/spark/hopsworks-jars/*";
     private static String appMasterEnvSparkHome = "/srv/hops/spark";
     private static String executorEnvSparkHome = "/srv/hops/spark";
     private static String appMasterEnvSparkConfDir = "/srv/hops/spark/conf";
@@ -109,8 +111,7 @@ public class LivyHelper {
     private static String appMasterEnvHadoopUserName = "test__meb10000";
     private static String executorEnvHadoopUserName = "test__meb10000";
     private static String sparkYarnDistFiles = "hdfs:///user/spark/metrics.properties,hdfs:///user/spark/log4j.properties,hdfs:///user/spark/hive-site.xml";
-    private static String sparkYarnDistJars = "local:///tmp/geospark-1.3.2.jar,local:///tmp/geospark-sql_2.3-1.3.2.jar,local:///tmp/geospark-viz_2.3-1.3.1.jar," +
-            "local:///srv/hops/apache-livy/rsc-jars/livy-api.jar,local:///srv/hops/apache-livy/rsc-jars/livy-rsc.jar," +
+    private static String sparkYarnDistJars = "local:///srv/hops/apache-livy/rsc-jars/livy-api.jar,local:///srv/hops/apache-livy/rsc-jars/livy-rsc.jar," +
             "local:///srv/hops/apache-livy/rsc-jars/netty-all.jar,local:///srv/hops/apache-livy/repl_2.11-jars/commons-codec.jar," +
             "local:///srv/hops/apache-livy/repl_2.11-jars/livy-core.jar,local:///srv/hops/apache-livy/repl_2.11-jars/livy-repl.jar," +
             "local:///srv/hops/spark/jars/datanucleus-api.jar,local:///srv/hops/spark/jars/datanucleus-core.jar";
@@ -119,28 +120,30 @@ public class LivyHelper {
     private static String sparkJars = "local:///tmp/geospark-1.3.2.jar,local:///tmp/geospark-sql_2.3-1.3.2.jar,local:///tmp/geospark-viz_2.3-1.3.1.jar";
     private static String sparkSerializer = "org.apache.spark.serializer.KryoSerializer";
     private static String sparkKryoRegistrator = "org.datasyslab.geosparkviz.core.Serde.GeoSparkVizKryoRegistrator";
-    private static String sparkJarsIvy = "/tmp/geospark*";
+    //private static String sparkJarsIvy = "/tmp/geospark*";
     private static String sparkExtraListeners = "org.apache.spark.sql.geosparksql.UDT.GeoSparkRegistratorListener";
-
-    protected static String create = "{\"kind\": \"spark\", \"proxyUser\": \""+proxyUser+"\"," +
-            " \"numExecutors\": "+numExecutors+", \"conf\" : {\"spark.submit.deployMode\": \"cluster\"," +
-            " \"spark.driver.extraClassPath\": \""+sparkDriverExtraClassPath+"\"," +
-            " \"spark.executor.extraClassPath\": \""+sparkExecutorExtraClassPath+"\"," +
-            " \"spark.yarn.appMasterEnv.SPARK_HOME\":\""+appMasterEnvSparkHome+"\", \"spark.executorEnv.SPARK_HOME\":\""+executorEnvSparkHome+"\"," +
-            " \"spark.yarn.appMasterEnv.SPARK_CONF_DIR\":\""+appMasterEnvSparkConfDir+"\", \"spark.executorEnv.SPARK_CONF_DIR\":\""+executorEnvSparkConfDir+"\"," +
-            " \"spark.yarn.appMasterEnv.HADOOP_HOME\": \""+appMasterEnvHadoopHome+"\", \"spark.executorEnv.HADOOP_HOME\": \""+executorEnvHadoopHome+"\"," +
-            " \"spark.yarn.appMasterEnv.HADOOP_HDFS_HOME\": \""+appMasterEnvHdfsHome+"\", \"spark.executorEnv.HADOOP_HDFS_HOME\": \""+executorEnvHdfsHome+"\"," +
-            " \"spark.yarn.appMasterEnv.HADOOP_USER_NAME\":\""+appMasterEnvHadoopUserName+"\", \"spark.executorEnv.HADOOP_USER_NAME\":\""+executorEnvHadoopUserName+"\"," +
-            " \"spark.yarn.dist.files\":\""+sparkYarnDistFiles+"\"," +
-            " \"spark.yarn.dist.jars\":\""+sparkYarnDistJars+"\"," +
-            " \"livy.rsc.rpc.server.address\":\""+livyRpcServerAddress+"\", \"spark.yarn.stagingDir\":\""+sparkYarnStagingDir+"\"," +
-            " \"spark.jars\":\""+sparkJars+"\"," +
-            " \"spark.serializer\":\""+sparkSerializer+"\"," +
-            " \"spark.kryo.registrator\":\""+sparkKryoRegistrator+"\", \"spark.jars.ivy\":\""+sparkJarsIvy+"\"," +
-            " \"spark.extraListeners\":\""+sparkExtraListeners+"\"}}";
 
     protected static String livyUrl = "http://10.0.10.50:8998/sessions";
     protected static String databaseName = "test";
+*/
+    protected static String create = "{\"kind\": \"spark\", \"proxyUser\": \""+ ConnectionConstants.PROXYUSER+"\"," +
+            " \"numExecutors\": "+ConnectionConstants.NUMEXECUTORS+", \"executorCores\": "+ConnectionConstants.EXECUTORCORES+ ", \"executorMemory\": \""+ConnectionConstants.EXECUTORMEMORY+"\", \"conf\" : {\"spark.submit.deployMode\": \"cluster\"," +
+            " \"spark.driver.extraClassPath\": \""+ConnectionConstants.SPARKDRIVEREXTRACLASSPATH+"\"," +
+            " \"spark.executor.extraClassPath\": \""+ConnectionConstants.SPARKEXECUTOREXTRACLASSPATH+"\"," +
+            " \"spark.yarn.appMasterEnv.SPARK_HOME\":\""+ConnectionConstants.APPMASTERENVHADOOPHOME+"\", \"spark.executorEnv.SPARK_HOME\":\""+ConnectionConstants.EXECUTORENVSPARKHOME+"\"," +
+            " \"spark.yarn.appMasterEnv.SPARK_CONF_DIR\":\""+ConnectionConstants.APPMASTERENVSPARKCONFDIR+"\", \"spark.executorEnv.SPARK_CONF_DIR\":\""+ConnectionConstants.EXECUTORENVSPARKCONFDIR+"\"," +
+            " \"spark.yarn.appMasterEnv.HADOOP_HOME\": \""+ConnectionConstants.APPMASTERENVHADOOPHOME+"\", \"spark.executorEnv.HADOOP_HOME\": \""+ConnectionConstants.EXECUTORENVHADOOPHOME+"\"," +
+            " \"spark.yarn.appMasterEnv.HADOOP_HDFS_HOME\": \""+ConnectionConstants.APPMASTERENVHDFSHOME+"\", \"spark.executorEnv.HADOOP_HDFS_HOME\": \""+ConnectionConstants.EXECUTORENVHDFSHOME+"\"," +
+            " \"spark.yarn.appMasterEnv.HADOOP_USER_NAME\":\""+ConnectionConstants.APPMASTERENVHADOOPUSERNAME+"\", \"spark.executorEnv.HADOOP_USER_NAME\":\""+ConnectionConstants.EXECUTORENVHADOOPUSERNAME+"\"," +
+            " \"spark.yarn.dist.files\":\""+ConnectionConstants.SPARKYARNDISTFILES+"\"," +
+            " \"spark.yarn.dist.jars\":\""+ConnectionConstants.SPARKYARNDISTJARS+"\"," +
+            " \"livy.rsc.rpc.server.address\":\""+ConnectionConstants.LIVYRPCSERVERADDRESS+"\", \"spark.yarn.stagingDir\":\""+ConnectionConstants.SPARKYARNSTAGINGDIR+"\"," +
+            " \"spark.jars\":\""+ConnectionConstants.SPARKJARS+"\"," +
+            " \"spark.serializer\":\""+ConnectionConstants.SPARKSERIALIZER+"\"," +
+            " \"spark.kryo.registrator\":\""+ConnectionConstants.SPARKKRYOREGISTRATOR+"\"," +
+            " \"spark.extraListeners\":\""+ConnectionConstants.SPARKEXTRALISTENERS+"\"}}";
+
+
 
 
     public static void main(String[] args) {

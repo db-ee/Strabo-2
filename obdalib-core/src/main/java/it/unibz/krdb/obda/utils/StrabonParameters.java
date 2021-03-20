@@ -2,19 +2,42 @@ package it.unibz.krdb.obda.utils;
 
 import it.unibz.krdb.obda.model.BooleanOperationPredicate;
 import it.unibz.krdb.obda.model.Function;
-import it.unibz.krdb.obda.model.NumericalOperationPredicate;
 import it.unibz.krdb.obda.model.Predicate;
 import it.unibz.krdb.obda.model.Term;
 import it.unibz.krdb.obda.model.impl.OBDAVocabulary;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class StrabonParameters {
+
+	public static final Logger log = LoggerFactory.getLogger(StrabonParameters.class);
 	
-	public static final String TEMPORARY_SCHEMA_NAME = "global_temp";
-	public static final String GEOMETRIES_TABLE = "geometries2";
-	public static final String GEOMETRIES_FIRST_COLUMN = "entity";
-	public static final String GEOMETRIES_SECOND_COLUMN = "geom";
-	public static final String GEOMETRIES_THIRD_COLUMN = "wkt";
-	public static final boolean USE_TEMPORARY_SCHEMA_NAME = true;
+	public static final String TEMPORARY_SCHEMA_NAME;
+	public static final String GEOMETRIES_TABLE ;
+	public static final String GEOMETRIES_FIRST_COLUMN;
+	public static final String GEOMETRIES_SECOND_COLUMN;
+	public static final String GEOMETRIES_THIRD_COLUMN;
+
+
+
+	static {
+		GenericProperties properties = StrabonProperties.getStrabonProperties();
+		//DECOMPOSER_LOG_LEVEL = properties.getString("decomposer.logLevel");
+		//Logger.getLogger("madgik.exareme.master.queryProcessor.decomposer")
+		//		.setLevel(Level.toLevel(DECOMPOSER_LOG_LEVEL));
+		//ANALYZER_LOG_LEVEL = properties.getString("analyzer.logLevel");
+		//Logger.getLogger("madgik.exareme.master.queryProcessor.analyzer").setLevel(Level.toLevel(ANALYZER_LOG_LEVEL));
+		//Logger.getLogger("madgik.exareme.master.queryProcessor.estimator").setLevel(Level.toLevel(ANALYZER_LOG_LEVEL));
+
+		TEMPORARY_SCHEMA_NAME = properties.getString("temp.schema.name");
+		GEOMETRIES_TABLE = properties.getString("geometries.tablename");
+		GEOMETRIES_FIRST_COLUMN = properties.getString("geometries.first.column");
+		GEOMETRIES_SECOND_COLUMN = properties.getString("geometries.second.column");
+		GEOMETRIES_THIRD_COLUMN = properties.getString("geometries.third.column");
+
+		log.trace("Strabon Properties Loaded.");
+	}
 	
 	public static boolean isSpatialJoin(Function atom) {
 		Predicate pred = atom.getFunctionSymbol();

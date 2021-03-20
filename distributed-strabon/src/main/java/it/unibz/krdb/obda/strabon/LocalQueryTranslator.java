@@ -97,6 +97,7 @@ public class LocalQueryTranslator {
 				p.setCurrentValueOf(QuestPreferences.OBTAIN_FULL_METADATA, QuestConstants.FALSE);
 				p.setCurrentValueOf(QuestPreferences.SQL_GENERATE_REPLACE, QuestConstants.FALSE);
 				p.setCurrentValueOf(QuestPreferences.REWRITE, QuestConstants.FALSE);
+				p.setCurrentValueOf(QuestPreferences.USE_TEMPORARY_SCHEMA_NAME, QuestConstants.TRUE);
 				// p.setCurrentValueOf(QuestPreferences.DBTYPE, QuestConstants.PANTELIS);
 				// p.setCurrentValueOf(QuestPreferences.DISTINCT_RESULTSET,
 				// QuestConstants.TRUE);
@@ -149,10 +150,7 @@ public class LocalQueryTranslator {
 	}
 
 	public static boolean createObdaFile(Map<String, String> predDictionary) throws SQLException, IOException {
-		String schemaPrefix = "";
-		if(StrabonParameters.USE_TEMPORARY_SCHEMA_NAME){
-			schemaPrefix = StrabonParameters.TEMPORARY_SCHEMA_NAME + ".";
-		}
+		String schemaPrefix = StrabonParameters.TEMPORARY_SCHEMA_NAME + ".";
 		boolean existsGeometryTable = false;
 		obdaFile = new StringBuffer();
 		obdaFile.append("[PrefixDeclaration]");

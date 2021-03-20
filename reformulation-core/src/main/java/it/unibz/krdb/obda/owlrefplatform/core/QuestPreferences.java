@@ -83,7 +83,8 @@ public class QuestPreferences extends Properties {
 	public static final String INIT_POOL_SIZE = "initial_pool_size";
 	public static final String REMOVE_ABANDONED = "remove_abandoned";
 	public static final String ABANDONED_TIMEOUT = "abandoned_timeout";
-	public static final String KEEP_ALIVE = "keep_alive";	
+	public static final String KEEP_ALIVE = "keep_alive";
+	public static final String USE_TEMPORARY_SCHEMA_NAME = "USE_TEMPORARY_SCHEMA_NAME";
 	
 	private Logger				log						= LoggerFactory.getLogger(QuestPreferences.class);
 
