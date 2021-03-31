@@ -20,8 +20,6 @@ package it.unibz.krdb.obda.owlrefplatform.core.translator;
  * #L%
  */
 
-import it.unibz.krdb.obda.owlrefplatform.core.translator.UnknownFunctionSymbolException;
-
 public class UnknownBooleanSymbolException extends UnknownFunctionSymbolException {
 
 	private static final long serialVersionUID = 1L;

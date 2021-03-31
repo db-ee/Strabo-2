@@ -9,6 +9,16 @@
  */
 package eu.earthobservatory.org.StrabonLivyEndpoint;
 
+import eu.earthobservatory.utils.Format;
+import org.openrdf.query.*;
+import org.openrdf.repository.RepositoryException;
+import org.openrdf.rio.RDFHandlerException;
+import org.openrdf.rio.RDFParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import sesameWrapper.StrabonLivyConnection;
+import sesameWrapper.StrabonLivyRepo;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
@@ -17,17 +27,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.openrdf.query.*;
-import org.openrdf.repository.RepositoryException;
-import org.openrdf.rio.RDFHandlerException;
-import org.openrdf.rio.RDFParseException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import sesameWrapper.StrabonLivyRepo;
-
-import eu.earthobservatory.utils.Format;
-import sesameWrapper.StrabonLivyConnection;
 
 public class StrabonBeanWrapper implements org.springframework.beans.factory.DisposableBean {
 

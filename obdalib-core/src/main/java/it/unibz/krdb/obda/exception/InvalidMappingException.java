@@ -20,7 +20,6 @@ package it.unibz.krdb.obda.exception;
  * #L%
  */
 
-import it.unibz.krdb.obda.exception.Indicator;
 import it.unibz.krdb.obda.model.Predicate;
 
 import java.util.ArrayList;

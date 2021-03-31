@@ -20,12 +20,12 @@ package it.unibz.krdb.obda.utils;
  * #L%
  */
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /***
  * A linked listed that rises "listChanged" events any time the list is

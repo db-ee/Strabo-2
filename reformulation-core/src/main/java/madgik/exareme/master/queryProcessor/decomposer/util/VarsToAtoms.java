@@ -1,19 +1,9 @@
 package madgik.exareme.master.queryProcessor.decomposer.util;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import com.google.common.hash.HashCode;
-
 import it.unibz.krdb.obda.model.Function;
 import it.unibz.krdb.obda.model.Term;
-import it.unibz.krdb.obda.model.Variable;
-import madgik.exareme.master.queryProcessor.decomposer.dag.Node;
+
+import java.util.*;
 
 public class VarsToAtoms {
 	

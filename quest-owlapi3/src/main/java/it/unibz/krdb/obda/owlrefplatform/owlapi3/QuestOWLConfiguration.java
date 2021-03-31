@@ -1,14 +1,13 @@
 package it.unibz.krdb.obda.owlrefplatform.owlapi3;
 
 
-import org.semanticweb.owlapi.reasoner.NullReasonerProgressMonitor;
-import org.semanticweb.owlapi.reasoner.ReasonerProgressMonitor;
-import org.semanticweb.owlapi.reasoner.SimpleConfiguration;
-
 import it.unibz.krdb.obda.model.OBDAModel;
 import it.unibz.krdb.obda.owlrefplatform.core.QuestPreferences;
 import it.unibz.krdb.obda.owlrefplatform.core.mappingprocessing.TMappingExclusionConfig;
 import it.unibz.krdb.sql.ImplicitDBConstraintsReader;
+import org.semanticweb.owlapi.reasoner.NullReasonerProgressMonitor;
+import org.semanticweb.owlapi.reasoner.ReasonerProgressMonitor;
+import org.semanticweb.owlapi.reasoner.SimpleConfiguration;
 
 
 @SuppressWarnings("serial")

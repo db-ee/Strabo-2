@@ -1,8 +1,12 @@
 package sesameWrapper;
+
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import okhttp3.*;
 
+import javax.json.Json;
+import javax.json.stream.JsonParser;
+import javax.json.stream.JsonParser.Event;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
@@ -10,9 +14,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import javax.json.Json;
-import javax.json.stream.JsonParser;
-import javax.json.stream.JsonParser.Event;
 
 
 public class LivyHelper {

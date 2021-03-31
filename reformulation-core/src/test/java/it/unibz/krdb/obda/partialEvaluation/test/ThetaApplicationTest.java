@@ -20,23 +20,19 @@ package it.unibz.krdb.obda.partialEvaluation.test;
  * #L%
  */
 
-import it.unibz.krdb.obda.model.CQIE;
-import it.unibz.krdb.obda.model.Function;
-import it.unibz.krdb.obda.model.Term;
-import it.unibz.krdb.obda.model.OBDADataFactory;
-import it.unibz.krdb.obda.model.Predicate;
-import it.unibz.krdb.obda.model.ValueConstant;
-import it.unibz.krdb.obda.model.Variable;
+import it.unibz.krdb.obda.model.*;
 import it.unibz.krdb.obda.model.impl.FunctionalTermImpl;
 import it.unibz.krdb.obda.model.impl.OBDADataFactoryImpl;
-import it.unibz.krdb.obda.owlrefplatform.core.basicoperations.*;
+import it.unibz.krdb.obda.owlrefplatform.core.basicoperations.SingletonSubstitution;
+import it.unibz.krdb.obda.owlrefplatform.core.basicoperations.Substitution;
+import it.unibz.krdb.obda.owlrefplatform.core.basicoperations.SubstitutionImpl;
+import it.unibz.krdb.obda.owlrefplatform.core.basicoperations.SubstitutionUtilities;
+import junit.framework.TestCase;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
-
-import junit.framework.TestCase;
 
 
 public class ThetaApplicationTest extends TestCase {

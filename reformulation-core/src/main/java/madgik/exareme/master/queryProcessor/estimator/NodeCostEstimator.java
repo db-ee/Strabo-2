@@ -11,13 +11,10 @@ import madgik.exareme.master.queryProcessor.decomposer.query.NonUnaryWhereCondit
 import madgik.exareme.master.queryProcessor.decomposer.query.Operand;
 import madgik.exareme.master.queryProcessor.decomposer.query.Selection;
 import madgik.exareme.master.queryProcessor.estimator.metadata.Metadata;
-
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import it.unibz.krdb.obda.owlrefplatform.core.QuestUnfolder;
+import java.util.List;
 
 import static madgik.exareme.master.queryProcessor.estimator.metadata.Metadata.NETWORK_RATE;
 

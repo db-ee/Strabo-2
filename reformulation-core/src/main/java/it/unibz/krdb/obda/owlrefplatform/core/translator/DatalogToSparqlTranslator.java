@@ -22,16 +22,7 @@ package it.unibz.krdb.obda.owlrefplatform.core.translator;
 
 import it.unibz.krdb.obda.io.PrefixManager;
 import it.unibz.krdb.obda.io.SimplePrefixManager;
-import it.unibz.krdb.obda.model.CQIE;
-import it.unibz.krdb.obda.model.DatalogProgram;
-import it.unibz.krdb.obda.model.Function;
-import it.unibz.krdb.obda.model.OBDADataFactory;
-import it.unibz.krdb.obda.model.OBDAQueryModifiers;
-import it.unibz.krdb.obda.model.OBDAQueryModifiers.OrderCondition;
-import it.unibz.krdb.obda.model.Predicate;
-import it.unibz.krdb.obda.model.Term;
-import it.unibz.krdb.obda.model.URIConstant;
-import it.unibz.krdb.obda.model.Variable;
+import it.unibz.krdb.obda.model.*;
 import it.unibz.krdb.obda.model.impl.OBDADataFactoryImpl;
 import it.unibz.krdb.obda.model.impl.OBDAVocabulary;
 

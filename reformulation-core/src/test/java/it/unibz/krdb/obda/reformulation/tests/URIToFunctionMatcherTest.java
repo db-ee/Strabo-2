@@ -21,20 +21,15 @@ package it.unibz.krdb.obda.reformulation.tests;
  */
 
 
-import it.unibz.krdb.obda.model.Function;
-import it.unibz.krdb.obda.model.Term;
-import it.unibz.krdb.obda.model.OBDADataFactory;
-import it.unibz.krdb.obda.model.Predicate;
-import it.unibz.krdb.obda.model.ValueConstant;
+import it.unibz.krdb.obda.model.*;
 import it.unibz.krdb.obda.model.impl.OBDADataFactoryImpl;
 import it.unibz.krdb.obda.owlrefplatform.core.unfolding.URIToFunctionMatcher;
+import junit.framework.TestCase;
 
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import junit.framework.TestCase;
 
 public class URIToFunctionMatcherTest extends TestCase {
 

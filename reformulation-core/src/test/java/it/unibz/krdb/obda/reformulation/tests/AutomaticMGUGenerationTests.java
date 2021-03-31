@@ -25,17 +25,15 @@ import it.unibz.krdb.obda.model.Variable;
 import it.unibz.krdb.obda.owlrefplatform.core.basicoperations.SingletonSubstitution;
 import it.unibz.krdb.obda.owlrefplatform.core.basicoperations.Substitution;
 import it.unibz.krdb.obda.owlrefplatform.core.basicoperations.UnifierUtilities;
+import junit.framework.TestCase;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
-
-import junit.framework.TestCase;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Mariano Rodriguez Muro

@@ -6,10 +6,6 @@ package madgik.exareme.master.queryProcessor.estimator.histogram;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
 /**
  * @author jim
  */

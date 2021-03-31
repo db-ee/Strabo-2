@@ -10,12 +10,10 @@
 package eu.earthobservatory.org.StrabonLivyEndpoint;
 
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.InetAddress;
-import java.util.Properties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
@@ -24,11 +22,12 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.InetAddress;
+import java.util.Properties;
 
 /**
  * @author Charalampos Nikolaou <charnik@di.uoa.gr>

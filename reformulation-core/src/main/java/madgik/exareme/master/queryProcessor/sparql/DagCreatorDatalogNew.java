@@ -1,32 +1,23 @@
 package madgik.exareme.master.queryProcessor.sparql;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import it.unibz.krdb.obda.model.CQIE;
 import it.unibz.krdb.obda.model.Function;
-import it.unibz.krdb.obda.model.Predicate;
-import it.unibz.krdb.obda.model.Term;
-import it.unibz.krdb.obda.model.Variable;
+import it.unibz.krdb.obda.model.*;
 import it.unibz.krdb.obda.model.impl.FunctionalTermImpl;
-import it.unibz.krdb.obda.model.impl.OBDAVocabulary;
 import it.unibz.krdb.obda.utils.StrabonParameters;
 import madgik.exareme.master.queryProcessor.decomposer.dag.Node;
 import madgik.exareme.master.queryProcessor.decomposer.dag.NodeHashValues;
 import madgik.exareme.master.queryProcessor.decomposer.dp.DPSubLinear;
 import madgik.exareme.master.queryProcessor.decomposer.dp.EquivalentColumnClass;
 import madgik.exareme.master.queryProcessor.decomposer.dp.EquivalentColumnClasses;
-import madgik.exareme.master.queryProcessor.decomposer.query.Column;
 import madgik.exareme.master.queryProcessor.decomposer.query.Constant;
-import madgik.exareme.master.queryProcessor.decomposer.query.NonUnaryWhereCondition;
-import madgik.exareme.master.queryProcessor.decomposer.query.Output;
-import madgik.exareme.master.queryProcessor.decomposer.query.SQLQuery;
-import madgik.exareme.master.queryProcessor.decomposer.query.Selection;
-import madgik.exareme.master.queryProcessor.decomposer.query.Table;
+import madgik.exareme.master.queryProcessor.decomposer.query.*;
 import madgik.exareme.master.queryProcessor.estimator.NodeSelectivityEstimator;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class DagCreatorDatalogNew {
 

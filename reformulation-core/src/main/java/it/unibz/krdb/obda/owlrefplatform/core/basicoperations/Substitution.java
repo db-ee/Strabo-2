@@ -25,7 +25,6 @@ import it.unibz.krdb.obda.model.Term;
 import it.unibz.krdb.obda.model.Variable;
 
 import java.util.Map;
-import java.util.Set;
 
 /**
  * A substitution is a function of variables to terms.

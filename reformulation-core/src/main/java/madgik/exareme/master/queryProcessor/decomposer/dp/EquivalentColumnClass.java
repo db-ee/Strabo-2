@@ -1,11 +1,10 @@
 package madgik.exareme.master.queryProcessor.decomposer.dp;
 
+import madgik.exareme.master.queryProcessor.decomposer.query.Column;
+
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import madgik.exareme.master.queryProcessor.decomposer.query.Column;
 
 public class EquivalentColumnClass {
 	

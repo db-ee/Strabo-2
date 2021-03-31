@@ -9,15 +9,7 @@
  */
 package eu.earthobservatory.org.StrabonEndpoint.client;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
-
+import eu.earthobservatory.utils.stSPARQLQueryResultFormat;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -26,8 +18,16 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.xerces.impl.dv.util.Base64;
 import org.openrdf.query.resultio.TupleQueryResultFormat;
-import eu.earthobservatory.utils.stSPARQLQueryResultFormat;
 import org.openrdf.rio.RDFFormat;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class is the implementation of a java client for accessing

@@ -3,16 +3,12 @@
  */
 package madgik.exareme.master.queryProcessor.decomposer.query;
 
+import com.google.common.hash.HashCode;
 import madgik.exareme.master.queryProcessor.decomposer.dag.Node;
-import madgik.exareme.master.queryProcessor.decomposer.dag.ResultList;
 import madgik.exareme.master.queryProcessor.decomposer.util.Util;
 import madgik.exareme.master.queryProcessor.sparql.UnionWrapperInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.hash.HashCode;
-
-import it.unibz.krdb.obda.owlrefplatform.core.QuestUnfolder;
 
 import java.util.*;
 

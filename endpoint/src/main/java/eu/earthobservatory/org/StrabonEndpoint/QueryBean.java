@@ -9,38 +9,28 @@
  */
 package eu.earthobservatory.org.StrabonEndpoint;
 
+import eu.earthobservatory.utils.Format;
+import eu.earthobservatory.utils.stSPARQLQueryResultFormat;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.openrdf.query.MalformedQueryException;
+import org.openrdf.query.resultio.TupleQueryResultFormat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import javax.servlet.*;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.StringTokenizer;
-
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringEscapeUtils;
-import org.openrdf.query.MalformedQueryException;
-import org.openrdf.query.resultio.TupleQueryResultFormat;
-import eu.earthobservatory.utils.stSPARQLQueryResultFormat;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
-
-import eu.earthobservatory.utils.Format;
+import java.util.*;
 
 /**
  *

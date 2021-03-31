@@ -1,25 +1,12 @@
 package it.unibz.krdb.obda.owlrefplatform.core.basicoperations;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
-import it.unibz.krdb.obda.model.CQIE;
-import it.unibz.krdb.obda.model.Function;
-import it.unibz.krdb.obda.model.OBDADataFactory;
-import it.unibz.krdb.obda.model.Predicate;
-import it.unibz.krdb.obda.model.Variable;
+import it.unibz.krdb.obda.model.*;
 import it.unibz.krdb.obda.model.impl.OBDADataFactoryImpl;
-import it.unibz.krdb.obda.ontology.ClassExpression;
-import it.unibz.krdb.obda.ontology.DataPropertyExpression;
-import it.unibz.krdb.obda.ontology.DataSomeValuesFrom;
-import it.unibz.krdb.obda.ontology.OClass;
-import it.unibz.krdb.obda.ontology.ObjectPropertyExpression;
-import it.unibz.krdb.obda.ontology.ObjectSomeValuesFrom;
+import it.unibz.krdb.obda.ontology.*;
 import it.unibz.krdb.obda.owlrefplatform.core.dagjgrapht.Equivalences;
 import it.unibz.krdb.obda.owlrefplatform.core.dagjgrapht.TBoxReasoner;
+
+import java.util.*;
 
 public class LinearInclusionDependencies {
 

@@ -1,10 +1,9 @@
 package madgik.exareme.master.queryProcessor.sparql;
 
+import madgik.exareme.master.queryProcessor.decomposer.query.Column;
+
 import java.util.HashSet;
 import java.util.Set;
-
-import madgik.exareme.master.queryProcessor.decomposer.query.Column;
-import madgik.exareme.master.queryProcessor.decomposer.query.Operand;
 
 public class JoinClass {
 

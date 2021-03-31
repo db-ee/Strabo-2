@@ -22,6 +22,7 @@ package it.unibz.krdb.obda.owlrefplatform.core.unfolding;
 
 import it.unibz.krdb.obda.model.DatalogProgram;
 import it.unibz.krdb.obda.model.OBDAException;
+
 import java.io.Serializable;
 
 /**

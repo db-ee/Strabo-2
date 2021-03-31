@@ -2,14 +2,10 @@
 
 package it.unibz.krdb.obda.parser;
 
+import org.antlr.runtime.*;
+
 import java.util.List;
 import java.util.Vector;
-
-
-import org.antlr.runtime.*;
-import java.util.Stack;
-import java.util.List;
-import java.util.ArrayList;
 
 @SuppressWarnings("all")
 public class DatalogLexer extends Lexer {

@@ -21,7 +21,6 @@ package it.unibz.krdb.obda.owlrefplatform.core;
  */
 
 import com.google.common.collect.HashMultimap;
-
 import it.unibz.krdb.obda.model.*;
 import it.unibz.krdb.obda.model.impl.OBDADataFactoryImpl;
 import it.unibz.krdb.obda.model.impl.OBDAVocabulary;
@@ -29,7 +28,9 @@ import it.unibz.krdb.obda.model.impl.TermUtils;
 import it.unibz.krdb.obda.ontology.Assertion;
 import it.unibz.krdb.obda.owlrefplatform.core.basicoperations.DatalogNormalizer;
 import it.unibz.krdb.obda.owlrefplatform.core.queryevaluation.SPARQLQueryUtility;
-import it.unibz.krdb.obda.owlrefplatform.core.resultset.*;
+import it.unibz.krdb.obda.owlrefplatform.core.resultset.EmptyQueryResultSet;
+import it.unibz.krdb.obda.owlrefplatform.core.resultset.QuestGraphResultSet;
+import it.unibz.krdb.obda.owlrefplatform.core.resultset.QuestResultset;
 import it.unibz.krdb.obda.owlrefplatform.core.translator.DatalogToSparqlTranslator;
 import it.unibz.krdb.obda.owlrefplatform.core.translator.SesameConstructTemplate;
 import it.unibz.krdb.obda.owlrefplatform.core.translator.SparqlAlgebraToDatalogTranslator;
@@ -44,7 +45,6 @@ import madgik.exareme.master.queryProcessor.decomposer.util.Util;
 import madgik.exareme.master.queryProcessor.decomposer.util.VarsToAtoms;
 import madgik.exareme.master.queryProcessor.estimator.NodeSelectivityEstimator;
 import madgik.exareme.master.queryProcessor.sparql.DagCreatorDatalogNew;
-
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.parser.ParsedQuery;
@@ -56,13 +56,7 @@ import org.slf4j.LoggerFactory;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
 
 //import org.sqlite.SQLiteConfig;

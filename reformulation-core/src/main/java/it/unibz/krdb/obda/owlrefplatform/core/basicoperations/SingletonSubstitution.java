@@ -21,7 +21,6 @@ package it.unibz.krdb.obda.owlrefplatform.core.basicoperations;
  */
 
 import com.google.common.collect.ImmutableMap;
-
 import it.unibz.krdb.obda.model.Function;
 import it.unibz.krdb.obda.model.Term;
 import it.unibz.krdb.obda.model.Variable;

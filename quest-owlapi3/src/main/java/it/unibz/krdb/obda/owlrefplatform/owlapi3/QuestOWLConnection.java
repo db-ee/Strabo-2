@@ -20,14 +20,13 @@ package it.unibz.krdb.obda.owlrefplatform.owlapi3;
  * #L%
  */
 
-import java.sql.Connection;
-
 import it.unibz.krdb.obda.model.OBDAException;
 import it.unibz.krdb.obda.owlrefplatform.core.QuestConnection;
 import it.unibz.krdb.obda.owlrefplatform.core.QuestStatement;
 import madgik.exareme.master.queryProcessor.estimator.NodeSelectivityEstimator;
-
 import org.semanticweb.owlapi.model.OWLException;
+
+import java.sql.Connection;
 
 /***
  * Handler for a connection. Note that as with JDBC, executing queries in

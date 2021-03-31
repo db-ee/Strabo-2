@@ -19,21 +19,21 @@ package it.unibz.krdb.obda.owlrefplatform.core.translator;
  * limitations under the License.
  * #L%
  */
+
 import it.unibz.krdb.obda.model.*;
 import it.unibz.krdb.obda.model.OBDAQueryModifiers.OrderCondition;
-import it.unibz.krdb.obda.model.Predicate.COL_TYPE;
 import it.unibz.krdb.obda.model.ValueConstant;
-import it.unibz.krdb.obda.model.impl.*;
+import it.unibz.krdb.obda.model.Predicate.COL_TYPE;
+import it.unibz.krdb.obda.model.impl.OBDADataFactoryImpl;
+import it.unibz.krdb.obda.model.impl.OBDAVocabulary;
+import it.unibz.krdb.obda.model.impl.TermUtils;
 import it.unibz.krdb.obda.owlrefplatform.core.basicoperations.UriTemplateMatcher;
 import org.openrdf.model.IRI;
 import org.openrdf.model.Literal;
-//import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.datatypes.XMLDatatypeUtil;
-//import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.algebra.*;
-//import org.openrdf.query.algebra.evaluation.function.FunctionRegistry;
 import org.openrdf.query.parser.ParsedGraphQuery;
 import org.openrdf.query.parser.ParsedQuery;
 import org.openrdf.query.parser.ParsedTupleQuery;
@@ -41,6 +41,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+
+//import org.openrdf.model.URI;
+//import org.openrdf.model.vocabulary.RDF;
+//import org.openrdf.query.algebra.evaluation.function.FunctionRegistry;
 
 
 /***

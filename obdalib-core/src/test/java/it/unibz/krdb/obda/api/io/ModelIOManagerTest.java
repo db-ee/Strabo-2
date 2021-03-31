@@ -1,15 +1,14 @@
 package it.unibz.krdb.obda.api.io;
 
-import java.io.IOException;
-
 import it.unibz.krdb.obda.exception.InvalidMappingException;
 import it.unibz.krdb.obda.exception.InvalidPredicateDeclarationException;
 import it.unibz.krdb.obda.io.ModelIOManager;
 import it.unibz.krdb.obda.model.OBDADataFactory;
 import it.unibz.krdb.obda.model.OBDAModel;
 import it.unibz.krdb.obda.model.impl.OBDADataFactoryImpl;
-
 import org.junit.Test;
+
+import java.io.IOException;
 
 public class ModelIOManagerTest {
 

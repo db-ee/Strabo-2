@@ -1,14 +1,19 @@
 package sesameWrapper;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
-
+import it.unibz.krdb.obda.io.ModelIOManager;
+import it.unibz.krdb.obda.model.OBDADataFactory;
+import it.unibz.krdb.obda.model.OBDAException;
+import it.unibz.krdb.obda.model.OBDAModel;
+import it.unibz.krdb.obda.model.impl.OBDADataFactoryImpl;
+import it.unibz.krdb.obda.owlrefplatform.core.QuestConstants;
+import it.unibz.krdb.obda.owlrefplatform.core.QuestPreferences;
 import it.unibz.krdb.obda.owlrefplatform.core.StrabonStatement;
+import it.unibz.krdb.obda.owlrefplatform.owlapi3.QuestOWL;
+import it.unibz.krdb.obda.owlrefplatform.owlapi3.QuestOWLConfiguration;
+import it.unibz.krdb.obda.owlrefplatform.owlapi3.QuestOWLFactory;
 import it.unibz.krdb.obda.strabon.LocalQueryTranslator;
+import it.unibz.krdb.obda.utils.StrabonParameters;
+import madgik.exareme.master.queryProcessor.estimator.NodeSelectivityEstimator;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.spark.serializer.KryoSerializer;
 import org.apache.spark.sql.Dataset;
@@ -26,18 +31,12 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import it.unibz.krdb.obda.io.ModelIOManager;
-import it.unibz.krdb.obda.model.OBDADataFactory;
-import it.unibz.krdb.obda.model.OBDAException;
-import it.unibz.krdb.obda.model.OBDAModel;
-import it.unibz.krdb.obda.model.impl.OBDADataFactoryImpl;
-import it.unibz.krdb.obda.owlrefplatform.core.QuestConstants;
-import it.unibz.krdb.obda.owlrefplatform.core.QuestPreferences;
-import it.unibz.krdb.obda.owlrefplatform.owlapi3.QuestOWL;
-import it.unibz.krdb.obda.owlrefplatform.owlapi3.QuestOWLConfiguration;
-import it.unibz.krdb.obda.owlrefplatform.owlapi3.QuestOWLFactory;
-import it.unibz.krdb.obda.utils.StrabonParameters;
-import madgik.exareme.master.queryProcessor.estimator.NodeSelectivityEstimator;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class SesameStrabonRepo implements Repository {
 	

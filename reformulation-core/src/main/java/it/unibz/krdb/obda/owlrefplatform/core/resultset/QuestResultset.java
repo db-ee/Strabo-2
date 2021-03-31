@@ -28,8 +28,8 @@ import it.unibz.krdb.obda.owlrefplatform.core.QuestStatement;
 import it.unibz.krdb.sql.DBMetadata;
 
 import java.net.URISyntaxException;
-import java.sql.*;
 import java.sql.ResultSet;
+import java.sql.*;
 import java.text.*;
 import java.util.HashMap;
 import java.util.List;

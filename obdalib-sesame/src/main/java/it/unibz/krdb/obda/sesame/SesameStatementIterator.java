@@ -21,10 +21,9 @@ package it.unibz.krdb.obda.sesame;
  */
 
 import it.unibz.krdb.obda.ontology.Assertion;
+import org.openrdf.model.Statement;
 
 import java.util.Iterator;
-
-import org.openrdf.model.Statement;
 
 /***
  * An iterator that will dynamically construct ABox assertions for the given

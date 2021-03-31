@@ -1,39 +1,12 @@
 package it.unibz.krdb.obda.owlapi3.swrl;
 
-import it.unibz.krdb.obda.model.CQIE;
-import it.unibz.krdb.obda.model.DatalogProgram;
-import it.unibz.krdb.obda.model.Function;
-import it.unibz.krdb.obda.model.OBDADataFactory;
-import it.unibz.krdb.obda.model.Predicate;
-import it.unibz.krdb.obda.model.Term;
+import it.unibz.krdb.obda.model.*;
 import it.unibz.krdb.obda.model.impl.OBDADataFactoryImpl;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-
-import org.semanticweb.owlapi.model.AxiomType;
-import org.semanticweb.owlapi.model.OWLAxiom;
-import org.semanticweb.owlapi.model.OWLLiteral;
-import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.SWRLArgument;
-import org.semanticweb.owlapi.model.SWRLAtom;
-import org.semanticweb.owlapi.model.SWRLBuiltInAtom;
-import org.semanticweb.owlapi.model.SWRLClassAtom;
-import org.semanticweb.owlapi.model.SWRLDataPropertyAtom;
-import org.semanticweb.owlapi.model.SWRLDataRangeAtom;
-import org.semanticweb.owlapi.model.SWRLDifferentIndividualsAtom;
-import org.semanticweb.owlapi.model.SWRLIndividualArgument;
-import org.semanticweb.owlapi.model.SWRLLiteralArgument;
-import org.semanticweb.owlapi.model.SWRLObjectPropertyAtom;
-import org.semanticweb.owlapi.model.SWRLObjectVisitor;
-import org.semanticweb.owlapi.model.SWRLRule;
-import org.semanticweb.owlapi.model.SWRLSameIndividualAtom;
-import org.semanticweb.owlapi.model.SWRLVariable;
+import org.semanticweb.owlapi.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.*;
 
 
 

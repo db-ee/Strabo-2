@@ -1,6 +1,5 @@
 package sesameWrapper;
 
-import com.jayway.jsonpath.JsonPath;
 import it.unibz.krdb.obda.io.ModelIOManager;
 import it.unibz.krdb.obda.model.OBDADataFactory;
 import it.unibz.krdb.obda.model.OBDAException;
@@ -15,7 +14,8 @@ import it.unibz.krdb.obda.owlrefplatform.owlapi3.QuestOWLFactory;
 import it.unibz.krdb.obda.strabon.LocalQueryTranslator;
 import it.unibz.krdb.obda.utils.StrabonParameters;
 import madgik.exareme.master.queryProcessor.estimator.NodeSelectivityEstimator;
-import okhttp3.*;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.repository.Repository;

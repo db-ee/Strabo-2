@@ -22,15 +22,10 @@ package it.unibz.krdb.obda.owlrefplatform.core.queryevaluation;
 
 import it.unibz.krdb.obda.model.OBDADataSource;
 import it.unibz.krdb.obda.model.impl.RDBMSourceParameterConstants;
-
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.sql.*;
 
 /**
  * The JDBC engine is a implementation of the evaluation engine interface which

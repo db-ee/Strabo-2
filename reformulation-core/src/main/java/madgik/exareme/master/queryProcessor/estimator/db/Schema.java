@@ -5,10 +5,10 @@ package madgik.exareme.master.queryProcessor.estimator.db;
  * and open the template in the editor.
  */
 
+import madgik.exareme.master.queryProcessor.analyzer.stat.JoinCardinalities;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import madgik.exareme.master.queryProcessor.analyzer.stat.JoinCardinalities;
 
 /**
  * @author jim

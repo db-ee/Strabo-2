@@ -20,12 +20,12 @@ package it.unibz.krdb.sql.api;
  * #L%
  */
 
+import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.schema.Column;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
-import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.schema.Column;
 
 /**
  * Class for an Aggregation, it contains the GROUP BY statement.

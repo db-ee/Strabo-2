@@ -21,14 +21,6 @@ package sesameWrapper;
  */
 
 
-import it.unibz.krdb.obda.model.OBDAException;
-import it.unibz.krdb.obda.model.TupleResultSet;
-
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import org.openrdf.query.Binding;
@@ -38,6 +30,9 @@ import org.openrdf.query.TupleQueryResult;
 import org.openrdf.query.impl.MapBindingSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Iterator;
+import java.util.List;
 
 public class StrabonTupleQueryResult implements TupleQueryResult {
 

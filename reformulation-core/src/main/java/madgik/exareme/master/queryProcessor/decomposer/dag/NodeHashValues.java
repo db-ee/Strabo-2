@@ -4,16 +4,12 @@
  */
 package madgik.exareme.master.queryProcessor.decomposer.dag;
 
+import com.google.common.hash.HashCode;
 import madgik.exareme.master.queryProcessor.estimator.NodeSelectivityEstimator;
-
-import java.util.HashMap;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.hash.HashCode;
-
-import it.unibz.krdb.obda.owlrefplatform.core.QuestUnfolder;
+import java.util.HashMap;
 
 /**
  * @author dimitris

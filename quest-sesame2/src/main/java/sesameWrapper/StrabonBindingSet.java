@@ -21,6 +21,7 @@ package sesameWrapper;
  */
 
 import it.unibz.krdb.obda.sesame.SesameHelper;
+import org.apache.spark.sql.Row;
 import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.ValueFactoryImpl;
@@ -28,13 +29,7 @@ import org.openrdf.query.Binding;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.impl.BindingImpl;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-
-import org.apache.spark.sql.Row;
+import java.util.*;
 public class StrabonBindingSet implements BindingSet {
 
 	private final ValueFactory fact = new ValueFactoryImpl();

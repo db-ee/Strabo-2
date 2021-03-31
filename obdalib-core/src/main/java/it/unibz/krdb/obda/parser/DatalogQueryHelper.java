@@ -20,8 +20,8 @@ package it.unibz.krdb.obda.parser;
  * #L%
  */
 
-import it.unibz.krdb.obda.model.OBDALibConstants;
 import it.unibz.krdb.obda.io.PrefixManager;
+import it.unibz.krdb.obda.model.OBDALibConstants;
 
 import java.util.Map;
 import java.util.Set;

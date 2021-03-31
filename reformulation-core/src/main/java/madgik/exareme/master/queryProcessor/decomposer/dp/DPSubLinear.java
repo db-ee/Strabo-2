@@ -1,17 +1,12 @@
 package madgik.exareme.master.queryProcessor.decomposer.dp;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import madgik.exareme.master.queryProcessor.decomposer.dag.Node;
 import madgik.exareme.master.queryProcessor.decomposer.query.NonUnaryWhereCondition;
-import madgik.exareme.master.queryProcessor.decomposer.query.Table;
 import madgik.exareme.master.queryProcessor.estimator.NodeCostEstimator;
 import madgik.exareme.master.queryProcessor.estimator.NodeInfo;
 import madgik.exareme.master.queryProcessor.estimator.NodeSelectivityEstimator;
+
+import java.util.*;
 
 public class DPSubLinear {
 

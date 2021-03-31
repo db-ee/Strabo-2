@@ -25,12 +25,7 @@ import it.unibz.krdb.obda.querymanager.QueryControllerEntity;
 import it.unibz.krdb.obda.querymanager.QueryControllerGroup;
 import it.unibz.krdb.obda.querymanager.QueryControllerQuery;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.LineNumberReader;
+import java.io.*;
 
 public class QueryIOManager {
 

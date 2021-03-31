@@ -1,7 +1,6 @@
 package it.unibz.krdb.obda.owlapi3.swrl;
 
 import it.unibz.krdb.obda.model.DatalogProgram;
-
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.SWRLRule;
 

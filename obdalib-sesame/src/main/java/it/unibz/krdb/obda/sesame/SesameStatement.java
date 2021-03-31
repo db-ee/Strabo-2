@@ -27,8 +27,10 @@ import it.unibz.krdb.obda.ontology.Assertion;
 import it.unibz.krdb.obda.ontology.ClassAssertion;
 import it.unibz.krdb.obda.ontology.DataPropertyAssertion;
 import it.unibz.krdb.obda.ontology.ObjectPropertyAssertion;
-
-import org.openrdf.model.*;
+import org.openrdf.model.IRI;
+import org.openrdf.model.Resource;
+import org.openrdf.model.Statement;
+import org.openrdf.model.Value;
 
 public class SesameStatement implements Statement {
     private static final long serialVersionUID = 3398547980791013746L;

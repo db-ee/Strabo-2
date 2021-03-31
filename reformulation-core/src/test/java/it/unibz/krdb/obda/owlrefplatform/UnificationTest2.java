@@ -20,18 +20,12 @@ package it.unibz.krdb.obda.owlrefplatform;
  * #L%
  */
 
-import it.unibz.krdb.obda.model.CQIE;
-import it.unibz.krdb.obda.model.DatalogProgram;
-import it.unibz.krdb.obda.model.Function;
-import it.unibz.krdb.obda.model.Term;
-import it.unibz.krdb.obda.model.OBDADataFactory;
-import it.unibz.krdb.obda.model.Predicate;
+import it.unibz.krdb.obda.model.*;
 import it.unibz.krdb.obda.model.impl.OBDADataFactoryImpl;
+import junit.framework.TestCase;
 
 import java.util.List;
 import java.util.Vector;
-
-import junit.framework.TestCase;
 
 public class UnificationTest2 extends TestCase {
 

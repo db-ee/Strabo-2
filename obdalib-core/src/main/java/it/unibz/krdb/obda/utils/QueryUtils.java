@@ -20,11 +20,7 @@ package it.unibz.krdb.obda.utils;
  * #L%
  */
 
-import it.unibz.krdb.obda.model.CQIE;
-import it.unibz.krdb.obda.model.DatalogProgram;
-import it.unibz.krdb.obda.model.Function;
-import it.unibz.krdb.obda.model.Term;
-import it.unibz.krdb.obda.model.Variable;
+import it.unibz.krdb.obda.model.*;
 
 public class QueryUtils {
 

@@ -23,16 +23,15 @@ package sesameWrapper;
 
 import it.unibz.krdb.obda.model.OBDAException;
 import it.unibz.krdb.obda.model.TupleResultSet;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.openrdf.query.Binding;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.TupleQueryResult;
 import org.openrdf.query.impl.MapBindingSet;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class SesameTupleQueryResult implements TupleQueryResult {
 

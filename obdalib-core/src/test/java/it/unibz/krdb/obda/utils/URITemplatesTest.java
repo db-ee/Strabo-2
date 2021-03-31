@@ -20,9 +20,9 @@ package it.unibz.krdb.obda.utils;
  * #L%
  */
 
-import java.util.Arrays;
-
 import junit.framework.TestCase;
+
+import java.util.Arrays;
 
 public class URITemplatesTest extends TestCase {
 	

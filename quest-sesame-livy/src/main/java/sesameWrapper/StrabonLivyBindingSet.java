@@ -29,11 +29,7 @@ import org.openrdf.query.Binding;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.impl.BindingImpl;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class StrabonLivyBindingSet implements BindingSet {
 

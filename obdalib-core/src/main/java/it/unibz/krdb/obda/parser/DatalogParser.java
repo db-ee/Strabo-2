@@ -2,26 +2,13 @@
 
 package it.unibz.krdb.obda.parser;
 
-import it.unibz.krdb.obda.model.CQIE;
-import it.unibz.krdb.obda.model.DatalogProgram;
-import it.unibz.krdb.obda.model.DatatypeFactory;
-import it.unibz.krdb.obda.model.Function;
-import it.unibz.krdb.obda.model.Term;
-import it.unibz.krdb.obda.model.OBDADataFactory;
-import it.unibz.krdb.obda.model.Predicate;
-import it.unibz.krdb.obda.model.URIConstant;
-import it.unibz.krdb.obda.model.ValueConstant;
-import it.unibz.krdb.obda.model.Variable;
+import it.unibz.krdb.obda.model.*;
 import it.unibz.krdb.obda.model.impl.OBDADataFactoryImpl;
 import it.unibz.krdb.obda.model.impl.OBDAVocabulary;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Vector;
-
+import org.antlr.runtime.BitSet;
 import org.antlr.runtime.*;
+
+import java.util.*;
 
 @SuppressWarnings("all")
 public class DatalogParser extends Parser {

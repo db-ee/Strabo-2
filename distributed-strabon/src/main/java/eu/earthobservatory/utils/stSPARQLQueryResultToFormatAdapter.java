@@ -9,12 +9,11 @@
  */
 package eu.earthobservatory.utils;
 
-import java.io.OutputStream;
-
 import org.openrdf.query.resultio.QueryResultIO;
 import org.openrdf.query.resultio.TupleQueryResultFormat;
 import org.openrdf.query.resultio.TupleQueryResultWriter;
-import org.openrdf.query.resultio.TupleQueryResultWriterFactory;
+
+import java.io.OutputStream;
 /*import org.openrdf.query.resultio.sparqlgeojson.stSPARQLResultsGeoJSONWriterFactory;
 import org.openrdf.query.resultio.sparqlhtml.stSPARQLResultsHTMLWriterFactory;
 import org.openrdf.query.resultio.sparqlkml.stSPARQLResultsKMLWriterFactory;

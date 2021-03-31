@@ -20,21 +20,16 @@ package it.unibz.krdb.obda.api.io;
  * #L%
  */
 
+import it.unibz.krdb.obda.io.PrefixManager;
 import it.unibz.krdb.obda.io.SimplePrefixManager;
-import it.unibz.krdb.obda.model.CQIE;
-import it.unibz.krdb.obda.model.DatalogProgram;
-import it.unibz.krdb.obda.model.Function;
-import it.unibz.krdb.obda.model.Term;
-import it.unibz.krdb.obda.model.OBDADataFactory;
+import it.unibz.krdb.obda.model.*;
 import it.unibz.krdb.obda.model.impl.FunctionalTermImpl;
 import it.unibz.krdb.obda.model.impl.OBDADataFactoryImpl;
-import it.unibz.krdb.obda.io.PrefixManager;
+import junit.framework.TestCase;
 
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-
-import junit.framework.TestCase;
 
 //import com.hp.hpl.jena.iri.IRIFactory;
 

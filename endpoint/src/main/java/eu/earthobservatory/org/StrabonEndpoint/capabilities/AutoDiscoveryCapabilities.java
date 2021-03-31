@@ -9,13 +9,13 @@
  */
 package eu.earthobservatory.org.StrabonEndpoint.capabilities;
 
-import java.io.IOException;
-import java.util.List;
-
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.List;
 
 /**
  * This class implements the {@link Capabilities} interface and

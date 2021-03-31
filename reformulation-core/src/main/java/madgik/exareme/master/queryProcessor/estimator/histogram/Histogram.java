@@ -4,18 +4,12 @@
  */
 package madgik.exareme.master.queryProcessor.estimator.histogram;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.NavigableMap;
-import java.util.TreeMap;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import it.unibz.krdb.obda.owlrefplatform.core.QuestUnfolder;
-import madgik.exareme.master.queryProcessor.estimator.NodeSelectivityEstimator;
-
+import java.util.Map;
+import java.util.NavigableMap;
+import java.util.TreeMap;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

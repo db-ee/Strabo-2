@@ -1,7 +1,6 @@
 package sesameWrapper;
 
 import it.unibz.krdb.obda.utils.GenericProperties;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

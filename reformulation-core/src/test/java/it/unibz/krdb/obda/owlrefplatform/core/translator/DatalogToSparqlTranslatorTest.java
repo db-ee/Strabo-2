@@ -22,24 +22,16 @@ package it.unibz.krdb.obda.owlrefplatform.core.translator;
 
 import it.unibz.krdb.obda.io.PrefixManager;
 import it.unibz.krdb.obda.io.SimplePrefixManager;
-import it.unibz.krdb.obda.model.CQIE;
-import it.unibz.krdb.obda.model.Constant;
-import it.unibz.krdb.obda.model.DatalogProgram;
-import it.unibz.krdb.obda.model.Function;
-import it.unibz.krdb.obda.model.OBDADataFactory;
-import it.unibz.krdb.obda.model.OBDAQueryModifiers;
+import it.unibz.krdb.obda.model.*;
 import it.unibz.krdb.obda.model.OBDAQueryModifiers.OrderCondition;
-import it.unibz.krdb.obda.model.Predicate;
 import it.unibz.krdb.obda.model.Predicate.COL_TYPE;
-import it.unibz.krdb.obda.model.Variable;
 import it.unibz.krdb.obda.model.impl.OBDADataFactoryImpl;
 import it.unibz.krdb.obda.model.impl.OBDAVocabulary;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.List;
-
-import org.junit.Before;
-import org.junit.Test;
 
 @SuppressWarnings("deprecation")
 public class DatalogToSparqlTranslatorTest {

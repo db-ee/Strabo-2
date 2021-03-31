@@ -25,26 +25,23 @@ import it.unibz.krdb.obda.model.OBDAModel;
 import it.unibz.krdb.obda.model.ResultSet;
 import it.unibz.krdb.obda.model.TupleResultSet;
 import it.unibz.krdb.obda.ontology.*;
-import it.unibz.krdb.obda.owlapi3.OWLAPI3ABoxIterator;
 import it.unibz.krdb.obda.owlapi3.OWLAPI3TranslatorUtility;
 import it.unibz.krdb.obda.owlrefplatform.core.*;
 import it.unibz.krdb.obda.owlrefplatform.core.mappingprocessing.TMappingExclusionConfig;
 import it.unibz.krdb.obda.utils.VersionInfo;
 import it.unibz.krdb.sql.ImplicitDBConstraintsReader;
 import madgik.exareme.master.queryProcessor.estimator.NodeSelectivityEstimator;
-import org.semanticweb.owlapi.reasoner.structural.StructuralReasoner;
-
 import org.semanticweb.owlapi.model.*;
-import org.semanticweb.owlapi.reasoner.*;
 import org.semanticweb.owlapi.reasoner.InconsistentOntologyException;
+import org.semanticweb.owlapi.reasoner.*;
 import org.semanticweb.owlapi.reasoner.impl.*;
-import org.semanticweb.owlapi.util.CollectionFactory;
+import org.semanticweb.owlapi.reasoner.structural.StructuralReasoner;
 import org.semanticweb.owlapi.util.OWLObjectPropertyManager;
 import org.semanticweb.owlapi.util.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import javax.annotation.Nonnull;
 
+import javax.annotation.Nonnull;
 import java.util.*;
 
 /**

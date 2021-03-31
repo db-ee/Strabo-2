@@ -1,30 +1,5 @@
 package it.unibz.krdb.obda.strabon;
 
-import org.apache.hadoop.fs.FSDataOutputStream;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.spark.serializer.KryoSerializer;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Row;
-import org.apache.spark.sql.SparkSession;
-import org.datasyslab.geosparksql.utils.GeoSparkSQLRegistrator;
-import org.datasyslab.geosparkviz.core.Serde.GeoSparkVizKryoRegistrator;
-
-import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import it.unibz.krdb.obda.io.ModelIOManager;
 import it.unibz.krdb.obda.model.OBDADataFactory;
 import it.unibz.krdb.obda.model.OBDAModel;
@@ -38,10 +13,28 @@ import it.unibz.krdb.obda.owlrefplatform.owlapi3.QuestOWLConfiguration;
 import it.unibz.krdb.obda.owlrefplatform.owlapi3.QuestOWLFactory;
 import it.unibz.krdb.obda.utils.StrabonParameters;
 import madgik.exareme.master.queryProcessor.estimator.NodeSelectivityEstimator;
-
+import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.spark.serializer.KryoSerializer;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Row;
+import org.apache.spark.sql.SparkSession;
+import org.datasyslab.geosparksql.utils.GeoSparkSQLRegistrator;
+import org.datasyslab.geosparkviz.core.Serde.GeoSparkVizKryoRegistrator;
+import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 //import org.openrdf.query.resultio.sparqlkml.stSPARQLResultsKMLWriter;
 

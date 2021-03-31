@@ -37,12 +37,6 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>ontop-obdalib-sesame</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
             <groupId>net.sourceforge.owlapi</groupId>
             <artifactId>owlapi-api</artifactId>
         </dependency>

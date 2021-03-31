@@ -21,8 +21,8 @@ package it.unibz.krdb.obda.model.impl;
  */
 
 import it.unibz.krdb.obda.model.Predicate;
-import it.unibz.krdb.obda.model.ValueConstant;
 import it.unibz.krdb.obda.model.Predicate.COL_TYPE;
+import it.unibz.krdb.obda.model.ValueConstant;
 
 public class ValueConstantImpl implements ValueConstant {
 

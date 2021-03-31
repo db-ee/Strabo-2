@@ -9,11 +9,7 @@
  */
 package eu.earthobservatory.org.StrabonEndpoint.client;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-
+import eu.earthobservatory.utils.stSPARQLQueryResultFormat;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.TupleQueryResult;
 import org.openrdf.query.TupleQueryResultHandlerException;
@@ -21,7 +17,11 @@ import org.openrdf.query.resultio.QueryResultIO;
 import org.openrdf.query.resultio.QueryResultParseException;
 import org.openrdf.query.resultio.TupleQueryResultFormat;
 import org.openrdf.query.resultio.UnsupportedQueryResultFormatException;
-import eu.earthobservatory.utils.stSPARQLQueryResultFormat;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 //import org.openrdf.query.resultio.sparqlkml.stSPARQLResultsKMLWriter;
 
 /**

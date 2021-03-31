@@ -20,7 +20,7 @@ package it.unibz.krdb.obda.utils;
  * #L%
  */
 
-import java.awt.Font;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

@@ -9,14 +9,13 @@
  */
 package eu.earthobservatory.org.StrabonEndpoint;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.openrdf.query.resultio.TupleQueryResultFormat;
 import eu.earthobservatory.utils.stSPARQLQueryResultFormat;
+import org.openrdf.query.resultio.TupleQueryResultFormat;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParserRegistry;
-import org.openrdf.rio.Rio;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Keeps common variables shared by beans and .jsp pages.

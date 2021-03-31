@@ -1,29 +1,23 @@
 package madgik.exareme.master.queryProcessor.estimator;
 
 import com.google.gson.Gson;
-
 import it.unibz.krdb.obda.owlrefplatform.core.QuestUnfolder;
-import madgik.exareme.master.queryProcessor.analyzer.stat.JoinCardinalities;
 import madgik.exareme.master.queryProcessor.analyzer.stat.StatUtils;
 import madgik.exareme.master.queryProcessor.decomposer.dag.Node;
 import madgik.exareme.master.queryProcessor.decomposer.query.*;
+import madgik.exareme.master.queryProcessor.estimator.db.AttrInfo;
 import madgik.exareme.master.queryProcessor.estimator.db.RelInfo;
 import madgik.exareme.master.queryProcessor.estimator.db.Schema;
 import madgik.exareme.master.queryProcessor.estimator.histogram.Bucket;
 import madgik.exareme.master.queryProcessor.estimator.histogram.Histogram;
-import madgik.exareme.master.queryProcessor.estimator.db.AttrInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author jim

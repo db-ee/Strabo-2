@@ -20,10 +20,6 @@ package it.unibz.krdb.obda.model.impl;
  * #L%
  */
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import it.unibz.krdb.obda.model.*;
 import it.unibz.krdb.obda.model.Predicate.COL_TYPE;
 

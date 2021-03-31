@@ -9,25 +9,20 @@
  */
 package eu.earthobservatory.org.StrabonEndpoint;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import eu.earthobservatory.utils.stSPARQLQueryResultFormat;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.openrdf.query.resultio.TupleQueryResultFormat;
-import eu.earthobservatory.utils.stSPARQLQueryResultFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import javax.servlet.*;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 /*@author Stella Giannakopoulou <sgian@di.uoa.gr>*/
 

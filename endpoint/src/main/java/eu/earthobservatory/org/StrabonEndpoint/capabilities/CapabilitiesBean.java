@@ -9,7 +9,9 @@
  */
 package eu.earthobservatory.org.StrabonEndpoint.capabilities;
 
-import java.io.IOException;
+import eu.earthobservatory.org.StrabonEndpoint.Common;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
@@ -18,11 +20,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
-
-import eu.earthobservatory.org.StrabonEndpoint.Common;
+import java.io.IOException;
 
 /**
  * 

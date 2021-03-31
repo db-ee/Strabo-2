@@ -19,6 +19,7 @@ package sesameWrapper;
  * limitations under the License.
  * #L%
  */
+
 import eu.earthobservatory.utils.Format;
 import eu.earthobservatory.utils.stSPARQLQueryResultToFormatAdapter;
 import info.aduna.iteration.CloseableIteration;
@@ -28,18 +29,6 @@ import it.unibz.krdb.obda.model.OBDAException;
 import it.unibz.krdb.obda.owlrefplatform.core.QuestConstants;
 import it.unibz.krdb.obda.owlrefplatform.core.StrabonStatement;
 import it.unibz.krdb.obda.sesame.SesameRDFIterator;
-
-import java.io.*;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.openrdf.IsolationLevel;
 import org.openrdf.IsolationLevels;
 import org.openrdf.OpenRDFUtil;
@@ -47,11 +36,7 @@ import org.openrdf.model.*;
 import org.openrdf.model.impl.NamespaceImpl;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.query.*;
-import org.openrdf.query.parser.ParsedBooleanQuery;
-import org.openrdf.query.parser.ParsedGraphQuery;
-import org.openrdf.query.parser.ParsedQuery;
-import org.openrdf.query.parser.ParsedTupleQuery;
-import org.openrdf.query.parser.QueryParserUtil;
+import org.openrdf.query.parser.*;
 import org.openrdf.query.resultio.BooleanQueryResultWriter;
 import org.openrdf.query.resultio.TupleQueryResultWriter;
 import org.openrdf.query.resultio.sparqlxml.SPARQLBooleanXMLWriter;
@@ -59,16 +44,14 @@ import org.openrdf.query.resultio.text.BooleanTextWriter;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.RepositoryResult;
 import org.openrdf.repository.UnknownTransactionStateException;
-import org.openrdf.rio.ParserConfig;
-import org.openrdf.rio.RDFFormat;
-import org.openrdf.rio.RDFHandler;
-import org.openrdf.rio.RDFHandlerException;
-import org.openrdf.rio.RDFParseException;
-import org.openrdf.rio.RDFParser;
-import org.openrdf.rio.Rio;
-import org.openrdf.rio.UnsupportedRDFormatException;
+import org.openrdf.rio.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.*;
 
 public class StrabonLivyConnection implements org.openrdf.repository.RepositoryConnection, AutoCloseable {
 

@@ -20,9 +20,9 @@ package it.unibz.krdb.obda.owlrefplatform.core;
  * #L%
  */
 
-import java.util.LinkedList;
-
 import junit.framework.TestCase;
+
+import java.util.LinkedList;
 
 public class TestURIIdentifier extends TestCase {
 

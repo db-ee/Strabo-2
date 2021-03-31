@@ -2,29 +2,18 @@ package it.unibz.krdb.obda.reformulation.owlapi3;
 
 import it.unibz.krdb.obda.model.CQIE;
 import it.unibz.krdb.obda.owlapi3.swrl.SWRLAPITranslator;
+import junit.framework.TestCase;
+import org.junit.Test;
+import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.model.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-
-import junit.framework.TestCase;
-
-import org.junit.Test;
-import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.model.AxiomType;
-import org.semanticweb.owlapi.model.OWLAxiom;
-import org.semanticweb.owlapi.model.OWLDataFactory;
-import org.semanticweb.owlapi.model.OWLEntity;
-import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.semanticweb.owlapi.model.SWRLAtom;
-import org.semanticweb.owlapi.model.SWRLRule;
-import org.semanticweb.owlapi.model.SWRLVariable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class SWRLTest extends TestCase {
 	

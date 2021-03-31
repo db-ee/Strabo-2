@@ -9,15 +9,15 @@
  */
 package eu.earthobservatory.org.StrabonEndpoint.client;
 
-import static org.junit.Assert.assertTrue;
+import eu.earthobservatory.utils.stSPARQLQueryResultFormat;
+import org.junit.Before;
+import org.junit.Test;
+import org.openrdf.query.resultio.TupleQueryResultFormat;
 
 import java.io.IOException;
 import java.util.Vector;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.openrdf.query.resultio.TupleQueryResultFormat;
-import eu.earthobservatory.utils.stSPARQLQueryResultFormat;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Charalampos Nikolaou <charnik@di.uoa.gr>

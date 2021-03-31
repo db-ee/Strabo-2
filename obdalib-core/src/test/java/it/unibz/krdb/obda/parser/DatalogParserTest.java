@@ -20,20 +20,14 @@ package it.unibz.krdb.obda.parser;
  * #L%
  */
 
-import it.unibz.krdb.obda.model.Function;
-import it.unibz.krdb.obda.model.CQIE;
-import it.unibz.krdb.obda.model.DatalogProgram;
-import it.unibz.krdb.obda.model.Term;
-import it.unibz.krdb.obda.model.Variable;
+import it.unibz.krdb.obda.model.*;
 import it.unibz.krdb.obda.model.impl.FunctionalTermImpl;
 import it.unibz.krdb.obda.model.impl.IRIConstantImpl;
 import it.unibz.krdb.obda.model.impl.ValueConstantImpl;
+import junit.framework.TestCase;
+import org.antlr.runtime.RecognitionException;
 
 import java.util.List;
-
-import junit.framework.TestCase;
-
-import org.antlr.runtime.RecognitionException;
 
 public class DatalogParserTest extends TestCase {
 

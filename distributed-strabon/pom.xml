@@ -14,16 +14,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- OBDA libraries -->
-
-        <!-- These are dependencies to the OBDA related classes. -->
-
-        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>ontop-obdalib-core</artifactId>
             <version>${project.version}</version>

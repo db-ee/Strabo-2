@@ -1,12 +1,12 @@
 package madgik.exareme.master.queryProcessor.decomposer.dp;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import madgik.exareme.master.queryProcessor.decomposer.query.Column;
 import madgik.exareme.master.queryProcessor.decomposer.query.NonUnaryWhereCondition;
 import madgik.exareme.master.queryProcessor.decomposer.query.Operand;
 import madgik.exareme.master.queryProcessor.estimator.NodeInfo;
+
+import java.util.HashSet;
+import java.util.Set;
 
 
 

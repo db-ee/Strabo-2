@@ -5,16 +5,10 @@
 package madgik.exareme.master.queryProcessor.decomposer.dag;
 
 import madgik.exareme.master.queryProcessor.decomposer.query.NonUnaryWhereCondition;
-import madgik.exareme.master.queryProcessor.decomposer.query.Operand;
 import madgik.exareme.master.queryProcessor.decomposer.query.Table;
-import madgik.exareme.master.queryProcessor.decomposer.util.Util;
 import madgik.exareme.master.queryProcessor.estimator.NodeInfo;
 
 import java.util.*;
-
-import com.google.common.hash.HashCode;
-import com.google.common.hash.HashFunction;
-import com.google.common.hash.Hashing;
 
 /**
  * @author dimitris

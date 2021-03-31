@@ -9,12 +9,12 @@
  */
 package eu.earthobservatory.constants;
 
+import eu.earthobservatory.vocabulary.GeoSPARQL;
+import eu.earthobservatory.vocabulary.SimpleFeatures;
+
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
-
-import eu.earthobservatory.vocabulary.GeoSPARQL;
-import eu.earthobservatory.vocabulary.SimpleFeatures;
 
 /**
  * This class is a placeholder for various constants around geometries. These

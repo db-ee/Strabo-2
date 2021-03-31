@@ -11,55 +11,7 @@
 	<description>Builds the distribution files for quest and the core apis.</description>
 	
 	<dependencies>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>ontop-quest-owlapi3</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>ontop-reformulation-core</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>ontop-obdalib-owlapi3</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>ontop-obdalib-core</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>ontop-quest-sesame</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>ontop-cli</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>ontop-obdalib-r2rml</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<!-- <dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>log4j-over-slf4j</artifactId>
-		</dependency> -->
-		<dependency>
-                       <groupId>ch.qos.logback</groupId>
-                       <artifactId>logback-classic</artifactId>
-                       
-                </dependency>
-                <dependency>
-                       <groupId>ch.qos.logback</groupId>
-                       <artifactId>logback-core</artifactId>
-                       
-                </dependency>
+
 
 	</dependencies>
 	

@@ -21,7 +21,6 @@ package it.unibz.krdb.obda.owlrefplatform.core;
  */
 
 import com.google.common.collect.HashMultimap;
-
 import it.unibz.krdb.obda.model.*;
 import it.unibz.krdb.obda.model.impl.OBDADataFactoryImpl;
 import it.unibz.krdb.obda.model.impl.OBDAVocabulary;
@@ -34,7 +33,6 @@ import it.unibz.krdb.obda.owlrefplatform.core.translator.SparqlAlgebraToDatalogT
 import it.unibz.krdb.obda.owlrefplatform.core.unfolding.DatalogUnfolder;
 import it.unibz.krdb.obda.owlrefplatform.core.unfolding.ExpressionEvaluator;
 import it.unibz.krdb.obda.renderer.DatalogProgramRenderer;
-
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.parser.ParsedQuery;
@@ -47,7 +45,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;

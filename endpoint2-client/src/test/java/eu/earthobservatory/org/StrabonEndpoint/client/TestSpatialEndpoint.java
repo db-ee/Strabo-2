@@ -8,14 +8,14 @@
  */
 package eu.earthobservatory.org.StrabonEndpoint.client;
 
-import java.io.IOException;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.TupleQueryResultHandlerException;
 import org.openrdf.query.resultio.QueryResultParseException;
 import org.openrdf.query.resultio.UnsupportedQueryResultFormatException;
+
+import java.io.IOException;
 
 /**
  * @author Kallirroi Dogani <kallirroi@di.uoa.gr>

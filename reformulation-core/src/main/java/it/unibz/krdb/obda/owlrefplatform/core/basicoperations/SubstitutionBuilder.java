@@ -2,6 +2,7 @@ package it.unibz.krdb.obda.owlrefplatform.core.basicoperations;
 
 import it.unibz.krdb.obda.model.Term;
 import it.unibz.krdb.obda.model.Variable;
+
 import java.util.HashMap;
 import java.util.Map;
 
