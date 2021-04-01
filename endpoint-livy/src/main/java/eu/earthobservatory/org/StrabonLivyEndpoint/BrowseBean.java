@@ -84,12 +84,7 @@ public class BrowseBean extends HttpServlet {
 					.getRequestDispatcher("/connection.jsp");
 
 			// pass the current details of the connection
-			request.setAttribute("geoSparkJars", strabonWrapper.getGeoSparkJars());
-			request.setAttribute("hadoopHomeDir", strabonWrapper.getHadoopHomeDir());
-			request.setAttribute("dbname", strabonWrapper.getDatabaseName());
-			request.setAttribute("sparkAddress", strabonWrapper.getSparkAddress());
-			request.setAttribute("port", strabonWrapper.getPort());
-			request.setAttribute("dbengine", strabonWrapper.getDBEngine());
+
 			request.setAttribute("dictionaryfile", request.getParameter("dictionaryfile"));
 			request.setAttribute("statisticsfile", request.getParameter("statisticsfile"));
 			request.setAttribute("asWKTfile", request.getParameter("asWKTfile"));

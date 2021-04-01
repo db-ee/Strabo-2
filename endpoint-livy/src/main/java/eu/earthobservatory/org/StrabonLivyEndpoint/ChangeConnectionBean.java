@@ -62,12 +62,6 @@ public class ChangeConnectionBean extends HttpServlet {
 		RequestDispatcher dispatcher = request.getRequestDispatcher("/connection.jsp");
 		
 		// pass the current details of the connection
-		request.setAttribute("geoSparkJars", strabonWrapper.getGeoSparkJars());
-		request.setAttribute("hadoopHomeDir", strabonWrapper.getHadoopHomeDir());
-		request.setAttribute("dbname", 	 strabonWrapper.getDatabaseName());
-		request.setAttribute("sparkAddress", strabonWrapper.getSparkAddress());
-		request.setAttribute("port", 	 strabonWrapper.getPort());
-		request.setAttribute("dbengine", strabonWrapper.getDBEngine());
 		request.setAttribute("googlemapskey", strabonWrapper.getGooglemapskey());
 		request.setAttribute("dictionaryfile", strabonWrapper.getDictFile());
 		request.setAttribute("statisticsfile", strabonWrapper.getStatFile());

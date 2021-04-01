@@ -28,41 +28,11 @@
         class="eu.earthobservatory.org.StrabonLivyEndpoint.StrabonBeanWrapper"
         destroy-method="destroy">
 
-        <constructor-arg type="java.lang.String" >
-            <!-- Database name -->
-            <value>${dbname}</value>
-        </constructor-arg>
-
-        <constructor-arg type="java.lang.String" >
-            <!-- GeoSpark Jars -->
-            <value>${geoSparkJars}</value>
-        </constructor-arg>
-
-        <constructor-arg type="java.lang.String" >
-            <!-- Hadoop Home Dir -->
-            <value>${hadoopHomeDir}</value>
-        </constructor-arg>
-
-        <constructor-arg type="int" >
-            <!-- Port -->
-            <value>${port}</value>
-        </constructor-arg>
-
-        <constructor-arg type="java.lang.String" >
-            <!-- Spark Address -->
-            <value>${sparkAddress}</value>
-        </constructor-arg>
-
         <constructor-arg type="boolean" >
             <!-- Check for locks and remove them (in case of a crash) -->
             <value>true</value>
         </constructor-arg>
-
-        <constructor-arg type="java.lang.String" >
-            <!-- Database Backend (either "postgis" or "monetdb") -->
-            <value>${dbengine}</value>
-        </constructor-arg>
-        
+  
         <constructor-arg type="java.lang.String" >
             <!-- Google Maps Key -->
             <value>${googlemapskey}</value>

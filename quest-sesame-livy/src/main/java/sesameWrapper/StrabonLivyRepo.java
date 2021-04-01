@@ -40,12 +40,8 @@ public class StrabonLivyRepo implements Repository {
     static StringBuffer obdaFile;
     static String propDictionary;
     static String queriesPath;
-    static String database;
     static String statfile;
     static String asWKTTablesFile;
-    private String sparkAddress;
-    private String geoSparkJars;
-    private String hadoopHomeDir;
     private static Map<String, String> asWKTSubpropertiesToTables;
     private StrabonStatement st;
     private Map<String, String> namespaces;
@@ -55,20 +51,17 @@ public class StrabonLivyRepo implements Repository {
     public static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
     private String sessionURL;
 
-    public StrabonLivyRepo(String propDictionary, String database, String statFile, String asWKTTablesFile, String sparkAddress, String geoSparkJars, String hadoopHomeDir)
+    public StrabonLivyRepo(String propDictionary, String statFile, String asWKTTablesFile)
             throws Exception {
         super();
         this.propDictionary = propDictionary;
-        this.database = database;
         this.statfile = statFile;
         this.asWKTTablesFile = asWKTTablesFile;
         asWKTSubpropertiesToTables = new HashMap<String, String>();
         namespaces = new HashMap<>();
         this.st = null;
         this.isInitialized = false;
-        this.sparkAddress = sparkAddress;
-        this.geoSparkJars = geoSparkJars;
-        this.hadoopHomeDir = hadoopHomeDir;
+
     }
 
     @Override
@@ -106,7 +99,7 @@ public class StrabonLivyRepo implements Repository {
             LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("SET spark.sql.cbo.enabled = true"), statementsURL, client);
             LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("SET spark.sql.cbo.joinReorder.enabled = true"), statementsURL, client);
 
-            LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("use "+ConnectionConstants.DATABASENAME), statementsURL, client);
+            LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("use " + ConnectionConstants.DATABASENAME), statementsURL, client);
             for (String udf : LivyHelper.udfs) {
                 String lib = "{\"code\":\"spark.sessionState.functionRegistry.createOrReplaceTempFunction(\\\"" + udf + "\\\",org.apache.spark.sql.geosparksql.expressions." + udf + ");\"}";
                 LivyHelper.sendCommandAndPrint(lib, statementsURL, client);
@@ -136,23 +129,23 @@ public class StrabonLivyRepo implements Repository {
             if (existDefaultGeometrytable) {
                 // preload geometeries
                 log.debug("preloading geometries");
-                String createGeometriesTable = "Create temporary view "+StrabonParameters.GEOMETRIES_TABLE+ "AS (Select " + StrabonParameters.GEOMETRIES_FIRST_COLUMN + ", "
+                String createGeometriesTable = "Create temporary view " + StrabonParameters.GEOMETRIES_TABLE + "AS (Select " + StrabonParameters.GEOMETRIES_FIRST_COLUMN + ", "
                         + StrabonParameters.GEOMETRIES_SECOND_COLUMN + ", ST_GeomFromWKT("
                         + StrabonParameters.GEOMETRIES_THIRD_COLUMN + ") as "
                         + StrabonParameters.GEOMETRIES_THIRD_COLUMN + " FROM geometries where " +
                         StrabonParameters.GEOMETRIES_THIRD_COLUMN + " IS NOT NULL)";
                 LivyHelper.sendCommandAndPrint(createGeometriesTable, statementsURL, client);
-                LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("CACHE TABLE "+StrabonParameters.GEOMETRIES_TABLE), statementsURL, client);
-                LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("SELECT COUNT(*) FROM "+StrabonParameters.GEOMETRIES_TABLE), statementsURL, client);
+                LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("CACHE TABLE " + StrabonParameters.GEOMETRIES_TABLE), statementsURL, client);
+                LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("SELECT COUNT(*) FROM " + StrabonParameters.GEOMETRIES_TABLE), statementsURL, client);
 
             }
             log.debug("preloading asWKT subproperty tables: " + asWKTSubpropertiesToTables.toString());
             for (String asWKTsubprop : asWKTSubpropertiesToTables.keySet()) {
                 String tblName = asWKTSubpropertiesToTables.get(asWKTsubprop);
 
-                LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("Create temporary view "+tblName+ " AS (Select s, ST_GeomFromWKT(o) as o FROM " + predDictionary.get(asWKTsubprop) + ") "), statementsURL, client);
-                LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("CACHE TABLE "+tblName), statementsURL, client);
-                LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("SELECT COUNT(*) FROM "+tblName), statementsURL, client);
+                LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("Create temporary view " + tblName + " AS (Select s, ST_GeomFromWKT(o) as o FROM " + predDictionary.get(asWKTsubprop) + ") "), statementsURL, client);
+                LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("CACHE TABLE " + tblName), statementsURL, client);
+                LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("SELECT COUNT(*) FROM " + tblName), statementsURL, client);
 
             }
 

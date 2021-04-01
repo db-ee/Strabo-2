@@ -2,9 +2,9 @@
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
- *
+ * <p>
  * Copyright (C) 2010, 2011, 2012, 2013 Pyravlos Team
- *
+ * <p>
  * http://www.strabon.di.uoa.gr/
  */
 package eu.earthobservatory.org.StrabonLivyEndpoint;
@@ -34,11 +34,7 @@ public class StrabonBeanWrapper implements org.springframework.beans.factory.Dis
 
     private static final String FILE_PROTOCOL = "file";
 
-    private int port;
-    private String databaseName;
-    private String geoSparkJars;
-    private String hadoopHomeDir;
-    private String dbBackend;
+
     private String googlemapskey;
     private int maxLimit;
     private boolean loadFromFile;
@@ -53,12 +49,10 @@ public class StrabonBeanWrapper implements org.springframework.beans.factory.Dis
     private String dictFile;
     private String asWKTFile;
     private StrabonLivyConnection con;
-    private String sparkAddress;
 
-    public StrabonBeanWrapper(String databaseName, String geoSparkJars, String hadoopHomeDir,
-            int port, String sparkAddress, boolean checkForLockTable, String dbBackend,
-            String googlemapskey, String statFile, String dictFile, String asWKTFile, int maxLimit, boolean loadFromFile, String prefixes, List<List<String>> args) {
-        setConnectionDetails(databaseName, geoSparkJars, hadoopHomeDir, String.valueOf(port), sparkAddress, dbBackend, googlemapskey, statFile, dictFile, asWKTFile);
+    public StrabonBeanWrapper(boolean checkForLockTable,
+                              String googlemapskey, String statFile, String dictFile, String asWKTFile, int maxLimit, boolean loadFromFile, String prefixes, List<List<String>> args) {
+        setConnectionDetails(googlemapskey, statFile, dictFile, asWKTFile);
         this.checkForLockTable = checkForLockTable;
         this.maxLimit = maxLimit;
         this.loadFromFile = loadFromFile;
@@ -121,8 +115,8 @@ public class StrabonBeanWrapper implements org.springframework.beans.factory.Dis
 
     public boolean init() {
         /* if the connection details have been modified
-        ** we should close the current Strabon (if any)
-        ** and create a new one
+         ** we should close the current Strabon (if any)
+         ** and create a new one
          */
         if (this.strabonConnectionDetailsHaveBeenModified) {
             this.closeConnection();
@@ -130,8 +124,8 @@ public class StrabonBeanWrapper implements org.springframework.beans.factory.Dis
                 logger.warn("[StrabonEndpoint] Strabon not initialized yet.");
                 logger.warn("[StrabonEndpoint] Initializing Strabon.");
                 //logger.info("[StrabonEndpoint] Connection details:\n" + this.getDetails());
-                strabon = new StrabonLivyRepo(dictFile, databaseName, statFile, asWKTFile, sparkAddress, geoSparkJars, hadoopHomeDir);
-                if(!strabon.isInitialized())
+                strabon = new StrabonLivyRepo(dictFile, statFile, asWKTFile);
+                if (!strabon.isInitialized())
                     strabon.initialize();
                 con = strabon.getConnection();
                 // initialize Strabon according to user preference
@@ -145,7 +139,7 @@ public class StrabonBeanWrapper implements org.springframework.beans.factory.Dis
 
                 logger.info("[StrabonEndpoint] Created new connection with details:\n" + this.getDetails());
                 /* we should clear the <strabonConnectionDetailsHaveBeenModified> flag
-                ** since the connection to Strabon has been made
+                 ** since the connection to Strabon has been made
                  */
                 this.strabonConnectionDetailsHaveBeenModified = false;
 
@@ -178,10 +172,10 @@ public class StrabonBeanWrapper implements org.springframework.beans.factory.Dis
             public void run() {
                 // just call the Strabon.close() method
                 try {
-					strabon.shutDown();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+                    strabon.shutDown();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         });
 
@@ -202,10 +196,10 @@ public class StrabonBeanWrapper implements org.springframework.beans.factory.Dis
         if (strabon != null) {
             logger.info("[StrabonEndpoint] Closing existing connection with details:\n" + this.getDetails());
             try {
-				strabon.shutDown();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+                strabon.shutDown();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             strabon = null;
         }
     }
@@ -223,7 +217,7 @@ public class StrabonBeanWrapper implements org.springframework.beans.factory.Dis
         if ((this.strabon == null) && (!init())) {
             throw new RepositoryException("Could not connect to Strabon.");
         }
-        if(this.con == null){
+        if (this.con == null) {
             throw new RepositoryException("Strabon has not been initialized properly.");
         }
         if (answerFormatStrabon.equalsIgnoreCase(Format.PIECHART.toString()) || answerFormatStrabon.equalsIgnoreCase(Format.AREACHART.toString())
@@ -390,10 +384,10 @@ public class StrabonBeanWrapper implements org.springframework.beans.factory.Dis
         return true;
     }
 
-    public void setConnectionDetails(String databaseName, String geoSparkJars, String hadoopHomeDir, String port, String sparkAddress, String dbBackend, String googlemapskey, String statFile, String dictFile, String asWKTFile) {
+    public void setConnectionDetails(String googlemapskey, String statFile, String dictFile, String asWKTFile) {
         /* validate-sanitize certain Strabon connection properties
-        ** dbBackend - must be one of the supported Db engines, or set it to PostGIS
-        ** port - must be an integer, or set it to dbBackend's default port
+         ** dbBackend - must be one of the supported Db engines, or set it to PostGIS
+         ** port - must be an integer, or set it to dbBackend's default port
          */
 //        if (StrabonDBEngine.getStrabonDBEngine(dbBackend) == null) {
 //            logger.warn("[StrabonEndpoint] Unknown database backend \"" + dbBackend + "\". Assuming PostGIS.");
@@ -406,23 +400,11 @@ public class StrabonBeanWrapper implements org.springframework.beans.factory.Dis
 //        }
 
         /* set the <strabonConnectionDetailsHaveBeenModified> flag if
-        ** any of the Strabon connection properties have changed
+         ** any of the Strabon connection properties have changed
          */
-        this.strabonConnectionDetailsHaveBeenModified = !(dbBackend.equalsIgnoreCase(this.dbBackend)
-                && sparkAddress.equalsIgnoreCase(this.sparkAddress)
-                && port.equalsIgnoreCase(String.valueOf(this.port))
-                && databaseName.equals(this.databaseName)
-                && geoSparkJars.equalsIgnoreCase(this.geoSparkJars)
-                && hadoopHomeDir.equals(this.hadoopHomeDir)
-                && dictFile.equals(this.dictFile)
+        this.strabonConnectionDetailsHaveBeenModified = !(dictFile.equals(this.dictFile)
                 && statFile.equals(this.statFile)
                 && asWKTFile.equals(this.asWKTFile));
-        this.dbBackend = dbBackend;
-        this.sparkAddress = sparkAddress;
-        this.port = Integer.parseInt(port);
-        this.databaseName = databaseName;
-        this.geoSparkJars = geoSparkJars;
-        this.hadoopHomeDir = hadoopHomeDir;
         this.googlemapskey = googlemapskey;
         this.checkForLockTable = true;
         this.dictFile = dictFile;
@@ -430,38 +412,9 @@ public class StrabonBeanWrapper implements org.springframework.beans.factory.Dis
         this.asWKTFile = asWKTFile;
     }
 
-    public String getGeoSparkJars() {
-        return geoSparkJars;
-    }
-
-    public String getHadoopHomeDir() {
-        return hadoopHomeDir;
-    }
-
-    public String getDatabaseName() {
-        return databaseName;
-    }
-
-    public String getDBEngine() {
-        return dbBackend;
-    }
-
-    public int getPort() {
-        return port;
-    }
-
-    public String getSparkAddress() {
-        return sparkAddress;
-    }
 
     private String getDetails() {
         String details = "-----------------------------------------\n";
-        details += "host     : " + sparkAddress + "\n";
-        details += "port     : " + port + "\n";
-        details += "database : " + databaseName + "\n";
-        details += "user     : " + geoSparkJars + "\n";
-        details += "password : " + hadoopHomeDir + "\n";
-        details += "dbengine : " + dbBackend + "\n";
         details += "googlemapskey : " + googlemapskey + "\n";
         details += "dictFile : " + dictFile + "\n";
         details += "statFile : " + statFile + "\n";
@@ -488,8 +441,8 @@ public class StrabonBeanWrapper implements org.springframework.beans.factory.Dis
     }
 
     /*
-	 * Limit the number of solutions returned.
-	 * */
+     * Limit the number of solutions returned.
+     * */
     public String addLimit(String queryString, String maxLimit) {
         String limitedQuery = queryString;
         String lowerLimit = null;

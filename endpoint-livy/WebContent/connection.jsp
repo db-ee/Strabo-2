@@ -68,35 +68,6 @@
 		</td>	
 	</tr>
 	<TR> 
-		<TD valign="top" class="style4">Database Name:</TD>
-		<TD><input type="text" name="dbname" value="<%=request.getAttribute("dbname")%>"/></TD>
-	</TR>
-	<TR> 
-		<TD valign="top" class="style4">Username:</TD>
-		<TD><input type="text" name="geoSparkJars" value="<%=request.getAttribute("geoSparkJars")%>"/></TD>
-	</TR>
-		<TR> 
-		<TD valign="top" class="style4">Password:</TD>
-		<TD><input type="password" name="hadoopHomeDir" value="<%=request.getAttribute("hadoopHomeDir")%>"/></TD>
-	</TR>
-	<TR> 
-		<TD valign="top" class="style4">Port:</TD>
-		<TD><input type="text" name="port" value="<%=request.getAttribute("port")%>"/></TD>
-	</TR>
-	<TR> 
-		<TD valign="top" class="style4">Hostname:</TD>
-		<TD><input type="text" name="sparkAddress" value="<%=request.getAttribute("sparkAddress")%>"/></TD>
-	</TR>
-	<TR> 
-		<TD valign="top" class="style4">Database Backend:</TD>
-		<TD>
-			<SELECT name="dbengine">
-				<OPTION value="<%=Common.DBBACKEND_POSTGIS%>" <%=Common.DBBACKEND_POSTGIS.equals(request.getAttribute("dbengine")) ? "selected":""%>><%=Common.DBBACKEND_POSTGIS%></OPTION>
-				<OPTION value="<%=Common.DBBACKEND_MONETDB%>" <%=Common.DBBACKEND_MONETDB.equals(request.getAttribute("dbengine")) ? "selected":""%>><%=Common.DBBACKEND_MONETDB%></OPTION>
-			</SELECT>
-		</TD>
-	</TR>
-	<TR> 
 		<TD valign="top" class="style4">Google Maps API Key:</TD>
 		<TD><input type="text" name="googlemapskey" value="<%=request.getAttribute("googlemapskey")%>"/></TD>
 	</TR>
