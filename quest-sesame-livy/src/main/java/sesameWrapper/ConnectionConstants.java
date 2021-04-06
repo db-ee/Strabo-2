@@ -40,6 +40,11 @@ public class ConnectionConstants {
     public static final String LIVYURL;
     public static final String DATABASENAME;
 
+    public static String DICTIONARYFILE;
+    public static String ASWKTFILE;
+    public static String STATISTICSFILE;
+    public static String GOOGLEMAPSKEY;
+
 
     static {
         GenericProperties properties = ConnectionProperties.getConnectionProperties();
@@ -72,6 +77,12 @@ public class ConnectionConstants {
 
         LIVYURL = properties.getString("livyUrl");
         DATABASENAME = properties.getString("databaseName");
+
+        DICTIONARYFILE = properties.getString("dictionaryfile");
+        STATISTICSFILE = properties.getString("statisticsfile");
+        ASWKTFILE = properties.getString("asWKTfile");
+        GOOGLEMAPSKEY = properties.getString("googlemapskey");
+
         log.trace("Strabon Properties Loaded.");
     }
 

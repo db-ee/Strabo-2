@@ -23,7 +23,7 @@ public class ConnectionProperties {
         try {
             Properties properties = new Properties();
             File jar = new File(ConnectionProperties.class.getProtectionDomain().getCodeSource().getLocation().toURI());
-            FileInputStream propFIle = new FileInputStream(jar.getParent().toString() + "/../connection.properties");
+            FileInputStream propFIle = new FileInputStream(jar.getParent().toString() + "/../../../connection.properties");
             //InputStream in = ServletContext.getResourceAsStream("/WEB-INF/connection.properties");
             properties.load(propFIle);
             connectionProperties = new GenericProperties(properties);

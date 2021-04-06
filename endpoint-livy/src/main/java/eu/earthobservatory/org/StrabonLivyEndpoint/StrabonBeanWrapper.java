@@ -16,6 +16,7 @@ import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.RDFParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sesameWrapper.ConnectionConstants;
 import sesameWrapper.StrabonLivyConnection;
 import sesameWrapper.StrabonLivyRepo;
 
@@ -405,11 +406,12 @@ public class StrabonBeanWrapper implements org.springframework.beans.factory.Dis
         this.strabonConnectionDetailsHaveBeenModified = !(dictFile.equals(this.dictFile)
                 && statFile.equals(this.statFile)
                 && asWKTFile.equals(this.asWKTFile));
-        this.googlemapskey = googlemapskey;
+        this.googlemapskey = ConnectionConstants.GOOGLEMAPSKEY;
         this.checkForLockTable = true;
-        this.dictFile = dictFile;
-        this.statFile = statFile;
-        this.asWKTFile = asWKTFile;
+        this.dictFile = ConnectionConstants.DICTIONARYFILE;
+        this.statFile = ConnectionConstants.STATISTICSFILE;
+        this.asWKTFile = ConnectionConstants.ASWKTFILE;
+
     }
 
 
