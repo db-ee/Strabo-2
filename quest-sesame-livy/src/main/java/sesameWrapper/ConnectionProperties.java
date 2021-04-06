@@ -42,7 +42,9 @@ public class ConnectionProperties {
                     }
                 }
             }
+            log.debug("Overwritting properties: "+overwrittenProps);
             for (String prop : overwrittenProps) {
+                properties.remove(prop);
                 properties.setProperty(prop, System.getenv(prop));
             }
 
