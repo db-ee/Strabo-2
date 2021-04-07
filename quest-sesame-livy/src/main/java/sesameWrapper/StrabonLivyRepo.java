@@ -129,12 +129,12 @@ public class StrabonLivyRepo implements Repository {
             if (existDefaultGeometrytable) {
                 // preload geometeries
                 log.debug("preloading geometries");
-                String createGeometriesTable = "Create temporary view " + StrabonParameters.GEOMETRIES_TABLE + "AS (Select " + StrabonParameters.GEOMETRIES_FIRST_COLUMN + ", "
+                String createGeometriesTable = "Create temporary view " + StrabonParameters.GEOMETRIES_TABLE + " AS (Select " + StrabonParameters.GEOMETRIES_FIRST_COLUMN + ", "
                         + StrabonParameters.GEOMETRIES_SECOND_COLUMN + ", ST_GeomFromWKT("
                         + StrabonParameters.GEOMETRIES_THIRD_COLUMN + ") as "
                         + StrabonParameters.GEOMETRIES_THIRD_COLUMN + " FROM geometries where " +
                         StrabonParameters.GEOMETRIES_THIRD_COLUMN + " IS NOT NULL)";
-                LivyHelper.sendCommandAndPrint(createGeometriesTable, statementsURL, client);
+                LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery(createGeometriesTable), statementsURL, client);
                 LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("CACHE TABLE " + StrabonParameters.GEOMETRIES_TABLE), statementsURL, client);
                 LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("SELECT COUNT(*) FROM " + StrabonParameters.GEOMETRIES_TABLE), statementsURL, client);
 
