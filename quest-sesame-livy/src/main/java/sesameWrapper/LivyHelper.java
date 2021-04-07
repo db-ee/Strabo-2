@@ -3,6 +3,8 @@ package sesameWrapper;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import okhttp3.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.json.Json;
 import javax.json.stream.JsonParser;
@@ -25,7 +27,7 @@ public class LivyHelper {
     //private ArrayList<String> outputs;
     //private Reader result = null;
     //private Response response2;
-
+    private static final Logger log = LoggerFactory.getLogger(LivyHelper.class);
     //private OkHttpClient client = new OkHttpClient();
 
 
@@ -209,6 +211,7 @@ public class LivyHelper {
 
     public static void sendCommandAndPrint(String command, String statementsURL, OkHttpClient client) throws IOException {
         //String json = t.getSQLQuery(command);
+        log.debug("Sending command: "+command);
         String response = post(statementsURL, command, client);
         System.out.println(response);
         int stID = JsonPath.parse(response).read("id");
@@ -240,6 +243,7 @@ public class LivyHelper {
 
     protected static JsonParser sendCommandAndGetBuffer(String command, String statementsURL, OkHttpClient client) throws IOException {
         //String json = t.getSQLQuery(command);
+        log.debug("Sending command: "+command);
         String response = post(statementsURL, command, client);
         System.out.println(response);
         int stID = JsonPath.parse(response).read("id");
