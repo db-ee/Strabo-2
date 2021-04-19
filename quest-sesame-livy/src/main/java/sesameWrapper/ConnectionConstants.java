@@ -39,6 +39,8 @@ public class ConnectionConstants {
 
     public static final String LIVYURL;
     public static final String DATABASENAME;
+    public static final String DRIVERMEMORY;
+    public static final int DRIVERCORES;
 
     public static String DICTIONARYFILE;
     public static String ASWKTFILE;
@@ -52,7 +54,9 @@ public class ConnectionConstants {
         PROXYUSER = properties.getString("proxyUser");
         NUMEXECUTORS = properties.getInt("numExecutors");
         EXECUTORCORES = properties.getInt("executorCores");
+        DRIVERCORES = properties.getInt("driverCores");
         EXECUTORMEMORY = properties.getString("executorMemory");
+        DRIVERMEMORY = properties.getString("driverMemory");
         SPARKDRIVEREXTRACLASSPATH = properties.getString("sparkDriverExtraClassPath");
         SPARKEXECUTOREXTRACLASSPATH = properties.getString("sparkExecutorExtraClassPath");
         APPMASTERENVSPARKHOME = properties.getString("appMasterEnvSparkHome");

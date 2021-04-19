@@ -130,7 +130,7 @@ public class LivyHelper {
     protected static String databaseName = "test";
 */
     protected static String create = "{\"kind\": \"spark\", \"proxyUser\": \""+ ConnectionConstants.PROXYUSER+"\"," +
-            " \"numExecutors\": "+ConnectionConstants.NUMEXECUTORS+", \"executorCores\": "+ConnectionConstants.EXECUTORCORES+ ", \"executorMemory\": \""+ConnectionConstants.EXECUTORMEMORY+"\", \"conf\" : {\"spark.submit.deployMode\": \"cluster\"," +
+            " \"numExecutors\": "+ConnectionConstants.NUMEXECUTORS+", \"executorCores\": "+ConnectionConstants.EXECUTORCORES+ ", \"driverCores\": "+ConnectionConstants.DRIVERCORES+ ", \"executorMemory\": \""+ConnectionConstants.EXECUTORMEMORY+"\", \"driverMemory\": \""+ConnectionConstants.DRIVERMEMORY+"\", \"conf\" : {\"spark.submit.deployMode\": \"cluster\"," +
             " \"spark.driver.extraClassPath\": \""+ConnectionConstants.SPARKDRIVEREXTRACLASSPATH+"\"," +
             " \"spark.executor.extraClassPath\": \""+ConnectionConstants.SPARKEXECUTOREXTRACLASSPATH+"\"," +
             " \"spark.yarn.appMasterEnv.SPARK_HOME\":\""+ConnectionConstants.APPMASTERENVHADOOPHOME+"\", \"spark.executorEnv.SPARK_HOME\":\""+ConnectionConstants.EXECUTORENVSPARKHOME+"\"," +
