@@ -41,6 +41,7 @@ public class ConnectionConstants {
     public static final String DATABASENAME;
     public static final String DRIVERMEMORY;
     public static final int DRIVERCORES;
+    public static final boolean USECACHE;
 
     public static String DICTIONARYFILE;
     public static String ASWKTFILE;
@@ -86,6 +87,7 @@ public class ConnectionConstants {
         STATISTICSFILE = properties.getString("statisticsfile");
         ASWKTFILE = properties.getString("asWKTfile");
         GOOGLEMAPSKEY = properties.getString("googlemapskey");
+        USECACHE = properties.getBoolean("usecahce");
 
         log.trace("Strabon Properties Loaded.");
     }

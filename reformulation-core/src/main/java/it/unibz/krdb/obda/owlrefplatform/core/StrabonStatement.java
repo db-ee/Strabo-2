@@ -39,6 +39,7 @@ import it.unibz.krdb.obda.owlrefplatform.core.unfolding.ExpressionEvaluator;
 import it.unibz.krdb.obda.renderer.DatalogProgramRenderer;
 import it.unibz.krdb.obda.utils.StrabonParameters;
 import it.unibz.krdb.sql.DatabaseRelationDefinition;
+import it.unibz.krdb.sql.Relation2DatalogPredicate;
 import it.unibz.krdb.sql.RelationID;
 import madgik.exareme.master.queryProcessor.decomposer.query.SQLQuery;
 import madgik.exareme.master.queryProcessor.decomposer.util.Util;
@@ -91,6 +92,10 @@ public class StrabonStatement implements OBDAStatement {
 
 	private static final Logger log = LoggerFactory.getLogger(StrabonStatement.class);
 
+	private Set<String> cachedTables;
+
+	private Set<String> temporaryCachedTables;
+
 	/*
 	 * For benchmark purpose
 	 */
@@ -99,6 +104,7 @@ public class StrabonStatement implements OBDAStatement {
 	private long unfoldingTime = 0;
 
 	private NodeSelectivityEstimator nse;
+	private boolean cache;
 
 	public StrabonStatement(Quest questinstance, QuestConnection conn, Statement st, NodeSelectivityEstimator nse) {
 
@@ -110,6 +116,16 @@ public class StrabonStatement implements OBDAStatement {
 
 		this.nse = nse;
 
+		this.cachedTables = new HashSet<>();
+
+		this.temporaryCachedTables = new HashSet<>();
+
+		this.cache = false;
+
+	}
+
+	public void useCache(boolean cache) {
+		this.cache = cache;
 	}
 
 	private class QueryExecutionThread extends Thread {
@@ -621,13 +637,116 @@ public class StrabonStatement implements OBDAStatement {
 				}
 
 				try {
-					for (CQIE cq : programAfterUnfolding.getRules()) {
+					for (CQIE cq : programAfterSplittingSpatialJoin.getRules()) {
 						DagCreatorDatalogNew creator = new DagCreatorDatalogNew(cq, nse, new HashMap<String, String>());
 						SQLQuery result2 = creator.getRootNode();
 					}
 				} catch (Exception e) {
 					log.error("Error while optimizing query. Using default translation. " + e.getMessage());
 				}
+
+				if(cache){
+					for (CQIE cq : programAfterSplittingSpatialJoin.getRules()) {
+						Set<Variable> previousVariables = new HashSet<>();
+						for(int i = 0; i < cq.getBody().size(); i++ ) {
+							Function atom = cq.getBody().get(i);
+							if(atom.getFunctionSymbol().toString().startsWith("prop")){
+								Term t0 = atom.getTerm(0);
+								boolean skip=false;
+								if(t0 instanceof Variable){
+									if(previousVariables.contains(t0)){
+										skip = true;
+										temporaryCachedTables.add("cache table subjectPartitioned"+atom.getFunctionSymbol().toString()+" as select * from "+
+												atom.getFunctionSymbol().toString() + " CLUSTER BY s");
+										atom.setPredicate(fac.getPredicate("subjectPartitioned"+atom.getFunctionSymbol().toString(), 2));
+										if(i==1){
+											Function first = cq.getBody().get(0);
+											if(first.getFunctionSymbol().toString().startsWith("prop")){
+												if(first.getTerm(0).equals(t0)){
+													temporaryCachedTables.add("cache table subjectPartitioned"+first.getFunctionSymbol().toString()+" as select * from "+
+															first.getFunctionSymbol().toString() + " CLUSTER BY s");
+													first.setPredicate(fac.getPredicate("subjectPartitioned"+first.getFunctionSymbol().toString(), 2));
+												}
+												else if(first.getTerm(1).equals(t0)){
+													temporaryCachedTables.add("cache table objectPartitioned"+first.getFunctionSymbol().toString()+" as select * from "+
+															first.getFunctionSymbol().toString() + " CLUSTER BY o");
+													first.setPredicate(fac.getPredicate("objectPartitioned"+first.getFunctionSymbol().toString(), 2));
+												}
+											}
+
+										}
+									}
+									previousVariables.add((Variable)t0);
+								}
+								else if(t0 instanceof Constant){
+									skip = true;
+									//temporaryCachedTables.add("cache table subjectPartitioned"+atom.getFunctionSymbol().toString()+" as select * from "+
+									//		atom.getFunctionSymbol().toString() + " CLUSTER BY s");
+									//atom.setPredicate(fac.getPredicate("subjectPartitioned"+atom.getFunctionSymbol().toString(), 2));
+								}
+								Term t1 = atom.getTerm(1);
+								if(t1 instanceof Variable){
+									if(!skip) {
+										if (previousVariables.contains(t1)) {
+											temporaryCachedTables.add("cache table objectPartitioned"+atom.getFunctionSymbol().toString()+" as select * from "+
+													atom.getFunctionSymbol().toString() + " CLUSTER BY o");
+											atom.setPredicate(fac.getPredicate("objectPartitioned"+atom.getFunctionSymbol().toString(), 2));
+											if (i == 1) {
+												Function first = cq.getBody().get(0);
+												if (first.getFunctionSymbol().toString().startsWith("prop")) {
+													if (first.getTerm(0).equals(t0)) {
+														temporaryCachedTables.add("cache table subjectPartitioned"+first.getFunctionSymbol().toString()+" as select * from "+
+																first.getFunctionSymbol().toString() + " CLUSTER BY s");
+														first.setPredicate(fac.getPredicate("subjectPartitioned"+first.getFunctionSymbol().toString(), 2));
+													} else if (first.getTerm(1).equals(t0)) {
+														temporaryCachedTables.add("cache table objectPartitioned"+first.getFunctionSymbol().toString()+" as select * from "+
+																first.getFunctionSymbol().toString() + " CLUSTER BY o");
+														first.setPredicate(fac.getPredicate("objectPartitioned"+first.getFunctionSymbol().toString(), 2));
+													}
+												}
+
+											}
+										}
+									}
+									previousVariables.add((Variable)t1);
+								}
+								else {
+									if(!skip && t1 instanceof Constant) {
+										//temporaryCachedTables.add("cache table objectPartitioned"+atom.getFunctionSymbol().toString()+" as select * from "+
+										//		atom.getFunctionSymbol().toString() + " CLUSTER BY o");
+										//atom.setPredicate(fac.getPredicate("objectPartitioned"+atom.getFunctionSymbol().toString(), 2));
+									}
+								}
+							}
+							else {
+								for(Term t:atom.getTerms()) {
+									if(t instanceof Variable) {
+										previousVariables.add((Variable)t);
+									}
+								}
+							}
+						}
+					}
+				}
+				for(String temp:temporaryCachedTables) {
+					if (!cachedTables.contains(temp)) {
+						RelationID relation = RelationID.createRelationIdFromDatabaseRecord(null, temp.split(" ")[2]);
+								//questInstance.getMetaData().getQuotedIDFactory().createRelationID(null,
+								//temp);
+						// questInstance.getMetaData().removeDatabaseRelation(relation);
+						DatabaseRelationDefinition replacement = questInstance.getMetaData()
+								.createDatabaseRelation(relation);
+
+						replacement.addAttribute(
+								questInstance.getMetaData().getQuotedIDFactory().createAttributeID("s"),
+								Types.VARCHAR, "VARCHAR", false);
+
+						replacement.addAttribute(
+								questInstance.getMetaData().getQuotedIDFactory().createAttributeID("o"),
+								Types.VARCHAR, "VARCHAR", false);
+					}
+				}
+
 
 				sql = getSQL(programAfterSplittingSpatialJoin, signatureContainer);
 				// cacheQueryAndProperties(strquery, sql);
@@ -642,6 +761,17 @@ public class StrabonStatement implements OBDAStatement {
 			}
 		}
 		return sql;
+	}
+
+	public Set<String> getTablesToCache() {
+		Set<String> result = new HashSet<>();
+		for(String temp:temporaryCachedTables){
+			if(cachedTables.add(temp)){
+				result.add(temp);
+			}
+		}
+		temporaryCachedTables.clear();
+		return result;
 	}
 
 	private DatalogProgram splitSpatialJoin(DatalogProgram program) {

@@ -123,6 +123,7 @@ public class LocalQueryTranslator {
 					e.printStackTrace();
 				}
 				StrabonStatement st = reasoner.createStrabonStatement(nse);
+				st.useCache(true);
 				List<String> sparqlQueries = new ArrayList<String>();
 
 				String[] query_files = readFilesFromDir(queriesPath);
@@ -130,6 +131,7 @@ public class LocalQueryTranslator {
 					System.out.println("Starting execution of query "+queryfile);
 					String sparql = readFile(queryfile);
 					SQLResult sql = st.getUnfolding(sparql, true);
+					System.out.println("temp table to be cached: "+st.getTablesToCache().toString());
 					System.out.println(sql.getTextResult());
 				}
 

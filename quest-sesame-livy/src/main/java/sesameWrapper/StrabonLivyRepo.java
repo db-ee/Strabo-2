@@ -30,8 +30,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 
 public class StrabonLivyRepo implements Repository {
@@ -50,6 +49,26 @@ public class StrabonLivyRepo implements Repository {
 
     public static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
     private String sessionURL;
+
+    //the following contain properties that have literls as object for each kind of literal
+    //TODO read these from a file
+    public static final Set<String> STRINGPROPERTIES = new HashSet<>(Arrays.asList("http://earthanalytics.eu/polar/ontology/hasCT",
+            "http://earthanalytics.eu/polar/ontology/hasURL",
+            "http://earthanalytics.eu/polar/ontology/hasThumbnail",
+            "http://earthanalytics.eu/polar/ontology/hasCT",
+            "http://earthanalytics.eu/polar/ontology/hasCTClassName",
+            "http://earthanalytics.eu/polar/ontology/hasTitle",
+            "http://geographica.di.uoa.gr/generator/landOwnership/hasKey",
+            "http://geographica.di.uoa.gr/generator/pointOfInterest/hasKey",
+            "http://geographica.di.uoa.gr/generator/state/hasKey",
+            "http://geographica.di.uoa.gr/generator/road/hasKey",
+            "http://earthanalytics.eu/fs/ontology/hasCropTypeName",
+            "http://ai.di.uoa.gr/invekos/ontology/hasCropTypeName"));
+
+    public static final Set<String> INTEGERPROPERTIES = new HashSet<>(Arrays.asList("http://data.linkedeodata.eu/ontology#has_code"));
+
+    public static final Set<String> DATETIMEPROPERTIES = new HashSet<>(Arrays.asList("http://earthanalytics.eu/polar/ontology/hasRECDAT",
+            "http://earthanalytics.eu/polar/ontology/hasRECDATE"));
 
     public StrabonLivyRepo(String propDictionary, String statFile, String asWKTTablesFile)
             throws Exception {
@@ -193,6 +212,7 @@ public class StrabonLivyRepo implements Repository {
                 e.printStackTrace();
             }
             st = reasoner.createStrabonStatement(nse);
+            st.useCache(ConnectionConstants.USECACHE);
 			/*List<String> sparqlQueries = new ArrayList<String>();
 
 			Path path = new Path(queriesPath);
@@ -356,7 +376,7 @@ public class StrabonLivyRepo implements Repository {
                 obdaFile.append(StrabonParameters.GEOMETRIES_TABLE);
                 obdaFile.append("\n");
                 obdaFile.append("\n");
-            } else if (property.contains("has_code") || property.contains("hasDN")) {
+            } else if (INTEGERPROPERTIES.contains(property)) {
                 obdaFile.append("mappingId\tmapp");
                 obdaFile.append(mappingId);
                 mappingId++;
@@ -388,7 +408,7 @@ public class StrabonLivyRepo implements Repository {
                 obdaFile.append(tablename);
                 obdaFile.append("\n");
                 obdaFile.append("\n");
-            } else if (property.contains("hasKey") || property.contains("hasCropTypeName") || property.contains("hasName")) {
+            } else if (STRINGPROPERTIES.contains(property)) {
                 obdaFile.append("mappingId\tmapp");
                 obdaFile.append(mappingId);
                 mappingId++;
@@ -402,7 +422,7 @@ public class StrabonLivyRepo implements Repository {
                 obdaFile.append(predDictionary.get(property));
                 obdaFile.append("\n");
                 obdaFile.append("\n");
-            } else if (property.contains("hasRECDATE")) {
+            } else if (DATETIMEPROPERTIES.contains(property)) {
                 obdaFile.append("mappingId\tmapp");
                 obdaFile.append(mappingId);
                 mappingId++;
