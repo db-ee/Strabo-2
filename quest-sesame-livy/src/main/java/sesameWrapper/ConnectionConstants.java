@@ -87,7 +87,7 @@ public class ConnectionConstants {
         STATISTICSFILE = properties.getString("statisticsfile");
         ASWKTFILE = properties.getString("asWKTfile");
         GOOGLEMAPSKEY = properties.getString("googlemapskey");
-        USECACHE = properties.getBoolean("usecahce");
+        USECACHE = properties.getBoolean("usecache");
 
         log.trace("Strabon Properties Loaded.");
     }
