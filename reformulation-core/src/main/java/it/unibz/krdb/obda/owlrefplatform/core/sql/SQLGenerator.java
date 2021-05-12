@@ -906,6 +906,9 @@ public class SQLGenerator implements SQLQueryGenerator {
 						termStr = getSQLLexicalForm((ValueConstant) term);
 					} else {
 						termStr = getSQLString(term, index, false);
+						if(function.getName().equals("http://www.opengis.net/ont/geosparql#wktLiteral") && transformGeoToWKT){
+							termStr = "ST_AsText(" + termStr + ")";
+						}
 					}
 				}
 				mainColumn = termStr;
@@ -1295,11 +1298,11 @@ public class SQLGenerator implements SQLQueryGenerator {
 					if (isStringColType(currentTerm, index)) {
 						repl = replace1 + (getSQLString(currentTerm, index, false)) + replace2;
 					} else {
-						if (isGeomColType(currentTerm, index)){
-							repl =  sqladapter.sqlCast(getSQLString(currentTerm, index, false), 1111);
-						}
-						else
-							repl = replace1 + sqladapter.sqlCast(getSQLString(currentTerm, index, false), Types.VARCHAR) + replace2;
+						//if (isGeomColType(currentTerm, index)){
+						//	repl =  sqladapter.sqlCast(getSQLString(currentTerm, index, false), 1111);
+						//}
+						//else
+						repl = replace1 + sqladapter.sqlCast(getSQLString(currentTerm, index, false), Types.VARCHAR) + replace2;
 					}
 					vex.add(repl);
 					if (termIndex < split.length ) {
