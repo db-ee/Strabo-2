@@ -27,6 +27,7 @@ import it.unibz.krdb.obda.model.impl.OBDAVocabulary;
 import it.unibz.krdb.obda.model.impl.TermUtils;
 import it.unibz.krdb.obda.ontology.Assertion;
 import it.unibz.krdb.obda.owlrefplatform.core.basicoperations.DatalogNormalizer;
+import it.unibz.krdb.obda.owlrefplatform.core.dagjgrapht.Equivalences;
 import it.unibz.krdb.obda.owlrefplatform.core.queryevaluation.SPARQLQueryUtility;
 import it.unibz.krdb.obda.owlrefplatform.core.resultset.EmptyQueryResultSet;
 import it.unibz.krdb.obda.owlrefplatform.core.resultset.QuestGraphResultSet;
@@ -105,6 +106,7 @@ public class StrabonStatement implements OBDAStatement {
 
 	private NodeSelectivityEstimator nse;
 	private boolean cache;
+	private Set<String> asWKTTables;
 
 	public StrabonStatement(Quest questinstance, QuestConnection conn, Statement st, NodeSelectivityEstimator nse) {
 
@@ -594,9 +596,17 @@ public class StrabonStatement implements OBDAStatement {
 							.createDatabaseRelation(relation);
 					for (String t : cq.getSignature()) {
 						try {
-							replacement.addAttribute(
-									questInstance.getMetaData().getQuotedIDFactory().createAttributeID(t.toString()),
-									Types.VARCHAR, "VARCHAR", false);
+							if(isGeometry(t, cq)){
+								replacement.addAttribute(
+										questInstance.getMetaData().getQuotedIDFactory().createAttributeID(t.toString()),
+										Types.BINARY, "geometry", false);
+							}
+							else {
+								replacement.addAttribute(
+										questInstance.getMetaData().getQuotedIDFactory().createAttributeID(t.toString()),
+										Types.VARCHAR, "VARCHAR", false);
+							}
+
 						} catch (IllegalArgumentException e) {
 							log.debug("Attribute already exists");
 						}
@@ -763,6 +773,18 @@ public class StrabonStatement implements OBDAStatement {
 		return sql;
 	}
 
+	private boolean isGeometry(String name, CQIE cq) {
+		for(Function f : cq.getBody()) {
+			if (f.getFunctionSymbol().getName().equals("http://www.opengis.net/ont/geosparql#asWKT") ||
+			asWKTTables.contains(f.getFunctionSymbol().getName())) {
+				if (f.getTerms().get(1).toString().equals(name)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 	public Set<String> getTablesToCache() {
 		Set<String> result = new HashSet<>();
 		for(String temp:temporaryCachedTables){
@@ -908,14 +930,24 @@ public class StrabonStatement implements OBDAStatement {
 		List<String> signature = new ArrayList<String>(cc.getVars().size());
 		List<Term> outputs = new ArrayList<Term>();
 		for (Term t : cc.getVars()) {
-			Constant uriTemplate = fac.getConstantLiteral("{}");
-			Term f = fac.getUriTemplate(uriTemplate, t);
+			//Constant uriTemplate = fac.getConstantLiteral("{}");
+			//Term f = fac.getUriTemplate(uriTemplate, t);
+			Term f = fac.getVariable(t.toString());
 			if (existentialVars.contains(t) || varsInSpatial.contains(t)) {
 				outputs.add(f);
 				signature.add(t.toString());
-				replacement.addAttribute(
-						questInstance.getMetaData().getQuotedIDFactory().createAttributeID(t.toString()),
-						Types.VARCHAR, "VARCHAR", false);
+				if(varsInSpatial.contains(t)){
+					//geometry
+					replacement.addAttribute(
+							questInstance.getMetaData().getQuotedIDFactory().createAttributeID(t.toString()),
+							Types.BINARY, "geometry", false);
+				}
+				else{
+					replacement.addAttribute(
+							questInstance.getMetaData().getQuotedIDFactory().createAttributeID(t.toString()),
+							Types.VARCHAR, "VARCHAR", false);
+				}
+
 			}
 		}
 		Function ans1 = fac.getFunction(fac.getPredicate(OBDAVocabulary.TEMP_VIEW_QUERY + id, outputs.size()),
@@ -1165,6 +1197,10 @@ public class StrabonStatement implements OBDAStatement {
 	 */
 	public int insertData(Iterator<Assertion> data, int commit, int batch) throws SQLException {
 		return -1;
+	}
+
+	public void setWKTTables (Set<String> tables) {
+		this.asWKTTables = tables;
 	}
 
 }

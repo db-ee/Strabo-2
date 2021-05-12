@@ -226,6 +226,7 @@ public class QueryExecutor {
                     e.printStackTrace();
                 }
                 StrabonStatement st = reasoner.createStrabonStatement(nse);
+                st.setWKTTables(asWKTSubpropertiesToTables.keySet());
                 st.useCache(cache);
                 List<String> sparqlQueries = new ArrayList<String>();
                 List<String> sqlQueries = new ArrayList<String>();

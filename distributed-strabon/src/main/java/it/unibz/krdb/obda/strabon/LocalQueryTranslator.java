@@ -124,6 +124,7 @@ public class LocalQueryTranslator {
 				}
 				StrabonStatement st = reasoner.createStrabonStatement(nse);
 				st.useCache(true);
+				st.setWKTTables(asWKTSubpropertiesToTables.keySet());
 				List<String> sparqlQueries = new ArrayList<String>();
 
 				String[] query_files = readFilesFromDir(queriesPath);

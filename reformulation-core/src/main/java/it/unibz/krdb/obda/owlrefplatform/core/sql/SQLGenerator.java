@@ -243,8 +243,10 @@ public class SQLGenerator implements SQLQueryGenerator {
 //			log.debug("Normalized CQ: \n{}", cq);
 
 			Predicate headPredicate = cq.getHead().getFunctionSymbol();
+			boolean isTempView = headPredicate.getName().toString().startsWith(OBDAVocabulary.TEMP_VIEW_QUERY);
+
 			if (!(headPredicate.getName().toString().equals(OBDAVocabulary.QUEST_QUERY)
-					|| headPredicate.getName().toString().startsWith(OBDAVocabulary.TEMP_VIEW_QUERY))) {
+					|| isTempView)) {
 				// not a target query, skip it.
 				continue;
 			}
@@ -258,7 +260,7 @@ public class SQLGenerator implements SQLQueryGenerator {
 
 			String FROM = getFROM(cq, index);
 			String WHERE = getWHERE(cq, index);
-			String SELECT = getSelectClause(signature, cq, index, innerdistincts);
+			String SELECT = getSelectClause(signature, cq, index, innerdistincts, !isTempView);
 
 			String querystr = SELECT + FROM + WHERE;
 			
@@ -286,7 +288,7 @@ public class SQLGenerator implements SQLQueryGenerator {
 			}
 			
 			
-			if(headPredicate.getName().toString().startsWith(OBDAVocabulary.TEMP_VIEW_QUERY)) {
+			if(isTempView) {
 				tempResults.add(querystr);
 				tempNames.add(headPredicate.getName().toString());
 			}
@@ -798,7 +800,7 @@ public class SQLGenerator implements SQLQueryGenerator {
 	 * @return the sql select clause
 	 */
 	private String getSelectClause(List<String> signature, CQIE query,
-			QueryAliasIndex index, boolean distinct) throws OBDAException {
+			QueryAliasIndex index, boolean distinct, boolean transformGeoToWKT) throws OBDAException {
 		/*
 		 * If the head has size 0 this is a boolean query.
 		 */
@@ -833,7 +835,7 @@ public class SQLGenerator implements SQLQueryGenerator {
 			Term ht = hit.next();
 			//String typeColumn = getTypeColumnForSELECT(ht, signature, hpos, sqlVariableNames);
 			//String langColumn = getLangColumnForSELECT(ht, signature, hpos,	index, sqlVariableNames);
-			String mainColumn = getMainColumnForSELECT(ht, signature, hpos, index, sqlVariableNames);
+			String mainColumn = getMainColumnForSELECT(ht, signature, hpos, index, sqlVariableNames, transformGeoToWKT);
 
 			sb.append("\n   ");
 			//sb.append(typeColumn);
@@ -850,7 +852,7 @@ public class SQLGenerator implements SQLQueryGenerator {
 	}
 
 	private String getMainColumnForSELECT(Term ht,
-			List<String> signature, int hpos, QueryAliasIndex index, Set<String> sqlVariableNames) {
+			List<String> signature, int hpos, QueryAliasIndex index, Set<String> sqlVariableNames, boolean transformGeoToWKT) {
 
 		/**
 		 * Creates a variable name that fits to the restrictions of the SQL dialect.
@@ -871,6 +873,9 @@ public class SQLGenerator implements SQLQueryGenerator {
 		else if (ht instanceof Variable) {
 			Variable v = (Variable) ht;
 			mainColumn = sqladapter.sqlCast(getSQLString(ht, index, false), Types.VARCHAR);
+			if(transformGeoToWKT && isGeomColType(v, index)){
+				mainColumn = "ST_AsText(" + v.getName() + ")";
+			}
 		}
 		else if (ht instanceof Function) {
 		
@@ -1375,7 +1380,7 @@ public class SQLGenerator implements SQLQueryGenerator {
 			DatabaseRelationDefinition table = metadata.getDatabaseRelation(tableId);
 			if (table != null) {
 	 			Attribute a = table.getAttribute(attributeId);
-				if (a.getType()==1111 || a.getType()== 2004) 
+				if (a.getSQLTypeName().equals("geometry"))
 					return true;
 				else
 					return false;
@@ -1384,6 +1389,8 @@ public class SQLGenerator implements SQLQueryGenerator {
 		return false;
 
 	}
+
+
 	
 	private boolean isStringColType(Term term, QueryAliasIndex index) {
 		if (term instanceof Function) {

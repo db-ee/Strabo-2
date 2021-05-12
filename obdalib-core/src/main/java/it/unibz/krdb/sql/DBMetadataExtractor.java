@@ -297,10 +297,13 @@ public class DBMetadataExtractor {
 			if (printouts)
 				System.out.println("         " + relationId + "." + attributeId2);
 
-			// columnNoNulls, columnNullable, columnNullableUnknown
-			isNullable = false;
-			typeName = "string";
-			dataType = java.sql.Types.VARCHAR;
+
+			if(relationId.getTableName().startsWith("tablewkt")){
+				//geometry data type
+				typeName = "geometry";
+				dataType = Types.BINARY;
+			}
+
 			// TODO change for numerics
 			currentRelation.addAttribute(attributeId2, dataType, typeName, isNullable);
 			
@@ -326,15 +329,15 @@ public class DBMetadataExtractor {
 				dataType = java.sql.Types.VARCHAR;
 				// TODO change for numerics
 				currentRelation.addAttribute(attributeId4, dataType, typeName, isNullable);
-				
+
 				QuotedID attributeId5 = QuotedID.createIdFromDatabaseRecord("wkt");
 				if (printouts)
 					System.out.println("         " + relationId + "." + attributeId5);
 
 				// columnNoNulls, columnNullable, columnNullableUnknown
 				isNullable = false;
-				typeName = "string";
-				dataType = java.sql.Types.VARCHAR;
+				typeName = "geometry";
+				dataType = Types.BINARY;
 				// TODO change for numerics
 				currentRelation.addAttribute(attributeId5, dataType, typeName, isNullable);
 				UniqueConstraint.Builder builder = UniqueConstraint.builder(currentRelation);
