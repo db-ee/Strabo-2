@@ -3,12 +3,13 @@
  */
 package madgik.exareme.master.queryProcessor.decomposer.query;
 
-import com.google.common.hash.HashCode;
 import madgik.exareme.master.queryProcessor.decomposer.dag.Node;
+import madgik.exareme.master.queryProcessor.decomposer.dag.ResultList;
 import madgik.exareme.master.queryProcessor.decomposer.util.Util;
-import madgik.exareme.master.queryProcessor.sparql.UnionWrapperInfo;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.google.common.hash.HashCode;
 
 import java.util.*;
 
@@ -38,7 +39,6 @@ public class SQLQuery {
 	private int limit;
 	private boolean isUnionAll;
 	private String unionAlias;
-	private List<UnionWrapperInfo> unions;
 	// private String nestedSelectSubqueryAlias;
 	private boolean hasUnionRootNode;
 	private SQLQuery leftJoinTable;
@@ -63,6 +63,8 @@ public class SQLQuery {
 	private boolean isCreateIndex;
 	private String stringOutputs;
 
+	private double estimatedSize;
+
 	public SQLQuery() {
 		super();
 		temporaryTableName = "table" + Util.createUniqueId();
@@ -85,7 +87,6 @@ public class SQLQuery {
 		joinNode = null;
 		joinOperands = new ArrayList<Operand>();
 		tableToSplit = -1;
-		unions=new ArrayList<UnionWrapperInfo>();
 	}
 
 	public String toDistSQL() {
@@ -239,8 +240,7 @@ public class SQLQuery {
 			} // else {
 
 			String joinKeyword = " JOIN \n";
-			boolean useCrossJoin=false;
-			if (useCrossJoin) {
+			//if (ParjUtils.USE_CROSS_JOIN) {
 				joinKeyword = " CROSS JOIN \n";
 
 				for (Table t : getInputTables()) {
@@ -251,7 +251,7 @@ public class SQLQuery {
 					separator = joinKeyword;
 				}
 
-			}
+			//}
 		}
 		separator = "";
 
@@ -1271,16 +1271,6 @@ public class SQLQuery {
 		for (Table t : this.inputTables) {
 			if (t.isInverse()) {
 				inverses.add(t.getAlias());
-				if(t.getName()>1024){
-					//union wrapper table
-					t.setInverse(false);
-					for(UnionWrapperInfo uwi:this.unions){
-						if(uwi.getAlias()==t.getName()){
-							uwi.inverseTables();
-							break;
-						}
-					}
-				}
 			}
 		}
 		if (inverses.isEmpty()) {
@@ -1307,7 +1297,6 @@ public class SQLQuery {
 
 	public List<String> computeExtraCreates(int partitions) {
 		List<String> result=new ArrayList<String>();
-		//result.addAll(this.unions);
 		int counter=1;
 		Set<Integer> existingTables=new HashSet<Integer>(inputTables.size());
 		for(Table t:inputTables){
@@ -1328,14 +1317,12 @@ public class SQLQuery {
 		}
 		return result;
 	}
-	
-	public void addUnionWrapper(UnionWrapperInfo createStmt){
-		this.unions.add(createStmt);
+
+	public void setEstimatedSize(double estimatedSize) {
+		this.estimatedSize = estimatedSize;
 	}
 
-	public List<UnionWrapperInfo> getUnions() {
-		return this.unions;
+	public double getEstimatedSize(){
+		return estimatedSize;
 	}
-	
-
 }

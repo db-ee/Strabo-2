@@ -5,10 +5,10 @@ package madgik.exareme.master.queryProcessor.estimator.db;
  * and open the template in the editor.
  */
 
-import madgik.exareme.master.queryProcessor.analyzer.stat.JoinCardinalities;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import madgik.exareme.master.queryProcessor.analyzer.stat.JoinCardinalities;
 
 /**
  * @author jim
@@ -18,7 +18,6 @@ public class Schema {
 	private String schemaName;
 	private Map<Integer, RelInfo> tableIndex;
 	private JoinCardinalities cards;
-	private Map<String, Long> unionCards;
 
 	/* constructor */
 	public Schema(String schemaName, Map<Integer, RelInfo> relIndex) {
@@ -60,14 +59,6 @@ public class Schema {
 
 	public void setCards(JoinCardinalities cards) {
 		this.cards = cards;
-	}
-
-	public Map<String, Long> getUnionCards() {
-		return unionCards;
-	}
-
-	public void setUnionCards(Map<String, Long> unionCards) {
-		this.unionCards = unionCards;
 	}
 	
 	

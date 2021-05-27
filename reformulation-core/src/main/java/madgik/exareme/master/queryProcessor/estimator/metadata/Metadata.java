@@ -6,7 +6,8 @@
 package madgik.exareme.master.queryProcessor.estimator.metadata;
 
 import madgik.exareme.master.queryProcessor.estimator.db.Schema;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 /**
  * @author jim
  */
@@ -27,6 +28,7 @@ public final class Metadata {
 	public static final int NUMBER_SIZE = 8; // bytes
 	public static final int TEXT_SIZE = 200;// bytes
 	public static final double INDEX_UTILIZATION = 0.01;
+	public static final double SPATIAL_INDEX_CREATION = 0.00007;
 
 	private static Schema schema;
 

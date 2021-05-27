@@ -13,7 +13,6 @@ import madgik.exareme.master.queryProcessor.decomposer.query.Selection;
 import madgik.exareme.master.queryProcessor.estimator.metadata.Metadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.util.List;
 
 import static madgik.exareme.master.queryProcessor.estimator.metadata.Metadata.NETWORK_RATE;
@@ -26,7 +25,28 @@ public class NodeCostEstimator {
 	private static final Logger log = LoggerFactory.getLogger(NodeCostEstimator.class);
 	private int partitionNo;
 
-	public Double getCostForOperator(Node o) {
+    public static double getCostForSpatialJoin(NodeInfo stats, NodeInfo stats1, NonUnaryWhereCondition join) {
+		double leftRelTuples = stats.getNumberOfTuples();
+		// double leftRelSize = left.getNodeInfo().outputRelSize();
+		double rightRelTuples = stats1.getNumberOfTuples();
+
+		double responseTime = -1.0;
+
+		responseTime = leftRelTuples * Metadata.SPATIAL_INDEX_CREATION + rightRelTuples * Metadata.SPATIAL_INDEX_CREATION;
+		//}
+
+		if (leftRelTuples < 1 || rightRelTuples < 1) {
+			return 0.0;
+		}
+
+		if (Double.isNaN(responseTime)) {
+			System.err.println("cost in Nan");
+			//throw new Exception("NaN");
+		}
+		return responseTime;
+    }
+
+    public Double getCostForOperator(Node o) {
 		if (o.getOpCode() == Node.JOIN) {
 			if (o.getChildren().size() == 1) {
 				return 0.0;
@@ -434,18 +454,13 @@ public class NodeCostEstimator {
 		// }*/
 
 		//if (responseTime < 0) {
-		if (leftRelTuples < 1 || rightRelTuples < 1) {
-			return 0.0;
-		}
-		if(rightRelTuples<5) {
-			//avoid log of very small values;
-			rightRelTuples=5;
-		}
 			responseTime = leftRelTuples * Math.log(rightRelTuples) * Metadata.PAGE_IO_TIME
 					* Metadata.INDEX_UTILIZATION;
 		//}
 
-		
+		if (leftRelTuples < 1 || rightRelTuples < 1) {
+			return 0.0;
+		}
 
 		if (Double.isNaN(responseTime)) {
 			System.err.println("cost in Nan");
@@ -514,18 +529,13 @@ public class NodeCostEstimator {
 		// }*/
 
 		//if (responseTime < 0) {
-		if (leftRelTuples < 1 || rightRelTuples < 1) {
-			return 0.0;
-		}
-		if(rightRelTuples<5) {
-			//avoid log of very small values;
-			rightRelTuples=5;
-		}
-		
 			responseTime = leftRelTuples * Math.log(rightRelTuples) * Metadata.PAGE_IO_TIME
 					* Metadata.INDEX_UTILIZATION * Metadata.INDEX_UTILIZATION;
 		//}
-		
+
+		if (leftRelTuples < 1 || rightRelTuples < 1) {
+			return 0.0;
+		}
 
 		if (Double.isNaN(responseTime)) {
 			System.err.println("cost in Nan");

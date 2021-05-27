@@ -341,7 +341,7 @@ public class StrabonLivyRepo implements Repository {
         obdaFile.append("[MappingDeclaration] @collection [[");
         obdaFile.append("\n");
 
-        int asWKTsubproperty = 0;
+        int asWKTsubproperty = 2;
         int mappingId = 0;
 
         for (String property : predDictionary.keySet()) {

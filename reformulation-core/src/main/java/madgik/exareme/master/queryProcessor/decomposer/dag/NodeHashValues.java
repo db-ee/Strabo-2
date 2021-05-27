@@ -4,12 +4,13 @@
  */
 package madgik.exareme.master.queryProcessor.decomposer.dag;
 
-import com.google.common.hash.HashCode;
 import madgik.exareme.master.queryProcessor.estimator.NodeSelectivityEstimator;
+
+import java.util.HashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
+import com.google.common.hash.HashCode;
 
 /**
  * @author dimitris
@@ -23,7 +24,7 @@ public class NodeHashValues extends HashMap<HashCode, Node> {
 	private NodeSelectivityEstimator nse;
 	private boolean containsRangeJoin = false;
 	private static final Logger log = LoggerFactory.getLogger(NodeHashValues.class);
-	
+
 	public void setSelectivityEstimator(NodeSelectivityEstimator nse) {
 		this.nse = nse;
 	}

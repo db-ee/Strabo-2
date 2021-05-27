@@ -5,7 +5,9 @@
  */
 package madgik.exareme.master.queryProcessor.estimator;
 
+import madgik.exareme.master.queryProcessor.estimator.db.AttrInfo;
 import madgik.exareme.master.queryProcessor.estimator.db.RelInfo;
+import madgik.exareme.master.queryProcessor.estimator.histogram.Bucket;
 
 /**
  * @author jim
@@ -61,4 +63,14 @@ public final class NodeInfo {
 	public double outputRelSize() {
 		return this.numberOfTuples * this.tupleLength;
 	}
+
+    public void applySelectivity(double selectivity) {
+		this.numberOfTuples = this.numberOfTuples * selectivity;
+		for(AttrInfo attInfo:this.resultRel.getAttrIndex().values()) {
+			for(Bucket b:attInfo.getHistogram().getBucketIndex().values()) {
+				b.setFrequency(b.getFrequency()*selectivity);
+			}
+		}
+		this.resultRel.setNumberOfTuples(this.numberOfTuples);
+    }
 }

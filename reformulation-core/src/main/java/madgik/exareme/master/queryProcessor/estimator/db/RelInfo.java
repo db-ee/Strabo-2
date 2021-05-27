@@ -4,16 +4,17 @@
  */
 package madgik.exareme.master.queryProcessor.estimator.db;
 
+import madgik.exareme.master.queryProcessor.decomposer.dag.NodeHashValues;
 import madgik.exareme.master.queryProcessor.decomposer.query.Column;
 import madgik.exareme.master.queryProcessor.estimator.histogram.Bucket;
 import madgik.exareme.master.queryProcessor.estimator.histogram.Histogram;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -25,6 +26,7 @@ public class RelInfo {
 	private double numberOfTuples;
 	private int tupleLength;
 	private static final Logger log = LoggerFactory.getLogger(RelInfo.class);
+
 	/* constructor */
 	public RelInfo(int relName, Map<Column, AttrInfo> attrIndex, double numberOfTuples, int tupleLength) {
 
@@ -199,5 +201,6 @@ public class RelInfo {
 		attrIndex.remove(oldName);
 
 	}
+
 
 }

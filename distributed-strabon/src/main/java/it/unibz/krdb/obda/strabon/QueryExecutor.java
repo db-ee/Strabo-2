@@ -220,12 +220,17 @@ public class QueryExecutor {
                 /// query repo
                 NodeSelectivityEstimator nse = null;
                 try {
-                    nse = new NodeSelectivityEstimator(statfile);
+                    Path path = new Path(statfile);
+                    BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(path)));
+                    nse = new NodeSelectivityEstimator(br);
                 } catch (Exception e) {
-                    // TODO Auto-generated catch block
+                    log.debug("Could not read statistics file");
                     e.printStackTrace();
                 }
                 StrabonStatement st = reasoner.createStrabonStatement(nse);
+                Map<String, String> predDictionaryStat = readPredicatesFromHadoop(propDictionary+".stat", fs);
+                st.setPredicateDictionaryForStatistics(predDictionaryStat);
+                log.debug("Stat pred dictionary: \n"+predDictionaryStat);
                 st.setWKTTables(asWKTSubpropertiesToTables.keySet());
                 st.useCache(cache);
                 List<String> sparqlQueries = new ArrayList<String>();
@@ -385,7 +390,7 @@ public class QueryExecutor {
         obdaFile.append("[MappingDeclaration] @collection [[");
         obdaFile.append("\n");
 
-        int asWKTsubproperty = 0;
+        int asWKTsubproperty = 2;
         int mappingId = 0;
 
         for (String property : predDictionary.keySet()) {

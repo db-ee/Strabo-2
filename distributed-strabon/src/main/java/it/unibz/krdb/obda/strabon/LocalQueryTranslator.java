@@ -123,6 +123,8 @@ public class LocalQueryTranslator {
 					e.printStackTrace();
 				}
 				StrabonStatement st = reasoner.createStrabonStatement(nse);
+				Map<String, String> predDictionaryStat = readPredicates(propDictionary+".stat");
+				st.setPredicateDictionaryForStatistics(predDictionaryStat);
 				st.useCache(true);
 				st.setWKTTables(asWKTSubpropertiesToTables.keySet());
 				List<String> sparqlQueries = new ArrayList<String>();
@@ -131,7 +133,7 @@ public class LocalQueryTranslator {
 				for (String queryfile : query_files) {
 					System.out.println("Starting execution of query "+queryfile);
 					String sparql = readFile(queryfile);
-					SQLResult sql = st.getUnfolding(sparql, true);
+					SQLResult sql = st.getUnfolding(sparql, false);
 					System.out.println("temp table to be cached: "+st.getTablesToCache().toString());
 					System.out.println(sql.getTextResult());
 				}
@@ -177,7 +179,7 @@ public class LocalQueryTranslator {
 
 
 		int mappingId = 0;
-		int asWKTsubproperty = 0;
+		int asWKTsubproperty = 2;
 		for (String property : predDictionary.keySet()) {
 
 			if (property.equals("http://www.opengis.net/ont/geosparql#asWKT")) {

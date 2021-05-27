@@ -5,6 +5,8 @@ package madgik.exareme.master.queryProcessor.decomposer.query;
 
 import java.util.List;
 
+import com.google.common.hash.HashCode;
+
 
 public class SQLColumn implements Operand {
 

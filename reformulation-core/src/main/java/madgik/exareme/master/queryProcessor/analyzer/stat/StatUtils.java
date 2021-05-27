@@ -8,10 +8,12 @@ package madgik.exareme.master.queryProcessor.analyzer.stat;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
 import madgik.exareme.master.queryProcessor.estimator.db.Schema;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.PrintWriter;
 import java.sql.Types;
 
@@ -97,7 +99,7 @@ public class StatUtils {
 		BufferedReader br = null;
 		Schema fileSchema = null;
 		File f = new File(filename);
-		/* if (f.exists() && !f.isDirectory()) {
+		if (f.exists() && !f.isDirectory()) {
 			br = new BufferedReader(new FileReader(filename));
 			Gson gson = new Gson();
 			fileSchema = gson.fromJson(br, Schema.class);
@@ -106,9 +108,9 @@ public class StatUtils {
 				fileSchema.getTableIndex().put(ri, s.getTableIndex().get(ri));
 			}
 
-		} else {*/
-		fileSchema = s;
-		//}
+		} else {
+			fileSchema = s;
+		}
 		Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
 		String jsonStr = gson.toJson(fileSchema);
 

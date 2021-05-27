@@ -38,7 +38,7 @@ public class StrabonParameters {
 		log.trace("Strabon Properties Loaded.");
 	}
 	
-	public static boolean isSpatialJoin(Function atom) {
+	public static boolean isSpatialFunction(Function atom) {
 		Predicate pred = atom.getFunctionSymbol();
 		if ( pred.equals(OBDAVocabulary.OVERLAPS) ||
 				pred.equals(OBDAVocabulary.SFCONTAINS) || 

@@ -5,7 +5,14 @@
 package madgik.exareme.master.queryProcessor.decomposer.query;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
+import com.google.common.hash.HashCode;
+import com.google.common.hash.Hashing;
+
+import madgik.exareme.master.queryProcessor.decomposer.dag.Node;
 
 /**
  * @author dimitris

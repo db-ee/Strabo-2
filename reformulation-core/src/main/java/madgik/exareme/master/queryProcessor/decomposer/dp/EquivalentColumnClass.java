@@ -1,22 +1,45 @@
 package madgik.exareme.master.queryProcessor.decomposer.dp;
 
-import madgik.exareme.master.queryProcessor.decomposer.query.Column;
-
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import it.unibz.krdb.obda.model.Function;
+import madgik.exareme.master.queryProcessor.decomposer.query.Column;
 
 public class EquivalentColumnClass {
 	
 	private Set<Column> cols;
 	private Map<Integer, Column> tables;
 	private boolean used;
+	private boolean isSpatial;
+	private Function spatialJoin;
+
+
+
 	public EquivalentColumnClass(Set<Column> cols) {
 		super();
 		this.cols = cols;
 		used=false;
 		computeTables();
+		isSpatial = false;
+		spatialJoin = null;
 	}
+
+
+	public void setSpatial( boolean b) {
+		isSpatial = b;
+	}
+
+	public Function getSpatialJoin() {
+		return spatialJoin;
+	}
+
+	public void setSpatialJoin(Function spatialJoin) {
+		this.spatialJoin = spatialJoin;
+	}
+
 	private void computeTables() {
 		this.tables=new HashMap<Integer, Column>();
 		for(Column c:this.cols){
@@ -44,7 +67,9 @@ public class EquivalentColumnClass {
 		}
 		
 	}
-	
-	
 
+
+	public boolean isSpatial() {
+		return isSpatial;
+	}
 }

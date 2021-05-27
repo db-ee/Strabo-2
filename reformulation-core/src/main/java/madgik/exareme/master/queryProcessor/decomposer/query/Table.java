@@ -13,7 +13,7 @@ public class Table {
 	private int replica;
 	private int dictionary;
 	private boolean inverse;
-	private static final Logger log = LoggerFactory.getLogger(Table.class);
+    private static final Logger log = LoggerFactory.getLogger(Table.class);
 	
 
 	public Table(int n, int a) {
