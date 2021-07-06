@@ -637,33 +637,37 @@ public class StrabonStatement implements OBDAStatement {
 
                 final long startTime = System.currentTimeMillis();
 
+
+
+                if (splitSpatialJoin) {
+                    try {
+                        programAfterSplittingSpatialJoin = splitSpatialJoin(program);
+                    } catch (Exception e) {
+                        log.error("Could not split query based on spatial join" + e.getMessage());
+                        programAfterSplittingSpatialJoin = program;
+                    }
+                } else {
+                    programAfterSplittingSpatialJoin = program;
+                }
+
                 //DatalogProgram programAfterOptimization = null;
-                DatalogProgram programAfterOptimization = program.clone();
+                DatalogProgram programAfterOptimization = programAfterSplittingSpatialJoin.clone();
                 try {
                     optimize(programAfterOptimization);
                 } catch (Exception e) {
                     log.error("Error while optimizing query. Using default translation. " + e.getMessage());
-                    programAfterOptimization = program;
+                    programAfterOptimization = programAfterSplittingSpatialJoin;
                 }
 
-                programAfterUnfolding = getUnfolding(programAfterOptimization);
+                programAfterUnfolding = getUnfolding(programAfterSplittingSpatialJoin);
 
 
                 unfoldingTime = System.currentTimeMillis() - startTime;
-                if (splitSpatialJoin) {
-                    try {
-                        programAfterSplittingSpatialJoin = splitSpatialJoin(programAfterUnfolding);
-                    } catch (Exception e) {
-                        log.error("Could not split query based on spatial join" + e.getMessage());
-                        programAfterSplittingSpatialJoin = programAfterUnfolding;
-                    }
-                } else {
-                    programAfterSplittingSpatialJoin = programAfterUnfolding;
-                }
+
 
 
                 if (cache) {
-                    for (CQIE cq : programAfterSplittingSpatialJoin.getRules()) {
+                    for (CQIE cq : programAfterUnfolding.getRules()) {
                         Set<Variable> previousVariables = new HashSet<>();
                         for (int i = 0; i < cq.getBody().size(); i++) {
                             Function atom = cq.getBody().get(i);
@@ -761,7 +765,7 @@ public class StrabonStatement implements OBDAStatement {
                 }
 
 
-                sql = getSQL(programAfterSplittingSpatialJoin, signatureContainer);
+                sql = getSQL(programAfterUnfolding, signatureContainer);
                 // cacheQueryAndProperties(strquery, sql);
                 questInstance.cacheSQL(strquery, sql);
             } catch (Exception e1) {
