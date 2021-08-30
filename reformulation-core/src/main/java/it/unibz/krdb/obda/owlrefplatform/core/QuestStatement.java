@@ -484,7 +484,7 @@ public class QuestStatement implements OBDAStatement {
 		log.debug("Producing the SQL string...");
 
 		// query = DatalogNormalizer.normalizeDatalogProgram(query);
-		String sql = questInstance.getDatasourceQueryGenerator().generateSourceQuery(query, signature).getMainQuery();
+		String sql = questInstance.getDatasourceQueryGenerator().generateSourceQuery(query, signature, false).getMainQuery();
 
 		log.debug("Resulting SQL: \n{}", sql);
 		return sql;

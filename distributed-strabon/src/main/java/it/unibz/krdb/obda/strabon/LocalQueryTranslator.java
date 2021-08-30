@@ -125,7 +125,9 @@ public class LocalQueryTranslator {
 				StrabonStatement st = reasoner.createStrabonStatement(nse);
 				Map<String, String> predDictionaryStat = readPredicates(propDictionary+".stat");
 				st.setPredicateDictionaryForStatistics(predDictionaryStat);
-				st.useCache(true);
+				st.useCache(false);
+				st.setUseSpatialCache(true);
+				st.setCacheSpatialIndex(false);
 				st.setWKTTables(asWKTSubpropertiesToTables.keySet());
 				List<String> sparqlQueries = new ArrayList<String>();
 

@@ -1,5 +1,10 @@
 package it.unibz.krdb.obda.strabon;
 
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.io.WKTReader;
 import it.unibz.krdb.obda.io.ModelIOManager;
 import it.unibz.krdb.obda.model.OBDADataFactory;
 import it.unibz.krdb.obda.model.OBDAModel;
@@ -12,15 +17,23 @@ import it.unibz.krdb.obda.owlrefplatform.owlapi3.QuestOWL;
 import it.unibz.krdb.obda.owlrefplatform.owlapi3.QuestOWLConfiguration;
 import it.unibz.krdb.obda.owlrefplatform.owlapi3.QuestOWLFactory;
 import it.unibz.krdb.obda.utils.StrabonParameters;
+import madgik.exareme.master.queryProcessor.decomposer.util.Util;
 import madgik.exareme.master.queryProcessor.estimator.NodeSelectivityEstimator;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.serializer.KryoSerializer;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
+import org.apache.spark.storage.StorageLevel;
+import org.datasyslab.geospark.enums.IndexType;
+import org.datasyslab.geospark.formatMapper.WktReader;
+import org.datasyslab.geospark.spatialOperator.RangeQuery;
+import org.datasyslab.geospark.spatialRDD.SpatialRDD;
+import org.datasyslab.geosparksql.utils.Adapter;
 import org.datasyslab.geosparksql.utils.GeoSparkSQLRegistrator;
 import org.datasyslab.geosparkviz.core.Serde.GeoSparkVizKryoRegistrator;
 import org.semanticweb.owlapi.apibinding.OWLManager;
@@ -69,6 +82,12 @@ public class QueryExecutor {
 
     public static final Set<String> DATETIMEPROPERTIES = new HashSet<>(Arrays.asList("http://earthanalytics.eu/polar/ontology/hasRECDAT",
             "http://earthanalytics.eu/polar/ontology/hasRECDATE"));
+    private static boolean cacheSpatialIndex;
+    //cacheSpatialIndex will create an in-memory spatial index during initialization
+    //and it will use it for spatial selections
+    private static  boolean useQualitiveSpatialCache;
+    //useQualitiveSpatialCache that the qualitive spatial relations have been
+    //computed by JedAI-spatial and stored in table tblde9im in Hive
 
     public static void main(String[] args) throws Exception {
         {
@@ -92,6 +111,10 @@ public class QueryExecutor {
             if (args.length > 7) {
                 shufflePartitions = Integer.parseInt(args[7]);
             }
+            cacheSpatialIndex=false;
+            if (args.length > 8) {
+                cacheSpatialIndex = args[8].equals("true");
+            }
             //cache = true;
 
 
@@ -100,7 +123,7 @@ public class QueryExecutor {
 
                 final SparkSession spark = SparkSession.builder()
                         // .master("local[*]") // Delete this if run in cluster mode
-                        .appName("strabonQuery") // Change this to a proper name
+                        .appName("strabonQuery")
                         // Enable GeoSpark custom Kryo serializer
                         .config("spark.serializer", KryoSerializer.class.getName())
                         .config("spark.kryo.registrator", GeoSparkVizKryoRegistrator.class.getName())
@@ -144,7 +167,11 @@ public class QueryExecutor {
                 Map<String, String> predDictionary = readPredicatesFromHadoop(propDictionary, fs);
                 log.debug("property dictionary: " + predDictionary.toString());
                 boolean existDefaultGeometrytable = createObdaFile(predDictionary);
-
+                
+                Map<String, SpatialRDD<Geometry>> cachedIndexes = null;
+                if(cacheSpatialIndex) {
+                    cachedIndexes = new HashMap<>();
+                }
 
                 if (existDefaultGeometrytable) {
                     // preload geometeries
@@ -166,6 +193,17 @@ public class QueryExecutor {
                     log.debug("preloading asWKT subproperty tables");
                     Dataset<Row> geoms = spark
                             .sql("Select s, ST_GeomFromWKT(o) as o FROM " + predDictionary.get(asWKTsubprop) + " ");
+                    if(cacheSpatialIndex) {
+                        long start = System.currentTimeMillis();
+                        SpatialRDD<Geometry> spatialRDD = Adapter.toSpatialRdd(geoms, "o");
+                        spatialRDD.buildIndex(IndexType.QUADTREE, false);
+                        spatialRDD.indexedRawRDD.persist(StorageLevel.MEMORY_ONLY());
+                        spatialRDD.indexedRawRDD.cache();
+                        //spatialRDD.analyze();
+                        cachedIndexes.put(tblName, spatialRDD);
+                        log.debug("Caching index for geometry table " + tblName + "(" + asWKTsubprop +
+                                ") finished in "+ (System.currentTimeMillis()-start) + " milliseconds");
+                    }
                     geoms.createOrReplaceGlobalTempView(tblName);
                     geoms.cache();
                     long count = geoms.count();
@@ -174,6 +212,8 @@ public class QueryExecutor {
                     log.debug("Geometry table " + tblName + " created with " + count + " rows");
 
                 }
+
+
 
                 if (analyze) {
                     log.debug("Analyzing tables...");
@@ -228,8 +268,15 @@ public class QueryExecutor {
                     e.printStackTrace();
                 }
                 StrabonStatement st = reasoner.createStrabonStatement(nse);
-                Map<String, String> predDictionaryStat = readPredicatesFromHadoop(propDictionary+".stat", fs);
+                Map<String, String> predDictionaryStat = null;
+                try {
+                    predDictionaryStat = readPredicatesFromHadoop(propDictionary+".stat", fs);
+                } catch (Exception e) {
+                    log.debug("Could not read propDictionary statistics file");
+                    e.printStackTrace();
+                }
                 st.setPredicateDictionaryForStatistics(predDictionaryStat);
+                st.setCacheSpatialIndex(cacheSpatialIndex);
                 log.debug("Stat pred dictionary: \n"+predDictionaryStat);
                 st.setWKTTables(asWKTSubpropertiesToTables.keySet());
                 st.useCache(cache);
@@ -301,7 +348,41 @@ public class QueryExecutor {
                         if (emptyResult) {
                             continue;
                         }
-                        Dataset<Row> result = spark.sql(sql.getMainQuery().replaceAll("\"", ""));
+
+                        if(sql.getSpatialTable() != null ) {
+                            //GeometryFactory gf = new GeometryFactory();
+                            WKTReader r = new WKTReader();
+                            log.debug("Spatial Filter for: "+sql.getSpatialFilterConstant().getValue());
+
+                            Geometry g = r.read(sql.getSpatialFilterConstant().getValue());
+                            log.debug("Cached Indexes: "+cachedIndexes);
+                            log.debug("spatial table to remove: "+sql.getSpatialTableToRemove().getFunctionSymbol().getName());
+                            JavaRDD rdd = RangeQuery.SpatialRangeQuery(cachedIndexes.get(sql.getSpatialTableToRemove().getFunctionSymbol().getName().replace(StrabonParameters.TEMPORARY_SCHEMA_NAME+".","")), g, true, true);
+                            //gf.createGeometry(g);
+                            SpatialRDD mySpatialRDD = new SpatialRDD();
+                            List<String> fieldNames = new ArrayList<String>(1);
+                            //fieldNames.add("o");
+                            fieldNames.add("s");
+                            mySpatialRDD.rawSpatialRDD = rdd;
+                            log.debug("previous field names: "+mySpatialRDD.fieldNames);
+                            mySpatialRDD.fieldNames = fieldNames;
+                            log.debug("new spatial table:"+sql.getSpatialTable());
+                            Adapter.toDf(mySpatialRDD, spark).createGlobalTempView(sql.getSpatialTable());
+                            //String temp = "table"+Util.createUniqueId();
+                            //Adapter.toDf(mySpatialRDD, spark).createGlobalTempView(temp);
+                            //Dataset<Row> filter = spark.sql("Select geometry as o, _c1 as s from "+StrabonParameters.TEMPORARY_SCHEMA_NAME + "." +temp);
+                            //filter.createGlobalTempView(sql.getSpatialTable());
+                            log.debug("done executing spatial filter");
+
+                        }
+                        String sqlString = sql.getMainQuery().replaceAll("\"", "");
+                        if(sql.getSpatialTable() != null ) {
+                            sqlString = sqlString.replace(sql.getSpatialTableToRemove().getFunctionSymbol().getName(), StrabonParameters.TEMPORARY_SCHEMA_NAME +"."+sql.getSpatialTable());
+
+
+                        }
+                        log.debug("Executing main SQL: "+sqlString);
+                        Dataset<Row> result = spark.sql(sqlString);
                         //result.cache();
                         long resultSize = result.count();
 

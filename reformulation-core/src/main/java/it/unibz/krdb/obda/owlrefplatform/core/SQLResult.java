@@ -1,13 +1,20 @@
 package it.unibz.krdb.obda.owlrefplatform.core;
 
+import it.unibz.krdb.obda.model.Constant;
+import it.unibz.krdb.obda.model.Function;
+
 import java.util.List;
 
 public class SQLResult {
 	
 	private String mainQuery;
-	List<String> tempQueries;
-	List<String> tempNames;
-	List<String> outputs;
+	private List<String> tempQueries;
+	private List<String> tempNames;
+	private List<String> outputs;
+	private Constant spatialFilterConstant;
+	private String spatialTable;
+	private Function spatialTableToRemove;
+
 	
 	public SQLResult(String mainQuery, List<String> tempQueries, List<String> tempNames, List<String> outputs) {
 		super();
@@ -15,6 +22,8 @@ public class SQLResult {
 		this.tempQueries = tempQueries;
 		this.tempNames=tempNames;
 		this.outputs=outputs;
+		this.spatialFilterConstant = null;
+		this.spatialTable = null;
 	}
 	
 	public String getMainQuery() {
@@ -49,4 +58,27 @@ public class SQLResult {
 		return this.outputs;
 	}
 
+	public Constant getSpatialFilterConstant() {
+		return spatialFilterConstant;
+	}
+
+	public void setSpatialFilterConstant(Constant spatialFilterConstant) {
+		this.spatialFilterConstant = spatialFilterConstant;
+	}
+
+	public String getSpatialTable() {
+		return spatialTable;
+	}
+
+	public void setSpatialTable(String spatialTable) {
+		this.spatialTable = spatialTable;
+	}
+
+	public Function getSpatialTableToRemove() {
+		return spatialTableToRemove;
+	}
+
+	public void setSpatialTableToRemove(Function spatialTableToRemove) {
+		this.spatialTableToRemove = spatialTableToRemove;
+	}
 }

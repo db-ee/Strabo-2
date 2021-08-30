@@ -246,4 +246,9 @@ public class FunctionalTermImpl implements Function, ListListener {
 	public boolean isDataTypeFunction() {
 		return this.functor.isDataTypePredicate();
 	}
+
+	@Override
+	public boolean isSpatialRelationFunction() {
+		return this.functor.isSpatialRelationPredicate();
+	}
 }

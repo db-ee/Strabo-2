@@ -83,4 +83,6 @@ public interface Function extends Term {
 	boolean isDateTimeFunction();
 	
 	boolean isDataTypeFunction();
+
+	boolean isSpatialRelationFunction();
 }

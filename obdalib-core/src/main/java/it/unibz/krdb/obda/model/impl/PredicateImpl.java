@@ -21,6 +21,7 @@ package it.unibz.krdb.obda.model.impl;
  */
 
 import it.unibz.krdb.obda.model.*;
+import com.google.common.collect.ImmutableList;
 
 public class PredicateImpl implements Predicate {
 
@@ -32,6 +33,17 @@ public class PredicateImpl implements Predicate {
 	private String name = null;
 	private int identifier = -1;
 	private COL_TYPE[] types = null;
+
+	public static final ImmutableList<String> GEOMETRIES_RELATION_FUNCTIONS =
+			ImmutableList.of(	OBDAVocabulary.sfContains.toString(),
+					OBDAVocabulary.ehCoveredBy.toString(),
+					OBDAVocabulary.ehCovers.toString(),
+					OBDAVocabulary.sfCrosses.toString(),
+					OBDAVocabulary.sfEquals.toString(),
+					OBDAVocabulary.SFINTERSECTS.toString(),
+					OBDAVocabulary.strOverlaps.toString(),
+					OBDAVocabulary.sfTouches.toString(),
+					OBDAVocabulary.sfWithin.toString());
 
 	//constant: change the constructor again to public? 
 	
@@ -151,4 +163,13 @@ public class PredicateImpl implements Predicate {
 	public boolean isDateTimePredicate() {
 		return this instanceof DateTimeOperationPredicate;
 	}
+
+	@Override
+	public boolean isSpatialRelationPredicate() {
+		if (GEOMETRIES_RELATION_FUNCTIONS.contains(name)){
+			return true;
+		}
+		return false;
+	}
+
 }

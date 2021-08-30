@@ -139,4 +139,6 @@ public interface Predicate extends Cloneable, Serializable {
 	boolean isTriplePredicate();
 
 	boolean isDateTimePredicate();
+
+	boolean isSpatialRelationPredicate();
 }

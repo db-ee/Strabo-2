@@ -157,8 +157,8 @@ public class SQLGenerator implements SQLQueryGenerator {
 	 * method descriptions.
 	 */
 	@Override
-	public SQLResult generateSourceQuery(DatalogProgram query, List<String> signature) throws OBDAException {
-			return generateQuery(query, signature, "");
+	public SQLResult generateSourceQuery(DatalogProgram query, List<String> signature, boolean useSpatialCache) throws OBDAException {
+			return generateQuery(query, signature, "", useSpatialCache);
 		
 	}
 
@@ -197,7 +197,7 @@ public class SQLGenerator implements SQLQueryGenerator {
 	 * limit/offset/order by.
 	 */
 	private SQLResult generateQuery(DatalogProgram query, List<String> signature,
-			String indent) throws OBDAException {
+			String indent, boolean useSpatialCache) throws OBDAException {
 
 		int numberOfQueries = query.getRules().size();
 
@@ -258,8 +258,8 @@ public class SQLGenerator implements SQLQueryGenerator {
 				innerdistincts = true;
 			}
 
-			String FROM = getFROM(cq, index);
-			String WHERE = getWHERE(cq, index);
+			String FROM = getFROM(cq, index, useSpatialCache);
+			String WHERE = getWHERE(cq, index, useSpatialCache);
 			String SELECT = getSelectClause(signature, cq, index, innerdistincts, !isTempView);
 
 			String querystr = SELECT + FROM + WHERE;
@@ -325,13 +325,13 @@ public class SQLGenerator implements SQLQueryGenerator {
 	 * Returns a string with boolean conditions formed with the boolean atoms
 	 * found in the atoms list.
 	 */
-	private LinkedHashSet<String> getBooleanConditionsString(List<Function> atoms, QueryAliasIndex index) {
+	private LinkedHashSet<String> getBooleanConditionsString(List<Function> atoms, QueryAliasIndex index, boolean useSpatialCache) {
 		LinkedHashSet<String> conditions = new LinkedHashSet<String>();
 		for (int atomidx = 0; atomidx < atoms.size(); atomidx++) {
 			Term innerAtom = atoms.get(atomidx);
 			Function innerAtomAsFunction = (Function) innerAtom;
 			if (innerAtomAsFunction.isBooleanFunction()) {
-				String condition = getSQLCondition(innerAtomAsFunction, index);
+				String condition = getSQLCondition(innerAtomAsFunction, index, useSpatialCache);
 				conditions.add(condition);
 			}else if (innerAtomAsFunction.isDataTypeFunction()) {
 				String condition = getSQLString(innerAtom, index, false);
@@ -344,7 +344,7 @@ public class SQLGenerator implements SQLQueryGenerator {
 	/***
 	 * Returns the SQL for an atom representing an SQL condition (booleans).
 	 */
-	private String getSQLCondition(Function atom, QueryAliasIndex index) {
+	private String getSQLCondition(Function atom, QueryAliasIndex index, boolean useSpatialCache) {
 		Predicate functionSymbol = atom.getFunctionSymbol();
 		if (isUnary(atom)) {
 			if (atom.isArithmeticFunction()) {
@@ -409,6 +409,21 @@ public class SQLGenerator implements SQLQueryGenerator {
 				Term right = atom.getTerm(1);
 				String leftOp = getSQLString(left, index, true);
 				String rightOp = getSQLString(right, index, true);
+				if(atom.isSpatialRelationFunction()) {
+					//if one of the two operands is a geometry literal do not search among cached geometries
+					if( !atom.toString().contains("GEOMFROMWKT")) {
+						String tblde9imColumn = getTblde9imColumn(atom.toString());
+						if(!useSpatialCache || tblde9imColumn.equals("")) {
+							return String.format("(" + expressionFormat + ")", leftOp, rightOp);
+						}
+						else {
+							String tblaliasid1 = leftOp.split("\\.")[0];
+							String tblaliasid2 = rightOp.split("\\.")[0];
+							String finalexpression = "( ("+ tblaliasid1 + ".\"s\"" + " = tblde9im.\"id1\") AND (" + tblaliasid2 + ".\"s\"" + " = tblde9im.\"id2\") AND (" + "tblde9im.\"" + tblde9imColumn + "\" = \"true\") )";
+							return finalexpression;
+						}
+					}
+				}
 				return String.format("(" + expressionFormat + ")", leftOp, rightOp);
 			} else if (atom.isArithmeticFunction()) {
 				// For numerical operators, e.g., MULTIPLY, SUBTRACT, ADDITION
@@ -451,6 +466,39 @@ public class SQLGenerator implements SQLQueryGenerator {
 		}
 	}
 
+	private String getTblde9imColumn(String function) {
+		if(function.toLowerCase().contains("contains")) {
+			return "contains";
+		}
+		else if(function.toLowerCase().contains("coveredby")) {
+			return "coveredby";
+		}
+		else if(function.toLowerCase().contains("covers")) {
+			return "covers";
+		}
+		else if(function.toLowerCase().contains("crosses")) {
+			return "crosses";
+		}
+		else if(function.toLowerCase().contains("equals")) {
+			return "equals";
+		}
+		else if(function.toLowerCase().contains("intersects")) {
+			return "intersects";
+		}
+		else if(function.toLowerCase().contains("overlaps")) {
+			return "overlaps";
+		}
+		else if(function.toLowerCase().contains("touches")) {
+			return "touches";
+		}
+		else if(function.toLowerCase().contains("within")) {
+			return "within";
+		}
+		else {
+			return "";
+		}
+	}
+
 	/**
 	 * Returns the table definition for these atoms. By default, a list of atoms
 	 * represents JOIN or LEFT JOIN of all the atoms, left to right. All boolean
@@ -476,7 +524,7 @@ public class SQLGenerator implements SQLQueryGenerator {
 	 */
 	private String getTableDefinitions(List<Function> inneratoms,
 			QueryAliasIndex index, boolean isTopLevel, boolean isLeftJoin,
-			String indent) {
+			String indent, boolean useSpatialCache) {
 		/*
 		 * We now collect the view definitions for each data atom each
 		 * condition, and each each nested Join/LeftJoin
@@ -485,7 +533,7 @@ public class SQLGenerator implements SQLQueryGenerator {
 		for (int atomidx = 0; atomidx < inneratoms.size(); atomidx++) {
 			Term innerAtom = inneratoms.get(atomidx);
 			Function innerAtomAsFunction = (Function) innerAtom;
-			String definition = getTableDefinition(innerAtomAsFunction, index, indent + INDENT);
+			String definition = getTableDefinition(innerAtomAsFunction, index, indent + INDENT, useSpatialCache);
 			if (!definition.isEmpty()) {
 				tableDefinitions.add(definition);
 			}
@@ -560,7 +608,7 @@ public class SQLGenerator implements SQLQueryGenerator {
 			 * last parenthesis ')' and replace it with ' ON %s)' where %s are
 			 * all the conditions
 			 */
-			String conditions = getConditionsString(inneratoms, index, true, indent);
+			String conditions = getConditionsString(inneratoms, index, true, indent, useSpatialCache);
 
 			if (conditions.length() > 0 && tableDefinitionsString.lastIndexOf(")") != -1) {
 				int lastidx = tableDefinitionsString.lastIndexOf(")");
@@ -578,9 +626,9 @@ public class SQLGenerator implements SQLQueryGenerator {
 	 * QueryAliasIndex. If the atom is a Join or Left Join, it will call
 	 * getTableDefinitions on the nested term list.
 	 */
-	private String getTableDefinition(Function atom, QueryAliasIndex index, String indent) {
+	private String getTableDefinition(Function atom, QueryAliasIndex index, String indent, boolean useSpatialCache) {
 		Predicate predicate = atom.getFunctionSymbol();
-		if (predicate instanceof BooleanOperationPredicate
+		if ((predicate instanceof BooleanOperationPredicate && !predicate.isSpatialRelationPredicate())
 				|| predicate instanceof NumericalOperationPredicate
 				|| predicate instanceof DatatypePredicate) {
 			// These don't participate in the FROM clause
@@ -591,10 +639,20 @@ public class SQLGenerator implements SQLQueryGenerator {
 				innerTerms.add((Function) innerTerm);
 			}
 			if (predicate == OBDAVocabulary.SPARQL_JOIN) {
-				return getTableDefinitions(innerTerms, index, false, false, indent + INDENT);
+				return getTableDefinitions(innerTerms, index, false, false, indent + INDENT, useSpatialCache);
 			} else if (predicate == OBDAVocabulary.SPARQL_LEFTJOIN) {
-				return getTableDefinitions(innerTerms, index, false, true, indent + INDENT);
+				return getTableDefinitions(innerTerms, index, false, true, indent + INDENT, useSpatialCache);
 			}
+		}
+		else if(predicate.isSpatialRelationPredicate()) {
+			if(useSpatialCache){
+				return "tblde9im";
+			}
+			else {
+				return "";
+			}
+
+			//return "\"tblde9im\" tmptblde9im";
 		}
 
 		/*
@@ -604,12 +662,12 @@ public class SQLGenerator implements SQLQueryGenerator {
 		return def;
 	}
 
-	private String getFROM(CQIE query, QueryAliasIndex index) {
+	private String getFROM(CQIE query, QueryAliasIndex index, boolean useSpatialCache) {
 		List<Function> atoms = new LinkedList<Function>();
 		for (Function atom : query.getBody()) {
 			atoms.add((Function) atom);
 		}
-		String tableDefinitions = getTableDefinitions(atoms, index, true, false, "");
+		String tableDefinitions = getTableDefinitions(atoms, index, true, false, "", useSpatialCache);
 		return "\n FROM \n" + tableDefinitions;
 	}
 
@@ -623,13 +681,13 @@ public class SQLGenerator implements SQLQueryGenerator {
 	 * to an upper level one.
 	 */
 	private String getConditionsString(List<Function> atoms,
-			QueryAliasIndex index, boolean processShared, String indent) {
+			QueryAliasIndex index, boolean processShared, String indent, boolean useSpatialCache) {
 
 		LinkedHashSet<String> equalityConditions = new LinkedHashSet<String>();
 
 		// if (processShared)
 		equalityConditions.addAll(getConditionsSharedVariablesAndConstants(atoms, index, processShared));
-		LinkedHashSet<String> booleanConditions = getBooleanConditionsString(atoms, index);
+		LinkedHashSet<String> booleanConditions = getBooleanConditionsString(atoms, index, useSpatialCache);
 
 		LinkedHashSet<String> conditions = new LinkedHashSet<String>();
 		conditions.addAll(equalityConditions);
@@ -780,12 +838,12 @@ public class SQLGenerator implements SQLQueryGenerator {
 		return Types.VARCHAR;
 	}
 
-	private String getWHERE(CQIE query, QueryAliasIndex index) {
+	private String getWHERE(CQIE query, QueryAliasIndex index, boolean useSpatialCache) {
 		List<Function> atoms = new LinkedList<Function>();
 		for (Function atom : query.getBody()) {
 			atoms.add((Function) atom);
 		}
-		String conditions = getConditionsString(atoms, index, false, "");
+		String conditions = getConditionsString(atoms, index, false, "", useSpatialCache);
 		if (conditions.length() == 0) {
 			return "";
 		}

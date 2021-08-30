@@ -95,6 +95,8 @@ public class StrabonStatement implements OBDAStatement {
 
     private Set<String> temporaryCachedTables;
 
+    private boolean useSpatialCache;
+
     /*
      * For benchmark purpose
      */
@@ -106,6 +108,7 @@ public class StrabonStatement implements OBDAStatement {
     private boolean cache;
     private Set<String> asWKTTables;
     private Map<String, String> predDictionaryStat;
+    private boolean cacheSpatialIndex;
 
     public StrabonStatement(Quest questinstance, QuestConnection conn, Statement st, NodeSelectivityEstimator nse) {
 
@@ -125,6 +128,12 @@ public class StrabonStatement implements OBDAStatement {
 
         this.predDictionaryStat = null;
 
+        this.useSpatialCache = false;
+
+    }
+
+    public void setUseSpatialCache(boolean spatialCache) {
+        this.useSpatialCache = spatialCache;
     }
 
     public void useCache(boolean cache) {
@@ -426,7 +435,7 @@ public class StrabonStatement implements OBDAStatement {
         log.debug("Producing the SQL string...");
 
         // query = DatalogNormalizer.normalizeDatalogProgram(query);
-        SQLResult sql = questInstance.getDatasourceQueryGenerator().generateSourceQuery(query, signature);
+        SQLResult sql = questInstance.getDatasourceQueryGenerator().generateSourceQuery(query, signature, useSpatialCache);
 
         //log.debug("Resulting SQL: \n{}", sql);
         return sql;
@@ -763,11 +772,94 @@ public class StrabonStatement implements OBDAStatement {
                                 Types.VARCHAR, "VARCHAR", false);
                     }
                 }
+                Variable spatialFilterVariable = null;
+                Constant spatalFilterConstant = null;
+                Function spatialTable = null;
+                Function toRemove = null;
+                if(cacheSpatialIndex && programAfterUnfolding.getRules().size()==1) {
+                    //check for spatial filter with intersects or within
+                    for(Function atom:programAfterUnfolding.getRules().get(0).getBody()) {
+                        Variable v = null;
+                        Constant c = null;
+                        if (atom.getFunctionSymbol().equals(OBDAVocabulary.SFINTERSECTS )) {
+                            Term t1 = atom.getTerm(0);
+                            if(t1 instanceof Variable) {
+                                v = (Variable) t1;
+                            }
+                            else if (t1 instanceof Function) {
+                                Function geom = (Function) t1;
+                                if(! geom.getFunctionSymbol().getName().equals(OBDAVocabulary.strGeomFromWKT)){
+                                    break;
+                                }
+                                Term wkt = geom.getTerm(0);
+                                if(!(wkt instanceof Constant)){
+                                    break;
+                                }
+                                c = (Constant) wkt;
+                            }
+                            Term t2 = atom.getTerm(1);
+                            if(t2 instanceof Variable) {
+                                if (v != null) {
+                                    //spatial join
+                                    v = null;
+                                    c = null;
+                                    continue;
+                                }
+                                v = (Variable) t2;
+                            }
+                            else if (t2 instanceof Function) {
+                                if(c != null){
+                                    v = null;
+                                    c = null;
+                                    continue;
+                                }
+
+                                Function geom = (Function) t2;
+                                if(! geom.getFunctionSymbol().getName().equals(OBDAVocabulary.strGeomFromWKT)){
+                                    break;
+                                }
+                                Term wkt = geom.getTerm(0);
+                                if(!(wkt instanceof Constant)){
+                                    break;
+                                }
+                                c = (Constant) wkt;
+
+
+                            }
+
+                            if(v!=null && c!=null) {
+                                toRemove = atom;
+                                //spatial filter
+                                spatialFilterVariable = v;
+                                spatalFilterConstant = c;
+                                for(Function atom2:programAfterUnfolding.getRules().get(0).getBody()) {
+                                    if(atom2.equals(toRemove)) continue;
+                                    for (Term t:atom2.getTerms()){
+                                        if(t.equals(v)) {
+                                            spatialTable = atom2;
+                                        }
+                                    }
+                                }
+                                break;
+                            }
+                        }
+
+                    }
+                    if(toRemove != null) {
+                        programAfterUnfolding.getRules().get(0).getBody().remove(toRemove);
+
+                    }
+                }
 
 
                 sql = getSQL(programAfterUnfolding, signatureContainer);
+                if(toRemove != null) {
+                    sql.setSpatialFilterConstant(spatalFilterConstant);
+                    sql.setSpatialTableToRemove(spatialTable);
+                    sql.setSpatialTable("table"+UUID.randomUUID().toString().replaceAll("-", ""));
+                }
                 // cacheQueryAndProperties(strquery, sql);
-                questInstance.cacheSQL(strquery, sql);
+                //questInstance.cacheSQL(strquery, sql);
             } catch (Exception e1) {
                 log.debug(e1.getMessage(), e1);
 
@@ -1216,4 +1308,12 @@ public class StrabonStatement implements OBDAStatement {
         this.asWKTTables = tables;
     }
 
+
+    public boolean isCacheSpatialIndex() {
+        return cacheSpatialIndex;
+    }
+
+    public void setCacheSpatialIndex(boolean cacheSpatialIndex) {
+        this.cacheSpatialIndex = cacheSpatialIndex;
+    }
 }
