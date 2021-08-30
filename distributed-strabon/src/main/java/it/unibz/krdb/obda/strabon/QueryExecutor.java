@@ -1,9 +1,6 @@
 package it.unibz.krdb.obda.strabon;
 
-import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.io.WKTReader;
 import it.unibz.krdb.obda.io.ModelIOManager;
 import it.unibz.krdb.obda.model.OBDADataFactory;
@@ -17,7 +14,6 @@ import it.unibz.krdb.obda.owlrefplatform.owlapi3.QuestOWL;
 import it.unibz.krdb.obda.owlrefplatform.owlapi3.QuestOWLConfiguration;
 import it.unibz.krdb.obda.owlrefplatform.owlapi3.QuestOWLFactory;
 import it.unibz.krdb.obda.utils.StrabonParameters;
-import madgik.exareme.master.queryProcessor.decomposer.util.Util;
 import madgik.exareme.master.queryProcessor.estimator.NodeSelectivityEstimator;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileStatus;
@@ -30,7 +26,6 @@ import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.storage.StorageLevel;
 import org.datasyslab.geospark.enums.IndexType;
-import org.datasyslab.geospark.formatMapper.WktReader;
 import org.datasyslab.geospark.spatialOperator.RangeQuery;
 import org.datasyslab.geospark.spatialRDD.SpatialRDD;
 import org.datasyslab.geosparksql.utils.Adapter;
@@ -60,7 +55,7 @@ public class QueryExecutor {
     private static boolean splitSpatialJoin;
     private static Map<String, String> asWKTSubpropertiesToTables;
     private static boolean analyze;
-    private static boolean cache;
+    private static boolean cacheThematicTables;
     private static int shufflePartitions;
 
     //the following contain properties that have literls as object for each kind of literal
@@ -100,9 +95,9 @@ public class QueryExecutor {
             if (args.length > 5) {
                 splitSpatialJoin = args[5].equals("true");
             }
-            cache = false;
+            cacheThematicTables = false;
             if (args.length > 6) {
-                cache = args[6].equals("true");
+                cacheThematicTables = args[6].equals("true");
             }
             asWKTSubpropertiesToTables = new HashMap<String, String>();
             analyze = false;
@@ -114,6 +109,10 @@ public class QueryExecutor {
             cacheSpatialIndex=false;
             if (args.length > 8) {
                 cacheSpatialIndex = args[8].equals("true");
+            }
+            useQualitiveSpatialCache = false;
+            if(args.length > 9 ) {
+                useQualitiveSpatialCache = args[9].equals("true");
             }
             //cache = true;
 
@@ -279,7 +278,8 @@ public class QueryExecutor {
                 st.setCacheSpatialIndex(cacheSpatialIndex);
                 log.debug("Stat pred dictionary: \n"+predDictionaryStat);
                 st.setWKTTables(asWKTSubpropertiesToTables.keySet());
-                st.useCache(cache);
+                st.useThematicCache(cacheThematicTables);
+                st.setUseQualititveSpatialCache(useQualitiveSpatialCache);
                 List<String> sparqlQueries = new ArrayList<String>();
                 List<String> sqlQueries = new ArrayList<String>();
 
@@ -317,7 +317,7 @@ public class QueryExecutor {
                         log.debug("Start Executing SPARQL query: " + sparql);
                         exec += "Executing SPARQL query: " + sparql + "\n";
                         SQLResult sql = st.getUnfolding(sparql, splitSpatialJoin);
-                        if (cache) {
+                        if (cacheThematicTables) {
                             for (String tableToCache : st.getTablesToCache()) {
                                 spark.sql(tableToCache);
                             }

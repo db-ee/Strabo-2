@@ -95,7 +95,7 @@ public class StrabonStatement implements OBDAStatement {
 
     private Set<String> temporaryCachedTables;
 
-    private boolean useSpatialCache;
+    private boolean useQualitiveSpatialCache;
 
     /*
      * For benchmark purpose
@@ -105,7 +105,7 @@ public class StrabonStatement implements OBDAStatement {
     private long unfoldingTime = 0;
 
     private NodeSelectivityEstimator nse;
-    private boolean cache;
+    private boolean cacheThematicTables;
     private Set<String> asWKTTables;
     private Map<String, String> predDictionaryStat;
     private boolean cacheSpatialIndex;
@@ -124,20 +124,20 @@ public class StrabonStatement implements OBDAStatement {
 
         this.temporaryCachedTables = new HashSet<>();
 
-        this.cache = false;
+        this.cacheThematicTables = false;
 
         this.predDictionaryStat = null;
 
-        this.useSpatialCache = false;
+        this.useQualitiveSpatialCache = false;
 
     }
 
-    public void setUseSpatialCache(boolean spatialCache) {
-        this.useSpatialCache = spatialCache;
+    public void setUseQualititveSpatialCache(boolean spatialCache) {
+        this.useQualitiveSpatialCache = spatialCache;
     }
 
-    public void useCache(boolean cache) {
-        this.cache = cache;
+    public void useThematicCache(boolean cache) {
+        this.cacheThematicTables = cache;
     }
 
     public void setPredicateDictionaryForStatistics(Map<String, String> predDictionaryStat) {
@@ -435,7 +435,7 @@ public class StrabonStatement implements OBDAStatement {
         log.debug("Producing the SQL string...");
 
         // query = DatalogNormalizer.normalizeDatalogProgram(query);
-        SQLResult sql = questInstance.getDatasourceQueryGenerator().generateSourceQuery(query, signature, useSpatialCache);
+        SQLResult sql = questInstance.getDatasourceQueryGenerator().generateSourceQuery(query, signature, useQualitiveSpatialCache);
 
         //log.debug("Resulting SQL: \n{}", sql);
         return sql;
@@ -675,7 +675,7 @@ public class StrabonStatement implements OBDAStatement {
 
 
 
-                if (cache) {
+                if (cacheThematicTables) {
                     for (CQIE cq : programAfterUnfolding.getRules()) {
                         Set<Variable> previousVariables = new HashSet<>();
                         for (int i = 0; i < cq.getBody().size(); i++) {

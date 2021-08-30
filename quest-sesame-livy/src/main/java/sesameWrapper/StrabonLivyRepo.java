@@ -212,7 +212,7 @@ public class StrabonLivyRepo implements Repository {
                 e.printStackTrace();
             }
             st = reasoner.createStrabonStatement(nse);
-            st.useCache(ConnectionConstants.USECACHE);
+            st.useThematicCache(ConnectionConstants.USECACHE);
             st.setWKTTables(asWKTSubpropertiesToTables.keySet());
 			/*List<String> sparqlQueries = new ArrayList<String>();
 
