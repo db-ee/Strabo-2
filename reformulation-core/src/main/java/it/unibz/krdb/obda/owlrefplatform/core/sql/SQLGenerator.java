@@ -932,7 +932,8 @@ public class SQLGenerator implements SQLQueryGenerator {
 			Variable v = (Variable) ht;
 			mainColumn = sqladapter.sqlCast(getSQLString(ht, index, false), Types.VARCHAR);
 			if(transformGeoToWKT && isGeomColType(v, index)){
-				mainColumn = "ST_AsText(" + v.getName() + ")";
+				mainColumn = "ST_AsText(" + mainColumn + ")";
+				System.out.println("main col: " + mainColumn);
 			}
 		}
 		else if (ht instanceof Function) {

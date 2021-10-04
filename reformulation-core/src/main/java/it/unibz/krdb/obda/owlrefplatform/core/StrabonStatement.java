@@ -977,7 +977,7 @@ public class StrabonStatement implements OBDAStatement {
                 if (spatialJoins.contains(initial.getBody().get(i)))
                     continue;
                 Set<Term> varsNext = new HashSet<>();
-                TermUtils.addReferencedVariablesAndURIsTo(varsNext, initial.getBody().get(i));
+                TermUtils.addReferencedVariablesAndURIsTo(varsNext, initial.getBody().get(i), true);
                 Set<Function> atomsNext = new HashSet<>();
                 atomsNext.add(initial.getBody().get(i));
                 VarsToAtoms v2aNext = new VarsToAtoms(varsNext, atomsNext);

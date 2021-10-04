@@ -73,10 +73,12 @@ public class QueryExecutor {
             "http://earthanalytics.eu/fs/ontology/hasCropTypeName",
             "http://ai.di.uoa.gr/invekos/ontology/hasCropTypeName"));
 
-    public static final Set<String> INTEGERPROPERTIES = new HashSet<>(Arrays.asList("http://data.linkedeodata.eu/ontology#has_code"));
+    public static final Set<String> INTEGERPROPERTIES = new HashSet<>(Arrays.asList("http://data.linkedeodata.eu/ontology#has_code",
+	    "http://earthanalytics.eu/fs/ontology/hasRelativeAmount"));
 
     public static final Set<String> DATETIMEPROPERTIES = new HashSet<>(Arrays.asList("http://earthanalytics.eu/polar/ontology/hasRECDAT",
-            "http://earthanalytics.eu/polar/ontology/hasRECDATE"));
+            "http://earthanalytics.eu/polar/ontology/hasRECDATE", 
+	    "http://earthanalytics.eu/fs/ontology/hasStartDate"));
     private static boolean cacheSpatialIndex;
     //cacheSpatialIndex will create an in-memory spatial index during initialization
     //and it will use it for spatial selections

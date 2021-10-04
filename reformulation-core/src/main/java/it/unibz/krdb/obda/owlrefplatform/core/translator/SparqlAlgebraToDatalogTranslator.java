@@ -1162,7 +1162,8 @@ public class SparqlAlgebraToDatalogTranslator {
         		
         	case "http://www.opengis.net/def/function/geosparql/sfIntersects":	
         	case "http://www.opengis.net/def/function/geosparql/sfTouches":
-        	case "http://www.opengis.net/def/function/geosparql/sfContains":	
+        	case "http://www.opengis.net/def/function/geosparql/sfContains":
+		case "http://www.opengis.net/def/function/geosparql/sfEquals":
         	case "http://www.opengis.net/def/function/geosparql/sfWithin":	
         	case "http://www.opengis.net/def/function/geosparql/sfCrosses":	
         	case "http://www.opengis.net/def/function/geosparql/sfOverlaps":	
@@ -1295,6 +1296,8 @@ public class SparqlAlgebraToDatalogTranslator {
     		return ofac.getFunctionSpatialTouches(term1, term2);
     	case "http://www.opengis.net/def/function/geosparql/sfContains":	
     		return ofac.getFunctionSpatialContains(term1, term2);
+        case "http://www.opengis.net/def/function/geosparql/sfEquals":
+		return ofac.getFunctionSpatialEquals(term1, term2);
     	case "http://www.opengis.net/def/function/geosparql/sfWithin":	
     		return ofac.getFunctionSpatialWithin(term1, term2);
     	case "http://www.opengis.net/def/function/geosparql/sfCrosses":	
