@@ -185,18 +185,27 @@ public class StrabonLivyRepo implements Repository {
             this.sessionURL = LivyHelper.createSession();
             this.statementsURL = sessionURL + "/statements";
 
+            LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("SET spark.serializer = org.apache.spark.serializer.KryoSerializer"), statementsURL, client);
+            LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("SET spark.kryo.registrator = org.datasyslab.geosparkviz.core.Serde.GeoSparkVizKryoRegistrator"), statementsURL, client);
             LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("SET hive.exec.dynamic.partition = true"), statementsURL, client);
             LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("SET hive.exec.dynamic.partition.mode = nonstrict"), statementsURL, client);
-            LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("SET hive.exec.max.dynamic.partitions = 4000"), statementsURL, client);
-            LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("SET hive.exec.max.dynamic.partitions.pernode = 2000"), statementsURL, client);
+            LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("SET hive.exec.max.dynamic.partitions = 400"), statementsURL, client);
+            LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("SET hive.exec.max.dynamic.partitions.pernode = 200"), statementsURL, client);
             LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("SET spark.sql.inMemoryColumnarStorage.compressed = true"), statementsURL, client);
             LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("SET spark.sql.crossJoin.enabled=true"), statementsURL, client);//for self-spatial joins on geometry table
             LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("SET spark.sql.parquet.filterPushdown = true"), statementsURL, client);
             LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("SET geospark.join.spatitionside = none"), statementsURL, client);
             LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("SET spark.sql.cbo.enabled = true"), statementsURL, client);
             LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("SET spark.sql.cbo.joinReorder.enabled = true"), statementsURL, client);
+            LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("SET spark.sql.autoBroadcastJoinThreshold = -1"), statementsURL, client);
+            LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("SET spark.sql.inMemoryColumnarStorage.batchSize = 20000"), statementsURL, client);
 
             LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("use " + ConnectionConstants.DATABASENAME), statementsURL, client);
+            
+            //register spatial join detector 
+            String reg = "{\"code\":\"spark.experimental.extraStrategies = org.apache.spark.sql.geosparksql.strategy.join.JoinQueryDetector :: Nil;\"}";
+            LivyHelper.sendCommandAndPrint(reg, statementsURL, client);
+            
             for (String udf : LivyHelper.udfs) {
                 String lib = "{\"code\":\"spark.sessionState.functionRegistry.createOrReplaceTempFunction(\\\"" + udf + "\\\",org.apache.spark.sql.geosparksql.expressions." + udf + ");\"}";
                 LivyHelper.sendCommandAndPrint(lib, statementsURL, client);
