@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import javax.json.stream.JsonParser;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 
 public class StrabonLivyTupleQuery implements TupleQuery {
@@ -62,13 +63,19 @@ public class StrabonLivyTupleQuery implements TupleQuery {
             long start = System.currentTimeMillis();
             // List<String> tempnames=new ArrayList<String>();
             boolean emptyResult=false;
-            OkHttpClient client = new OkHttpClient();
+            OkHttpClient client1  = new OkHttpClient.Builder()
+            	    .connectTimeout(10, TimeUnit.SECONDS)
+            	    .writeTimeout(10, TimeUnit.SECONDS)
+            	    .readTimeout(300000, TimeUnit.SECONDS)
+            	    .build();
+       
+            
             for (int k = 0; k < sql.getTempQueries().size(); k++) {
                 String temp = sql.getTempQueries().get(k).replaceAll("\"", "").replaceAll("\n", " ");
                 log.debug("creating temp table " + sql.getTempName(k) + " with query: " + temp);
-                LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("Create temporary view "+sql.getTempName(k)+ " AS ("+temp+") "), sessionUrl, client);
-                LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("CACHE TABLE "+sql.getTempName(k)), sessionUrl, client);
-                LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("SELECT COUNT(*) FROM "+sql.getTempName(k)), sessionUrl, client);
+                LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("Create temporary view "+sql.getTempName(k)+ " AS ("+temp+") "), sessionUrl, client1);
+                LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("CACHE TABLE "+sql.getTempName(k)), sessionUrl, client1);
+                LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("SELECT COUNT(*) FROM "+sql.getTempName(k)), sessionUrl, client1);
 
 
                 //TODO
@@ -88,7 +95,15 @@ public class StrabonLivyTupleQuery implements TupleQuery {
                 tuples.setTempTables(tempTables);
                 return tuples;
             }
-            JsonParser parser = LivyHelper.sendCommandAndGetBuffer(LivyHelper.getSQLQuery(sql.getMainQuery().replaceAll("\"", "").replaceAll("\n", " ")), sessionUrl, client);
+
+	    //LivyHelper.sendCommandAndGetBuffer(LivyHelper.getSQLWriteResult(sql.getMainQuery().replaceAll("\"", "").replaceAll("\n", " "), "hdfs:///Projects/FoodSecurity/Resources/1"), sessionUrl, client1);
+            JsonParser parser = LivyHelper.sendCommandAndGetBuffer(LivyHelper.getSQLQuery(sql.getMainQuery().replaceAll("\"", "").replaceAll("\n", " ")), sessionUrl, client1);
+            
+            //LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("Create temporary view ttttt AS ("+sql.getMainQuery().replaceAll("\"", "").replaceAll("\n", " ")+") "), sessionUrl, client1);
+            //LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("CACHE TABLE ttttt"), sessionUrl, client1);
+            //tempTables.add("ttttt");
+            //LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("select count(*) from ttttt"), sessionUrl, client1);
+            //JsonParser parser = LivyHelper.sendCommandAndGetBuffer(LivyHelper.getSQLQuery("select * from ttttt"), sessionUrl, client1);
             if(parser == null)
                 throw new NullPointerException();
 
@@ -105,6 +120,7 @@ public class StrabonLivyTupleQuery implements TupleQuery {
             //spark.sql("DROP VIEW globaltemp."+sql.getTempName(k));
             //}
         } catch (Exception ex) {
+        	ex.printStackTrace();
             throw new QueryEvaluationException("Could not execute query " + queryString + "\nException: " + ex.getMessage());
         }
 

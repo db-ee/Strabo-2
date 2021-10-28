@@ -45,7 +45,8 @@ public class LivyHelper {
 
     protected static String createSession() throws IOException {
 
-        OkHttpClient client = new OkHttpClient();
+	OkHttpClient client = new OkHttpClient();
+
         String createResponse = post(ConnectionConstants.LIVYURL, create, client);
 
         //System.out.println(createResponse.files.values());
@@ -93,8 +94,25 @@ public class LivyHelper {
     }
 
     protected static String getSQLQuery(String query) {
+	//return "{ \"code\": \"val d = spark.sql(\\\"" + query + "\\\").toJSON.toLocalIterator\\n while (d.hasNext) { println(d.next)}\"}";
+	//return "{ \"code\": \"val d = spark.sql(\\\"" + query + "\\\")randomSplit(Array(0.1, 0.5, 0.5, 0.5, 0.5, 0.5))\\nd(0).toJSON.collect\\n%json\"}";
         return "{ \"code\": \"val d = spark.sql(\\\"" + query + "\\\").toJSON.collect\\n%json\"}";
+	//return "{ \"code\": \"val d = spark.sql(\\\"" + query + "\\\").collect\"}";
+	//return "{ \"code\": \"println(spark.sql(\\\"" + query + "\\\").collect.mkString(\\\"[\\\", \\\"\\\\n\\\", \\\"]\\\"))\"}";
         //return "{ \"code\": \"println(spark.sql(\\\"" + query + "\\\").toJSON.collect.mkString(\\\"[\\\", \\\"\\\\n\\\", \\\"]\\\"))\"}";
+    }
+
+   protected static String getSQLQuerySplit(String query, int splitNumber) {
+	String splitStrng = "1.0";
+	for (int i=1;i<splitNumber;i++) {
+		splitStrng += ", 1.0";
+	}
+        return "{ \"code\": \"val d = spark.sql(\\\"" + query + "\\\")randomSplit(Array(" + splitStrng +"))\\nd(0).toJSON.collect\\n%json\"}";
+        
+    }
+
+    protected static String getSQLWriteResult(String query, String filename) {
+	return "{ \"code\": \"val d = spark.sql(\\\"" + query + "\\\").write.csv(\\\""+filename+"\\\")\"}";
     }
 
   /*  private static String proxyUser = "test__meb10000";
@@ -143,6 +161,10 @@ public class LivyHelper {
             " \"livy.rsc.rpc.server.address\":\""+ConnectionConstants.LIVYRPCSERVERADDRESS+"\", \"spark.yarn.stagingDir\":\""+ConnectionConstants.SPARKYARNSTAGINGDIR+"\"," +
             " \"spark.jars\":\""+ConnectionConstants.SPARKJARS+"\"," +
             " \"spark.serializer\":\""+ConnectionConstants.SPARKSERIALIZER+"\"," +
+	    " \"spark.kryoserializer.buffer.max\":\"256m\"," +
+	    //" \"spark.eventLog.buffer.kb\":\"1024k\"," +
+	    //" \"spark.network.io.preferDirectBufs\":\"false\"," +
+	    //" \"spark.sql.execution.pandas.udf.buffer.size\":\"1024k\"," +
             " \"spark.kryo.registrator\":\""+ConnectionConstants.SPARKKRYOREGISTRATOR+"\"," +
             " \"spark.extraListeners\":\""+ConnectionConstants.SPARKEXTRALISTENERS+"\"}}";
 
@@ -254,7 +276,7 @@ public class LivyHelper {
                 .url(statementURL)
                 .build();
         //Reader result = null;
-        String firstLine = "";
+        //String firstLine = "";
         BufferedReader buf = null;
         while (true) {
             Response response2 = client.newCall(request2).execute();

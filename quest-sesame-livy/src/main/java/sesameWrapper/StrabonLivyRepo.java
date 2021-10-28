@@ -25,13 +25,14 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+//import org.slf4j.spi.LocationAwareLogger;
+//import java.lang.reflect.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
-
 
 public class StrabonLivyRepo implements Repository {
 
@@ -50,6 +51,7 @@ public class StrabonLivyRepo implements Repository {
     public static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
     private String sessionURL;
 
+    
     
     //the following contain properties that have literls as object for each kind of literal
     //TODO read these from a file
@@ -158,6 +160,19 @@ public class StrabonLivyRepo implements Repository {
         namespaces = new HashMap<>();
         this.st = null;
         this.isInitialized = false;
+	
+	System.setProperty("org.slf4j.impl.SimpleLogger.DEFAULT_LOG_LEVEL_KEY", "INFO");	
+	/*try
+    	{
+        Logger l = LoggerFactory.getLogger("com.jayway.jsonpath.internal.path.CompiledPath");  
+        Field f = l.getClass().getSuperclass().getDeclaredField("currentLogLevel");
+        f.setAccessible(true);
+        f.set(l, LocationAwareLogger.WARN_INT);
+    	}
+    	catch (Exception e)
+    	{
+        log.warn("Failed to reset the log level", e);
+    	}*/
 
     }
 
@@ -199,6 +214,7 @@ public class StrabonLivyRepo implements Repository {
             LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("SET spark.sql.cbo.joinReorder.enabled = true"), statementsURL, client);
             LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("SET spark.sql.autoBroadcastJoinThreshold = -1"), statementsURL, client);
             LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("SET spark.sql.inMemoryColumnarStorage.batchSize = 20000"), statementsURL, client);
+	    LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("SET spark.kryoserializer.buffer.max = 128m"), statementsURL, client);
 
             LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("use " + ConnectionConstants.DATABASENAME), statementsURL, client);
             
