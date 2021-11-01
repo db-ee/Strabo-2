@@ -122,6 +122,7 @@
                             <targetPath>/WEB-INF/classes</targetPath>
                             <directory>${basedir}/src</directory>
                             <includes>
+				<include>logback.xml</include>
                                 <include>log4j.properties</include>
                             </includes>
                         </resource>

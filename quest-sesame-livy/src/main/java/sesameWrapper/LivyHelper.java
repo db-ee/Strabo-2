@@ -103,12 +103,18 @@ public class LivyHelper {
     }
 
    protected static String getSQLQuerySplit(String query, int splitNumber) {
-	String splitStrng = "1.0";
+	String splitString = "1.0";
 	for (int i=1;i<splitNumber;i++) {
-		splitStrng += ", 1.0";
+		splitString += ", 1.0";
 	}
-        return "{ \"code\": \"val d = spark.sql(\\\"" + query + "\\\")randomSplit(Array(" + splitStrng +"))\\nd(0).toJSON.collect\\n%json\"}";
+        return "{ \"code\": \"val d1 = spark.sql(\\\"" + query + "\\\").cache()\\nval d =d1.randomSplit(Array(" + splitString +"))\"}";
         
+    }
+
+    protected static String getSQLQueryPart(int part) {
+        return "{ \"code\": \"d("+part+").toJSON.collect\\n%json\"}";
+
+
     }
 
     protected static String getSQLWriteResult(String query, String filename) {

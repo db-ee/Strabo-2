@@ -90,24 +90,26 @@ public class StrabonLivyTupleQuery implements TupleQuery {
             }
 
             if(emptyResult){
-                StrabonLivyTupleQueryResult tuples= new StrabonLivyTupleQueryResult(null, sql.getSignature());
+                StrabonLivyTupleQueryResult tuples= new StrabonLivyTupleQueryResult((JsonParser) null, sql.getSignature());
                 tuples.setSessionUrl(sessionUrl);
                 tuples.setTempTables(tempTables);
                 return tuples;
             }
+	    int partitionNumber = 10;
+	        //LivyHelper.sendCommandAndGetBuffer(LivyHelper.getSQLWriteResult(sql.getMainQuery().replaceAll("\"", "").replaceAll("\n", " "), "hdfs:///Projects/FoodSecurity/Resources/1"), sessionUrl, client1);
+            //JsonParser parser = LivyHelper.sendCommandAndGetBuffer(LivyHelper.getSQLQuery(sql.getMainQuery().replaceAll("\"", "").replaceAll("\n", " ")), sessionUrl, client1);
+            LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuerySplit(sql.getMainQuery().replaceAll("\"", "").replaceAll("\n", " "), partitionNumber), sessionUrl, client1);
 
-	    //LivyHelper.sendCommandAndGetBuffer(LivyHelper.getSQLWriteResult(sql.getMainQuery().replaceAll("\"", "").replaceAll("\n", " "), "hdfs:///Projects/FoodSecurity/Resources/1"), sessionUrl, client1);
-            JsonParser parser = LivyHelper.sendCommandAndGetBuffer(LivyHelper.getSQLQuery(sql.getMainQuery().replaceAll("\"", "").replaceAll("\n", " ")), sessionUrl, client1);
-            
             //LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("Create temporary view ttttt AS ("+sql.getMainQuery().replaceAll("\"", "").replaceAll("\n", " ")+") "), sessionUrl, client1);
             //LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("CACHE TABLE ttttt"), sessionUrl, client1);
             //tempTables.add("ttttt");
             //LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("select count(*) from ttttt"), sessionUrl, client1);
             //JsonParser parser = LivyHelper.sendCommandAndGetBuffer(LivyHelper.getSQLQuery("select * from ttttt"), sessionUrl, client1);
-            if(parser == null)
-                throw new NullPointerException();
+            //if(parser == null)
+            //    throw new NullPointerException();
 
-            StrabonLivyTupleQueryResult tuples= new StrabonLivyTupleQueryResult(parser, sql.getSignature());
+            //StrabonLivyTupleQueryResult tuples= new StrabonLivyTupleQueryResult(parser, sql.getSignature());
+            StrabonLivyTupleQueryResult tuples= new StrabonLivyTupleQueryResult(client1, sql.getSignature(), partitionNumber);
             tuples.setSessionUrl(sessionUrl);
             tuples.setTempTables(tempTables);
             return tuples;

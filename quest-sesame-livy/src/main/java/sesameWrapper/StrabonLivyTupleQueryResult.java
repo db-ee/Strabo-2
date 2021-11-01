@@ -37,6 +37,7 @@ import java.util.List;
 
 public class StrabonLivyTupleQueryResult implements TupleQueryResult {
 
+    private final OkHttpClient client;
     JsonParser resultParser;
     private boolean nextConsumed;
     private JsonParser.Event nextResult;
@@ -44,11 +45,23 @@ public class StrabonLivyTupleQueryResult implements TupleQueryResult {
     private List<String> tempTables; //the temp tables that have been created for this query. To delete on close
     private static final Logger log = LoggerFactory.getLogger(StrabonLivyTupleQueryResult.class);
     private String sessionUrl;
+    private int partNumber;
+    private int maxPartition = 1;
 
     StrabonLivyTupleQueryResult(JsonParser jsonParser, List<String> signature){
         this.resultParser = jsonParser;
         this.signature = signature;
         this.nextConsumed = false;
+        client = null;
+    }
+
+    public StrabonLivyTupleQueryResult(OkHttpClient client, List<String> signature, int maxPartition) {
+        this.signature = signature;
+        this.nextConsumed = false;
+        this.client = client;
+        this.partNumber = 0;
+	this.maxPartition = maxPartition;
+	//readNextPart();
     }
 
     @Override
@@ -68,24 +81,46 @@ public class StrabonLivyTupleQueryResult implements TupleQueryResult {
 
     @Override
     public boolean hasNext() throws QueryEvaluationException {
-        if(resultParser == null){
+
+        if(partNumber==0) {
+	    readNextPart();
+	}
+	if(resultParser == null) {
             return false;
         }
-        if (resultParser.hasNext()){
-            nextResult = resultParser.next();
-            int noOfResults = 0;
-            nextConsumed = true;
-            if (nextResult == JsonParser.Event.END_ARRAY) {
-                return false;
+        while (partNumber < maxPartition){
+            if (resultParser.hasNext()){
+                nextResult = resultParser.next();
+                //int noOfResults = 0;
+                nextConsumed = true;
+                if (nextResult == JsonParser.Event.END_ARRAY) {
+                    readNextPart();
+                    continue;
+                }
+                else{
+                    return true;
+                }
             }
             else{
-                return true;
+                readNextPart();
             }
         }
-        else{
-            return false;
+        return false;
+
         }
+
+    private void readNextPart()  throws QueryEvaluationException {
+        if(resultParser != null)
+            resultParser.close();
+        try {
+            resultParser = LivyHelper.sendCommandAndGetBuffer(LivyHelper.getSQLQueryPart(partNumber), sessionUrl, client);
+            partNumber++;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new QueryEvaluationException("Could not execute query \nException: " + ex.getMessage());
     }
+
+}
 
     @Override
     public BindingSet next() throws QueryEvaluationException {
