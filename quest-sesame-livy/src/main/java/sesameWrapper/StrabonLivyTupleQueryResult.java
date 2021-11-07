@@ -59,7 +59,7 @@ public class StrabonLivyTupleQueryResult implements TupleQueryResult {
         this.signature = signature;
         this.nextConsumed = false;
         this.client = client;
-        this.partNumber = 0;
+        this.partNumber = -1;
 	this.maxPartition = maxPartition;
 	//readNextPart();
     }
@@ -82,27 +82,40 @@ public class StrabonLivyTupleQueryResult implements TupleQueryResult {
     @Override
     public boolean hasNext() throws QueryEvaluationException {
 
-        if(partNumber==0) {
+        if(partNumber==-1) {
 	    readNextPart();
 	}
 	if(resultParser == null) {
             return false;
         }
-        while (partNumber < maxPartition){
+        while (true){
             if (resultParser.hasNext()){
                 nextResult = resultParser.next();
                 //int noOfResults = 0;
                 nextConsumed = true;
                 if (nextResult == JsonParser.Event.END_ARRAY) {
-                    readNextPart();
-                    continue;
+                    if(partNumber < maxPartition -1) {
+                    	readNextPart();
+			continue;
+		    }
+                    else {
+                        if(resultParser != null)
+                            resultParser.close();
+                        break;
+		    }
                 }
                 else{
                     return true;
                 }
             }
             else{
-                readNextPart();
+		if(partNumber < maxPartition -1)
+                    readNextPart();
+		else {
+		    if(resultParser != null)
+            		resultParser.close();
+		    break;
+		}
             }
         }
         return false;
@@ -110,11 +123,12 @@ public class StrabonLivyTupleQueryResult implements TupleQueryResult {
         }
 
     private void readNextPart()  throws QueryEvaluationException {
+	partNumber++;
         if(resultParser != null)
             resultParser.close();
         try {
             resultParser = LivyHelper.sendCommandAndGetBuffer(LivyHelper.getSQLQueryPart(partNumber), sessionUrl, client);
-            partNumber++;
+            //partNumber++;
         } catch (Exception ex) {
             ex.printStackTrace();
             throw new QueryEvaluationException("Could not execute query \nException: " + ex.getMessage());

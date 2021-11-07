@@ -107,7 +107,7 @@ public class LivyHelper {
 	for (int i=1;i<splitNumber;i++) {
 		splitString += ", 1.0";
 	}
-        return "{ \"code\": \"val d1 = spark.sql(\\\"" + query + "\\\").cache()\\nval d =d1.randomSplit(Array(" + splitString +"))\"}";
+        return "{ \"code\": \"val d1 = spark.sql(\\\"" + query + "\\\").cache()\\nval d =d1.randomSplit(Array(" + splitString +"), seed=13)\"}";
         
     }
 
