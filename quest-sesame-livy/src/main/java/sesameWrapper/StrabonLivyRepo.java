@@ -55,21 +55,22 @@ public class StrabonLivyRepo implements Repository {
     
     //the following contain properties that have literls as object for each kind of literal
     //TODO read these from a file
-    public static final Set<String> STRINGPROPERTIES = new HashSet<>(Arrays.asList("http://earthanalytics.eu/polar/ontology/hasCT",
-            "http://earthanalytics.eu/polar/ontology/hasURL",
-            "http://earthanalytics.eu/polar/ontology/hasThumbnail",
-            "http://earthanalytics.eu/polar/ontology/hasCT",
-            "http://earthanalytics.eu/polar/ontology/hasCTClassName",
-            "http://earthanalytics.eu/fs/ontology/hasClassName",
-            "http://earthanalytics.eu/polar/ontology/hasTitle",
+    public static final Set<String> STRINGPROPERTIES = new HashSet<>(Arrays.asList("http://ai.di.uoa.gr/polar/ontology/hasCT",
+            "http://ai.di.uoa.gr/polar/ontology/hasURL",
+            "http://ai.di.uoa.gr/polar/ontology/hasThumbnail",
+            "http://ai.di.uoa.gr/polar/ontology/hasCT",
+            "http://ai.di.uoa.gr/polar/ontology/hasCTClassName",
+            "http://ai.di.uoa.gr/fs/ontology/hasClassName",
+            "http://ai.di.uoa.gr/polar/ontology/hasTitle",
             "http://geographica.di.uoa.gr/generator/landOwnership/hasKey",
             "http://geographica.di.uoa.gr/generator/pointOfInterest/hasKey",
             "http://geographica.di.uoa.gr/generator/state/hasKey",
             "http://geographica.di.uoa.gr/generator/road/hasKey",
-            "http://earthanalytics.eu/fs/ontology/hasCropTypeName",
+            "http://ai.di.uoa.gr/fs/ontology/hasCropTypeName",
             "http://ai.di.uoa.gr/eu-hydro/ontology/hasLAN",
             "http://ai.di.uoa.gr/eu-hydro/ontology/hasZHYD",
             "http://ai.di.uoa.gr/eu-hydro/ontology/hasName",
+	    "http://ai.di.uoa.gr/gadm/ontology/hasName", 
             "http://ai.di.uoa.gr/eu-hydro/ontology/hasCATCH_AREA",
             "http://ai.di.uoa.gr/eu-hydro/ontology/hasHYDRONODCT",
             "http://ai.di.uoa.gr/eu-hydro/ontology/hasREF_TOPO",
@@ -92,11 +93,11 @@ public class StrabonLivyRepo implements Repository {
             "http://ai.di.uoa.gr/eu-hydro/ontology/hasNEXTUPID",
             "http://ai.di.uoa.gr/eu-hydro/ontology/hasNODETYPE",
             "http://ai.di.uoa.gr/eu-hydro/ontology/hasNEXTDOWNID",
-            "http://earthanalytics.eu/fs/ontology/hasNUTS_ID",
-            "http://earthanalytics.eu/fs/ontology/hasCropTypeName",
-            "http://earthanalytics.eu/fs/ontology/hasDescription",
-            "http://earthanalytics.eu/fs/ontology/hasCNTR_CODE",
-            "http://earthanalytics.eu/fs/ontology/hasLC1",
+            "http://ai.di.uoa.gr/fs/ontology/hasNUTS_ID",
+            "http://ai.di.uoa.gr/fs/ontology/hasCropTypeName",
+            "http://ai.di.uoa.gr/fs/ontology/hasDescription",
+            "http://ai.di.uoa.gr/fs/ontology/hasCNTR_CODE",
+            "http://ai.di.uoa.gr/fs/ontology/hasLC1",
             "http://ai.di.uoa.gr/invekos/ontology/hasCropTypeName"));
 
     public static final Set<String> INTEGERPROPERTIES = new HashSet<>(Arrays.asList("http://data.linkedeodata.eu/ontology#has_code",
@@ -119,18 +120,18 @@ public class StrabonLivyRepo implements Repository {
     		"http://ai.di.uoa.gr/eu-hydro/ontology/hasWCOURSE_ID",
     		"http://ai.di.uoa.gr/eu-hydro/ontology/hasLOC",
     		"http://ai.di.uoa.gr/eu-hydro/ontology/hasWINDOW",
-    		"http://earthanalytics.eu/fs/ontology/hasLC1_SPEC",
-    		"http://earthanalytics.eu/fs/ontology/hasCropTypeNumber",
-    		"http://earthanalytics.eu/fs/ontology/hasID",
-    		"http://earthanalytics.eu/fs/ontology/hasLC1_PERC",
-    		"http://earthanalytics.eu/fs/ontology/hasOBS_DIRECT",
-	    "http://earthanalytics.eu/fs/ontology/hasRelativeAmount"));
+    		"http://ai.di.uoa.gr/fs/ontology/hasLC1_SPEC",
+    		"http://ai.di.uoa.gr/fs/ontology/hasCropTypeNumber",
+    		"http://ai.di.uoa.gr/fs/ontology/hasID",
+    		"http://ai.di.uoa.gr/fs/ontology/hasLC1_PERC",
+    		"http://ai.di.uoa.gr/fs/ontology/hasOBS_DIRECT",
+	    "http://ai.di.uoa.gr/fs/ontology/hasRelativeAmount"));
 
-    public static final Set<String> DATETIMEPROPERTIES = new HashSet<>(Arrays.asList("http://earthanalytics.eu/polar/ontology/hasRECDAT",
-            "http://earthanalytics.eu/polar/ontology/hasRECDATE", 
-            "http://earthanalytics.eu/fs/ontology/hasSURVEYDATE",
-            "http://earthanalytics.eu/fs/ontology/hasEndDate",
-	    "http://earthanalytics.eu/fs/ontology/hasStartDate"));
+    public static final Set<String> DATETIMEPROPERTIES = new HashSet<>(Arrays.asList("http://ai.di.uoa.gr/polar/ontology/hasRECDAT",
+            "http://ai.di.uoa.gr/polar/ontology/hasRECDATE", 
+            "http://ai.di.uoa.gr/fs/ontology/hasSURVEYDATE",
+            "http://ai.di.uoa.gr/fs/ontology/hasEndDate",
+	    "http://ai.di.uoa.gr/fs/ontology/hasStartDate"));
     
     public static final Set<String> DOUBLEPROPERTIES = new HashSet<>(Arrays.asList("http://ai.di.uoa.gr/eu-hydro/ontology/hasCUM_LEN",
     		"http://ai.di.uoa.gr/eu-hydro/ontology/hasELEV",
@@ -145,9 +146,9 @@ public class StrabonLivyRepo implements Repository {
     		"http://ai.di.uoa.gr/eu-hydro/ontology/hasPENTE",
     		"http://ai.di.uoa.gr/eu-hydro/ontology/hasSHAPE_Length",
     		"http://ai.di.uoa.gr/eu-hydro/ontology/hasLENGTH",
-    		"http://earthanalytics.eu/fs/ontology/hasArea",
-    		"http://earthanalytics.eu/fs/ontology/hasRelativeAmount",
-    		"http://earthanalytics.eu/fs/ontology/hasCapabilityValue",
+    		"http://ai.di.uoa.gr/fs/ontology/hasArea",
+    		"http://ai.di.uoa.gr/fs/ontology/hasRelativeAmount",
+    		"http://ai.di.uoa.gr/fs/ontology/hasCapabilityValue",
     		"http://ai.di.uoa.gr/eu-hydro/ontology/hasPFAFSTETER"));
 
     public StrabonLivyRepo(String propDictionary, String statFile, String asWKTTablesFile)
