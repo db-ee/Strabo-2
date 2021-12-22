@@ -244,6 +244,34 @@ public class QueryExecutor {
 
                 Map<String, String> predDictionary = readPredicatesFromHadoop(propDictionary, fs);
                 log.debug("property dictionary: " + predDictionary.toString());
+		
+		Map<String, String> prefixes = new HashMap<>();
+                //key is the prefix
+                if (spark.catalog().tableExists(database,"nsprefixes")) {
+                    //read prefixes from table
+                    List<Row> dataRows = spark.sql("Select * from nsprefixes").collectAsList();
+                    for (Row row : dataRows) {
+                        prefixes.put(row.getString(0), row.getString(1));
+                    }
+                    log.debug("Prefixes Read: "+prefixes);
+                    //transform properties back to full IRI
+                    log.debug("Transform properties back to full IRI");
+                    Map<String, String> modifiedPredDictionary = new HashMap<>(predDictionary.size());
+                    for(String iri:predDictionary.keySet()) {
+                        for(String prefix:prefixes.keySet()) {
+                            if (iri.contains(prefix+ ":" )){
+                                String replaced = iri.replace(prefix + ":", prefixes.get(prefix));
+                                modifiedPredDictionary.put(replaced, predDictionary.get(iri));
+                                log.debug("Replacing " + iri + " with " + replaced );
+                                break;
+                            }
+                        }
+                        modifiedPredDictionary.put(iri, predDictionary.get(iri));
+                    }
+                    predDictionary = modifiedPredDictionary;
+                    log.debug("Predicate Dictionary changed: \n" + predDictionary);
+                }
+
                 boolean existDefaultGeometrytable = createObdaFile(predDictionary);
                 
                 Map<String, SpatialRDD<Geometry>> cachedIndexes = null;
@@ -265,8 +293,7 @@ public class QueryExecutor {
                     log.debug("Geometry table " + StrabonParameters.GEOMETRIES_TABLE + " created with " + count + " rows");
 
                 }
-
-                for (String asWKTsubprop : asWKTSubpropertiesToTables.keySet()) {
+		for (String asWKTsubprop : asWKTSubpropertiesToTables.keySet()) {
                     String tblName = asWKTSubpropertiesToTables.get(asWKTsubprop);
                     log.debug("preloading asWKT subproperty tables");
                     Dataset<Row> geoms = spark
@@ -277,6 +304,7 @@ public class QueryExecutor {
                         spatialRDD.buildIndex(IndexType.QUADTREE, false);
                         spatialRDD.indexedRawRDD.persist(StorageLevel.MEMORY_ONLY());
                         spatialRDD.indexedRawRDD.cache();
+			spatialRDD.indexedRawRDD.count();//force caching
                         //spatialRDD.analyze();
                         cachedIndexes.put(tblName, spatialRDD);
                         log.debug("Caching index for geometry table " + tblName + "(" + asWKTsubprop +
@@ -368,7 +396,8 @@ public class QueryExecutor {
                     FileStatus[] fileStatuses = fs.listStatus(path);
 
                     for (FileStatus fileStatus : fileStatuses) {
-                        if (fileStatus.isFile() && fileStatus.getPath().toString().endsWith(".q")) {
+                        if (fileStatus.isFile() && ( fileStatus.getPath().toString().endsWith(".q") 
+							|| fileStatus.getPath().toString().endsWith(".qry"))) {
                             sparqlQueries.add(readHadoopFile(fileStatus.getPath(), fs));
                         }
                         if (fileStatus.isFile() && fileStatus.getPath().toString().endsWith(".sql")) {
@@ -377,6 +406,8 @@ public class QueryExecutor {
 
                     }
                 }
+		long totalTime = 0l;
+		int noOfQueries = 0;
                 String exec = "";
                 // String[] query_files =
                 // readFilesFromDir("/home/dimitris/spatialdbs/queries/");
@@ -436,7 +467,8 @@ public class QueryExecutor {
                             Geometry g = r.read(sql.getSpatialFilterConstant().getValue());
                             log.debug("Cached Indexes: "+cachedIndexes);
                             log.debug("spatial table to remove: "+sql.getSpatialTableToRemove().getFunctionSymbol().getName());
-                            JavaRDD rdd = RangeQuery.SpatialRangeQuery(cachedIndexes.get(sql.getSpatialTableToRemove().getFunctionSymbol().getName().replace(StrabonParameters.TEMPORARY_SCHEMA_NAME+".","")), g, true, true);
+                            JavaRDD rdd = RangeQuery.SpatialRangeQuery(cachedIndexes.get(sql.getSpatialTableToRemove().getFunctionSymbol().getName().replace(StrabonParameters.TEMPORARY_SCHEMA_NAME+".","")), g, sql.isCondsiderSpatialBoundary(), true);
+			    //JavaRDD rdd = RangeQuery.SpatialRangeQuery(cachedIndexes.get(sql.getSpatialTableToRemove().getFunctionSymbol().getName().replace(StrabonParameters.TEMPORARY_SCHEMA_NAME+".","")), g, true, true);
                             //gf.createGeometry(g);
                             SpatialRDD mySpatialRDD = new SpatialRDD();
                             List<String> fieldNames = new ArrayList<String>(1);
@@ -464,7 +496,8 @@ public class QueryExecutor {
                         Dataset<Row> result = spark.sql(sqlString);
                         //result.cache();
                         long resultSize = result.count();
-
+			totalTime += (System.currentTimeMillis() - start);
+			noOfQueries++;
                         log.debug("Execution finished in " + (System.currentTimeMillis() - start) + " with "
                                 + resultSize + " results.");
                         exec += "Execution finished in " + (System.currentTimeMillis() - start) + " with "
@@ -493,7 +526,8 @@ public class QueryExecutor {
                         Dataset<Row> result = spark.sql(sql.replaceAll("\"", ""));
                         //result.cache();
                         long resultSize = result.count();
-
+			totalTime += (System.currentTimeMillis() - start);
+                        noOfQueries++;
                         log.debug("Execution finished in " + (System.currentTimeMillis() - start) + " with "
                                 + resultSize + " results.");
                         exec += "Execution finished in " + (System.currentTimeMillis() - start) + " with "
@@ -506,6 +540,8 @@ public class QueryExecutor {
                     }
 
                 }
+
+		log.debug("Executed " + noOfQueries + " queries in " + totalTime + " ms");
 
                 // TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, preds);
                 // TupleQueryResultHandler handler = new SPARQLResultsTSVWriter(System.out);

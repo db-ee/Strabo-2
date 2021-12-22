@@ -665,10 +665,13 @@ public class StrabonStatement implements OBDAStatement {
                     optimize(programAfterOptimization);
                 } catch (Exception e) {
                     log.error("Error while optimizing query. Using default translation. " + e.getMessage());
-                    programAfterOptimization = programAfterSplittingSpatialJoin;
+                    //put tables with filter first
+                    programAfterOptimization = programAfterSplittingSpatialJoin.clone();
+                    reorderFilters(programAfterOptimization);
+                    //programAfterOptimization = programAfterSplittingSpatialJoin;
                 }
 
-                programAfterUnfolding = getUnfolding(programAfterSplittingSpatialJoin);
+                programAfterUnfolding = getUnfolding(programAfterOptimization);
 
 
                 unfoldingTime = System.currentTimeMillis() - startTime;
@@ -776,12 +779,17 @@ public class StrabonStatement implements OBDAStatement {
                 Constant spatalFilterConstant = null;
                 Function spatialTable = null;
                 Function toRemove = null;
+		boolean isIntersects = true;
                 if(cacheSpatialIndex && programAfterUnfolding.getRules().size()==1) {
                     //check for spatial filter with intersects or within
                     for(Function atom:programAfterUnfolding.getRules().get(0).getBody()) {
                         Variable v = null;
                         Constant c = null;
-                        if (atom.getFunctionSymbol().equals(OBDAVocabulary.SFINTERSECTS )) {
+                        //if (atom.getFunctionSymbol().equals(OBDAVocabulary.SFINTERSECTS )) {
+			if (atom.getFunctionSymbol().equals(OBDAVocabulary.SFINTERSECTS ) || atom.getFunctionSymbol().equals(OBDAVocabulary.SFWITHIN )) {
+                            if(atom.getFunctionSymbol().equals(OBDAVocabulary.SFWITHIN )){
+                                isIntersects = false;
+                            }
                             Term t1 = atom.getTerm(0);
                             if(t1 instanceof Variable) {
                                 v = (Variable) t1;
@@ -857,6 +865,7 @@ public class StrabonStatement implements OBDAStatement {
                     sql.setSpatialFilterConstant(spatalFilterConstant);
                     sql.setSpatialTableToRemove(spatialTable);
                     sql.setSpatialTable("table"+UUID.randomUUID().toString().replaceAll("-", ""));
+		    sql.setCondsiderSpatialBoundary(isIntersects);
                 }
                 // cacheQueryAndProperties(strquery, sql);
                 //questInstance.cacheSQL(strquery, sql);
@@ -870,6 +879,18 @@ public class StrabonStatement implements OBDAStatement {
             }
         }
         return sql;
+    }
+
+    private void reorderFilters(DatalogProgram program) {
+        for (CQIE cq : program.getRules()) {
+            for(int i=1;i<cq.getBody().size();i++) {
+                Function f = cq.getBody().get(i);
+                if(TermUtils.containsConstant(f,false)){
+                    cq.getBody().remove(i);
+                    cq.getBody().add(0, f);
+                }
+            }
+        }
     }
 
     private DatalogProgram optimize(DatalogProgram program) throws SQLException {

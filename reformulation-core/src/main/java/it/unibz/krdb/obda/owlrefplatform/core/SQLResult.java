@@ -14,6 +14,7 @@ public class SQLResult {
 	private Constant spatialFilterConstant;
 	private String spatialTable;
 	private Function spatialTableToRemove;
+	private boolean condsiderSpatialBoundary;
 
 	
 	public SQLResult(String mainQuery, List<String> tempQueries, List<String> tempNames, List<String> outputs) {
@@ -24,6 +25,7 @@ public class SQLResult {
 		this.outputs=outputs;
 		this.spatialFilterConstant = null;
 		this.spatialTable = null;
+		this.condsiderSpatialBoundary = true;
 	}
 	
 	public String getMainQuery() {
@@ -81,4 +83,13 @@ public class SQLResult {
 	public void setSpatialTableToRemove(Function spatialTableToRemove) {
 		this.spatialTableToRemove = spatialTableToRemove;
 	}
+
+	public boolean isCondsiderSpatialBoundary() {
+		return condsiderSpatialBoundary;
+	}
+
+	public void setCondsiderSpatialBoundary(boolean condsiderSpatialBoundary) {
+		this.condsiderSpatialBoundary = condsiderSpatialBoundary;
+	}
 }
+

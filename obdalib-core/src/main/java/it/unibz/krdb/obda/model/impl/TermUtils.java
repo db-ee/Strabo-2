@@ -78,6 +78,28 @@ public class TermUtils {
 			// no-op
 		}
 	}
+
+	public static boolean containsConstant(Function f, boolean includeRDFTypeConstant) {
+		for (Term t : f.getTerms()) {
+			if (t instanceof Variable)
+				continue;
+			else if (t instanceof ValueConstant) {
+				return true;
+			}
+			else if (t instanceof Function) {
+				Function f2 = (Function) t;
+				if (!includeRDFTypeConstant && f.getFunctionSymbol().getName().equals("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")) {
+					continue;
+				} else {
+					if(containsConstant(f2,includeRDFTypeConstant)){
+						return true;
+					}
+					continue;
+				}
+			}
+		}
+		return false;
+	}
 	
 }
 
