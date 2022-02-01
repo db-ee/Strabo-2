@@ -57,6 +57,10 @@ public class StrabonLivyRepo implements Repository {
     //TODO read these from a file
     public static final Set<String> STRINGPROPERTIES = new HashSet<>(Arrays.asList("http://ai.di.uoa.gr/polar/ontology/hasCT",
             "http://ai.di.uoa.gr/polar/ontology/hasURL",
+	    "http://ai.di.uoa.gr/polar/ontology/hasPolygonType",
+	    "http://ai.di.uoa.gr/fs/ontology/hasLabelName",
+	    "http://ai.di.uoa.gr/polar/ontology/hasImageID",
+	    "http://ai.di.uoa.gr/polar/ontology/hasTitle",
             "http://ai.di.uoa.gr/polar/ontology/hasThumbnail",
             "http://ai.di.uoa.gr/polar/ontology/hasCT",
             "http://ai.di.uoa.gr/polar/ontology/hasCTClassName",
@@ -125,7 +129,8 @@ public class StrabonLivyRepo implements Repository {
     		"http://ai.di.uoa.gr/fs/ontology/hasID",
     		"http://ai.di.uoa.gr/fs/ontology/hasLC1_PERC",
     		"http://ai.di.uoa.gr/fs/ontology/hasOBS_DIRECT",
-	    "http://ai.di.uoa.gr/fs/ontology/hasRelativeAmount"));
+		"http://ai.di.uoa.gr/fs/ontology/hasLabel",
+	    	"http://ai.di.uoa.gr/fs/ontology/hasRelativeAmount"));
 
     public static final Set<String> DATETIMEPROPERTIES = new HashSet<>(Arrays.asList("http://ai.di.uoa.gr/polar/ontology/hasRECDAT",
             "http://ai.di.uoa.gr/polar/ontology/hasRECDATE", 
@@ -255,7 +260,7 @@ public class StrabonLivyRepo implements Repository {
                 String createGeometriesTable = "Create temporary view " + StrabonParameters.GEOMETRIES_TABLE + " AS (Select " + StrabonParameters.GEOMETRIES_FIRST_COLUMN + ", "
                         + StrabonParameters.GEOMETRIES_SECOND_COLUMN + ", ST_GeomFromWKT("
                         + StrabonParameters.GEOMETRIES_THIRD_COLUMN + ") as "
-                        + StrabonParameters.GEOMETRIES_THIRD_COLUMN + " FROM geometries where " +
+                        + StrabonParameters.GEOMETRIES_THIRD_COLUMN + " FROM geometries6 where " +
                         StrabonParameters.GEOMETRIES_THIRD_COLUMN + " IS NOT NULL)";
                 LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery(createGeometriesTable), statementsURL, client);
                 LivyHelper.sendCommandAndPrint(LivyHelper.getSQLQuery("CACHE TABLE " + StrabonParameters.GEOMETRIES_TABLE), statementsURL, client);

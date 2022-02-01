@@ -914,6 +914,18 @@ public class StrabonStatement implements OBDAStatement {
         return false;
     }
 
+    private boolean isGeometry(String name, Set<Function> atoms) {
+        for (Function f : atoms) {
+            if (f.getFunctionSymbol().getName().equals("http://www.opengis.net/ont/geosparql#asWKT") ||
+                    asWKTTables.contains(f.getFunctionSymbol().getName())) {
+                if (f.getTerms().get(1).toString().equals(name)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     public Set<String> getTablesToCache() {
         Set<String> result = new HashSet<>();
         for (String temp : temporaryCachedTables) {
@@ -1063,7 +1075,8 @@ public class StrabonStatement implements OBDAStatement {
             if (existentialVars.contains(t) || varsInSpatial.contains(t)) {
                 outputs.add(f);
                 signature.add(t.toString());
-                if (varsInSpatial.contains(t)) {
+                //if (varsInSpatial.contains(t)) {
+		if (varsInSpatial.contains(t) || isGeometry(t.toString(), initial) || isGeometry(t.toString(), cc.getAtoms())) {
                     //geometry
                     replacement.addAttribute(
                             questInstance.getMetaData().getQuotedIDFactory().createAttributeID(t.toString()),
@@ -1119,8 +1132,10 @@ public class StrabonStatement implements OBDAStatement {
 
                 TermUtils.addReferencedVariablesTo(varsInSpatial, atom);
                 if (varsInSpatial.size() != 2) {
-                    log.debug("Spatial join with " + varsInSpatial.size() + " variables. Cannot split spatial join");
-                    return false;
+		    varsInSpatial.clear();
+                    log.debug("Spatial function with " + varsInSpatial.size() + " variables. Cannot split spatial join");
+		    continue;
+                    //return false;
                 } else {
                     spatialJoins.add(atom);
                     return true;

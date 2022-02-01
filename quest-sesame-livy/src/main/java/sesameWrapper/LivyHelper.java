@@ -368,7 +368,7 @@ public class LivyHelper {
             parser.close();
             response2.close();
             try {
-                Thread.sleep(2000);
+                Thread.sleep(500);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

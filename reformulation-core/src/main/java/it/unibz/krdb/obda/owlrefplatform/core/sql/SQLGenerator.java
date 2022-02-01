@@ -206,8 +206,9 @@ public class SQLGenerator implements SQLQueryGenerator {
 		List<String> tempResults = new ArrayList<String>();
 		List<String> tempNames = new ArrayList<String>();
 		boolean outerDistinct=false;
+		int queryPos = 0;
 		for (CQIE cq : query.getRules()) {
-			
+			queryPos++;
 			boolean isDistinct = hasSelectDistinctStatement(cq);
 			/*
 			 * Here we normalize so that the form of the CQ is as close to the
@@ -254,7 +255,7 @@ public class SQLGenerator implements SQLQueryGenerator {
 			QueryAliasIndex index = new QueryAliasIndex(cq);
 			
 			boolean innerdistincts = false;
-			if (isDistinct && !distinctResultSet && numberOfQueries == 1) {
+			if (isDistinct && !distinctResultSet && numberOfQueries == queryPos) {
 				innerdistincts = true;
 			}
 
