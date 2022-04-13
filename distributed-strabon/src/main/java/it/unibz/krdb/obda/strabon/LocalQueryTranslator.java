@@ -22,9 +22,12 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /*
  * #%L
@@ -56,7 +59,68 @@ public class LocalQueryTranslator {
 	static String queriesPath;
 	static String statfile;
 	static String asWKTTablesFile;
-	private static Map<String, String> asWKTSubpropertiesToTables;
+	private static Set<GeometryTable> geometryTables;
+	private static Set<String> asWKTproperties;
+	
+	// the following contain properties that have literls as object for each kind of
+	// literal
+	// TODO read these from a file
+	public static final Set<String> STRINGPROPERTIES = new HashSet<>(Arrays.asList(
+			"http://ai.di.uoa.gr/polar/ontology/hasCT", "http://ai.di.uoa.gr/polar/ontology/hasURL",
+			"http://ai.di.uoa.gr/polar/ontology/hasThumbnail", "http://ai.di.uoa.gr/polar/ontology/hasCT",
+			"http://ai.di.uoa.gr/polar/ontology/hasCTClassName", "http://ai.di.uoa.gr/fs/ontology/hasClassName",
+			"http://ai.di.uoa.gr/polar/ontology/hasTitle",
+			"http://geographica.di.uoa.gr/generator/landOwnership/hasKey",
+			"http://geographica.di.uoa.gr/generator/pointOfInterest/hasKey",
+			"http://geographica.di.uoa.gr/generator/state/hasKey", "http://geographica.di.uoa.gr/generator/road/hasKey",
+			"http://ai.di.uoa.gr/fs/ontology/hasCropTypeName", "http://ai.di.uoa.gr/eu-hydro/ontology/hasLAN",
+			"http://ai.di.uoa.gr/eu-hydro/ontology/hasZHYD", "http://ai.di.uoa.gr/eu-hydro/ontology/hasName",
+			"http://ai.di.uoa.gr/gadm/ontology/hasName", "http://ai.di.uoa.gr/eu-hydro/ontology/hasCATCH_AREA",
+			"http://ai.di.uoa.gr/eu-hydro/ontology/hasHYDRONODCT", "http://ai.di.uoa.gr/eu-hydro/ontology/hasREF_TOPO",
+			"http://ai.di.uoa.gr/eu-hydro/ontology/hasREX", "http://ai.di.uoa.gr/eu-hydro/ontology/hasRN_I_ID",
+			"http://ai.di.uoa.gr/eu-hydro/ontology/hasDFDD", "http://ai.di.uoa.gr/eu-hydro/ontology/hasSYSTEM_CD",
+			"http://ai.di.uoa.gr/eu-hydro/ontology/hasEUWFDCODE", "http://ai.di.uoa.gr/eu-hydro/ontology/hasLKE_TYPE",
+			"http://ai.di.uoa.gr/eu-hydro/ontology/hasNODE_ID", "http://ai.di.uoa.gr/eu-hydro/ontology/hasLAKINOUT",
+			"http://ai.di.uoa.gr/eu-hydro/ontology/hasNAM", "http://ai.di.uoa.gr/eu-hydro/ontology/hasLAKID",
+			"http://ai.di.uoa.gr/eu-hydro/ontology/hasBEGLIFEVER", "http://ai.di.uoa.gr/eu-hydro/ontology/hasDRAIN_ID",
+			"http://ai.di.uoa.gr/eu-hydro/ontology/hasWBodyID", "http://ai.di.uoa.gr/eu-hydro/ontology/hasEU_DAM_ID",
+			"http://ai.di.uoa.gr/eu-hydro/ontology/hasENDLIFEVER", "http://ai.di.uoa.gr/eu-hydro/ontology/hasTR",
+			"http://ai.di.uoa.gr/eu-hydro/ontology/hasNEXTUPID", "http://ai.di.uoa.gr/eu-hydro/ontology/hasNODETYPE",
+			"http://ai.di.uoa.gr/eu-hydro/ontology/hasNEXTDOWNID", "http://ai.di.uoa.gr/fs/ontology/hasNUTS_ID",
+			"http://ai.di.uoa.gr/fs/ontology/hasCropTypeName", "http://ai.di.uoa.gr/fs/ontology/hasDescription",
+			"http://ai.di.uoa.gr/fs/ontology/hasCNTR_CODE", "http://ai.di.uoa.gr/fs/ontology/hasLC1",
+			"http://ai.di.uoa.gr/invekos/ontology/hasCropTypeName"));
+
+	public static final Set<String> INTEGERPROPERTIES = new HashSet<>(Arrays.asList(
+			"http://data.linkedeodata.eu/ontology#has_code", "http://ai.di.uoa.gr/eu-hydro/ontology/hasMAINDR_ID",
+			"http://ai.di.uoa.gr/eu-hydro/ontology/hasSEA_CD", "http://ai.di.uoa.gr/eu-hydro/ontology/hasNVS",
+			"http://ai.di.uoa.gr/eu-hydro/ontology/hasCOMM_CD", "http://ai.di.uoa.gr/eu-hydro/ontology/hasCCM_ID",
+			"http://ai.di.uoa.gr/eu-hydro/ontology/hasCGNELIN", "http://ai.di.uoa.gr/eu-hydro/ontology/hasHYP",
+			"http://ai.di.uoa.gr/eu-hydro/ontology/hasFNODE", "http://ai.di.uoa.gr/eu-hydro/ontology/hasFUN",
+			"http://ai.di.uoa.gr/eu-hydro/ontology/hasSTRAHLER", "http://ai.di.uoa.gr/eu-hydro/ontology/hasMC",
+			"http://ai.di.uoa.gr/eu-hydro/ontology/hasPERIMETER", "http://ai.di.uoa.gr/eu-hydro/ontology/hasWMT",
+			"http://ai.di.uoa.gr/eu-hydro/ontology/hasNUM_SEG", "http://ai.di.uoa.gr/eu-hydro/ontology/hasTNODE",
+			"http://ai.di.uoa.gr/eu-hydro/ontology/hasWSO_ID", "http://ai.di.uoa.gr/eu-hydro/ontology/hasWCOURSE_ID",
+			"http://ai.di.uoa.gr/eu-hydro/ontology/hasLOC", "http://ai.di.uoa.gr/eu-hydro/ontology/hasWINDOW",
+			"http://ai.di.uoa.gr/fs/ontology/hasLC1_SPEC", "http://ai.di.uoa.gr/fs/ontology/hasCropTypeNumber",
+			"http://ai.di.uoa.gr/fs/ontology/hasID", "http://ai.di.uoa.gr/fs/ontology/hasLC1_PERC",
+			"http://ai.di.uoa.gr/fs/ontology/hasOBS_DIRECT", "http://ai.di.uoa.gr/fs/ontology/hasRelativeAmount"));
+
+	public static final Set<String> DATETIMEPROPERTIES = new HashSet<>(
+			Arrays.asList("http://ai.di.uoa.gr/polar/ontology/hasRECDAT",
+					"http://ai.di.uoa.gr/polar/ontology/hasRECDATE", "http://ai.di.uoa.gr/fs/ontology/hasSURVEYDATE",
+					"http://ai.di.uoa.gr/fs/ontology/hasEndDate", "http://ai.di.uoa.gr/fs/ontology/hasStartDate"));
+
+	public static final Set<String> DOUBLEPROPERTIES = new HashSet<>(Arrays.asList(
+			"http://ai.di.uoa.gr/eu-hydro/ontology/hasCUM_LEN", "http://ai.di.uoa.gr/eu-hydro/ontology/hasELEV",
+			"http://ai.di.uoa.gr/eu-hydro/ontology/hasLONGPATH", "http://ai.di.uoa.gr/eu-hydro/ontology/hasAREA",
+			"http://ai.di.uoa.gr/eu-hydro/ontology/hasMAINDR_CLS", "http://ai.di.uoa.gr/eu-hydro/ontology/hasALTITUDE",
+			"http://ai.di.uoa.gr/eu-hydro/ontology/hasSHAPE_Area", "http://ai.di.uoa.gr/eu-hydro/ontology/hasLEN_TOM",
+			"http://ai.di.uoa.gr/eu-hydro/ontology/hasDAMX", "http://ai.di.uoa.gr/eu-hydro/ontology/hasDAMY",
+			"http://ai.di.uoa.gr/eu-hydro/ontology/hasPENTE", "http://ai.di.uoa.gr/eu-hydro/ontology/hasSHAPE_Length",
+			"http://ai.di.uoa.gr/eu-hydro/ontology/hasLENGTH", "http://ai.di.uoa.gr/fs/ontology/hasArea",
+			"http://ai.di.uoa.gr/fs/ontology/hasRelativeAmount", "http://ai.di.uoa.gr/fs/ontology/hasCapabilityValue",
+			"http://ai.di.uoa.gr/eu-hydro/ontology/hasPFAFSTETER"));
 
 	public static void main(String[] args) throws Exception {
 		{
@@ -64,12 +128,19 @@ public class LocalQueryTranslator {
 			queriesPath = args[1];
 			statfile = args[2];
 			asWKTTablesFile = args[3];
-			asWKTSubpropertiesToTables = new HashMap<String, String>();
+			geometryTables = new HashSet<GeometryTable>();
+			asWKTproperties = new HashSet<String>();
 
 			try {
 				String asWKTFile = readFile(asWKTTablesFile);
-				for (String nextProp : asWKTFile.split("\n")) {
-					asWKTSubpropertiesToTables.put(nextProp, null);
+				int geometryTableCounter = 2;
+				for (String nextGeometryPair : asWKTFile.split("\n")) {
+					//asWKTFile contains pairs of hasGeometry and asWKT subproperties
+					String hasGeometrySubproperty = nextGeometryPair.split(",")[0];
+					String asWKTubproperty = nextGeometryPair.split(",")[1];
+					String tablename = StrabonParameters.GEOMETRIES_TABLE + geometryTableCounter++;
+					geometryTables.add(new GeometryTable(tablename, hasGeometrySubproperty, asWKTubproperty));
+					asWKTproperties.add(asWKTubproperty);
 				}
 			} catch (Exception fnf) {
 				log.error("Could not read other WKT properties file");
@@ -123,20 +194,17 @@ public class LocalQueryTranslator {
 					e.printStackTrace();
 				}
 				StrabonStatement st = reasoner.createStrabonStatement(nse);
-				Map<String, String> predDictionaryStat = readPredicates(propDictionary+".stat");
+				Map<String, String> predDictionaryStat = readPredicates(propDictionary + ".stat");
 				st.setPredicateDictionaryForStatistics(predDictionaryStat);
-				st.useThematicCache(false);
-				st.setUseQualititveSpatialCache(true);
 				st.setCacheSpatialIndex(false);
-				st.setWKTTables(asWKTSubpropertiesToTables.keySet());
+				st.setWKTTables(asWKTproperties);
 				List<String> sparqlQueries = new ArrayList<String>();
 
 				String[] query_files = readFilesFromDir(queriesPath);
 				for (String queryfile : query_files) {
-					System.out.println("Starting execution of query "+queryfile);
+					System.out.println("Starting execution of query " + queryfile);
 					String sparql = readFile(queryfile);
 					SQLResult sql = st.getUnfolding(sparql, false);
-					System.out.println("temp table to be cached: "+st.getTablesToCache().toString());
 					System.out.println(sql.getTextResult());
 				}
 
@@ -152,9 +220,7 @@ public class LocalQueryTranslator {
 
 	}
 
-	public static boolean createObdaFile(Map<String, String> predDictionary) throws SQLException, IOException {
-		String schemaPrefix = StrabonParameters.TEMPORARY_SCHEMA_NAME + ".";
-		boolean existsGeometryTable = false;
+	public static void createObdaFile(Map<String, String> predDictionary) throws SQLException, IOException {
 		obdaFile = new StringBuffer();
 		obdaFile.append("[PrefixDeclaration]");
 		obdaFile.append("\n");
@@ -179,60 +245,52 @@ public class LocalQueryTranslator {
 		obdaFile.append("[MappingDeclaration] @collection [[");
 		obdaFile.append("\n");
 
-
 		int mappingId = 0;
-		int asWKTsubproperty = 2;
-		for (String property : predDictionary.keySet()) {
 
-			if (property.equals("http://www.opengis.net/ont/geosparql#asWKT")) {
-				existsGeometryTable = true;
-				obdaFile.append("mappingId\tmapp");
-				obdaFile.append(mappingId);
-				mappingId++;
-				obdaFile.append("\n");
-				obdaFile.append("target\t");
-				obdaFile.append("<{" + StrabonParameters.GEOMETRIES_SECOND_COLUMN + "}> ");
-				obdaFile.append("<" + property + ">");
-				obdaFile.append(" {" + StrabonParameters.GEOMETRIES_THIRD_COLUMN + "}^^geo:wktLiteral .\n");
-				obdaFile.append("source\t");
-				obdaFile.append("select " + StrabonParameters.GEOMETRIES_SECOND_COLUMN + ", "
-						+ StrabonParameters.GEOMETRIES_THIRD_COLUMN + " from ");
-				obdaFile.append(schemaPrefix + StrabonParameters.GEOMETRIES_TABLE);
-				obdaFile.append("\n");
-				obdaFile.append("\n");
-			} else if (asWKTSubpropertiesToTables.keySet().contains(property)) {
-				String tablename = "tablewkt" + asWKTsubproperty;
-				asWKTsubproperty++;
-				asWKTSubpropertiesToTables.put(property, tablename);
-				obdaFile.append("mappingId\tmapp");
-				obdaFile.append(mappingId);
-				mappingId++;
-				obdaFile.append("\n");
-				obdaFile.append("target\t");
-				obdaFile.append("<{s}> ");
-				obdaFile.append("<" + property + ">");
-				obdaFile.append(" {o}^^geo:wktLiteral .\n");
-				obdaFile.append("source\t");
-				obdaFile.append("select s, o from ");
-				obdaFile.append(schemaPrefix + tablename);
-				obdaFile.append("\n");
-				obdaFile.append("\n");
-			} else if (property.equals("http://www.opengis.net/ont/geosparql#hasGeometry")) {
-				obdaFile.append("mappingId\tmapp");
-				obdaFile.append(mappingId);
-				mappingId++;
-				obdaFile.append("\n");
-				obdaFile.append("target\t");
-				obdaFile.append("<{" + StrabonParameters.GEOMETRIES_FIRST_COLUMN + "}> ");
-				obdaFile.append("<" + property + ">");
-				obdaFile.append(" <{" + StrabonParameters.GEOMETRIES_SECOND_COLUMN + "}> .\n");
-				obdaFile.append("source\t");
-				obdaFile.append("select " + StrabonParameters.GEOMETRIES_FIRST_COLUMN + ", "
-						+ StrabonParameters.GEOMETRIES_SECOND_COLUMN + " from ");
-				obdaFile.append(schemaPrefix  + StrabonParameters.GEOMETRIES_TABLE);
-				obdaFile.append("\n");
-				obdaFile.append("\n");
-			} else if (property.contains("has_code") || property.contains("hasDN")) {
+		for (String property : predDictionary.keySet()) {
+			
+			//first check to see if it is hasGeometry or as WKT subproperty
+			boolean belongsToGeometryTables = false;
+			for(GeometryTable geom:geometryTables) {
+				if(geom.hasAsWKTSubproperty(property)) {
+					belongsToGeometryTables = true;
+					obdaFile.append("mappingId\tmapp");
+					obdaFile.append(mappingId);
+					mappingId++;
+					obdaFile.append("\n");
+					obdaFile.append("target\t");
+					obdaFile.append("<{" + StrabonParameters.GEOMETRIES_SECOND_COLUMN + "}> ");
+					obdaFile.append("<" + property + ">");
+					obdaFile.append(" {" + StrabonParameters.GEOMETRIES_THIRD_COLUMN + "}^^geo:wktLiteral .\n");
+					obdaFile.append("source\t");
+					obdaFile.append("select " + StrabonParameters.GEOMETRIES_SECOND_COLUMN + ", "
+							+ StrabonParameters.GEOMETRIES_THIRD_COLUMN + " from ");
+					obdaFile.append(StrabonParameters.TEMPORARY_SCHEMA_NAME + "." + geom.getTablename());
+					obdaFile.append("\n");
+					obdaFile.append("\n");
+				}
+				else if (geom.hasGeometrySubproperty(property)) {
+					belongsToGeometryTables = true;
+					obdaFile.append("mappingId\tmapp");
+					obdaFile.append(mappingId);
+					mappingId++;
+					obdaFile.append("\n");
+					obdaFile.append("target\t");
+					obdaFile.append("<{" + StrabonParameters.GEOMETRIES_FIRST_COLUMN + "}> ");
+					obdaFile.append("<" + property + ">");
+					obdaFile.append(" <{" + StrabonParameters.GEOMETRIES_SECOND_COLUMN + "}> .\n");
+					obdaFile.append("source\t");
+					obdaFile.append("select " + StrabonParameters.GEOMETRIES_FIRST_COLUMN + ", "
+							+ StrabonParameters.GEOMETRIES_SECOND_COLUMN + " from ");
+					obdaFile.append(StrabonParameters.TEMPORARY_SCHEMA_NAME + "." + geom.getTablename());
+					obdaFile.append("\n");
+					obdaFile.append("\n");
+				}
+			}
+			if (belongsToGeometryTables) {
+				continue;
+			}
+			else if (INTEGERPROPERTIES.contains(property)) {
 				obdaFile.append("mappingId\tmapp");
 				obdaFile.append(mappingId);
 				mappingId++;
@@ -246,7 +304,8 @@ public class LocalQueryTranslator {
 				obdaFile.append(predDictionary.get(property));
 				obdaFile.append("\n");
 				obdaFile.append("\n");
-			} else if (property.contains("hasKey") || property.contains("hasCropTypeName")|| property.contains("hasName")) {
+
+			} else if (STRINGPROPERTIES.contains(property)) {
 				obdaFile.append("mappingId\tmapp");
 				obdaFile.append(mappingId);
 				mappingId++;
@@ -260,23 +319,21 @@ public class LocalQueryTranslator {
 				obdaFile.append(predDictionary.get(property));
 				obdaFile.append("\n");
 				obdaFile.append("\n");
-			}
-				else if (property.contains("hasRECDATE")) {
-					                               obdaFile.append("mappingId\tmapp");
-					                                obdaFile.append(mappingId);
-					                                mappingId++;
-					                                obdaFile.append("\n");
-					                                obdaFile.append("target\t");
-					                               obdaFile.append("<{s}> ");
-					                                obdaFile.append("<" + property + ">");
-					                                obdaFile.append(" {o}^^xsd:dateTime .\n");
-					                                obdaFile.append("source\t");
-					                               obdaFile.append("select s, o from ");
-					                                obdaFile.append(predDictionary.get(property));
-					                                obdaFile.append("\n");
-					                                obdaFile.append("\n");
-					                        }
-			else {
+			} else if (DATETIMEPROPERTIES.contains(property)) {
+				obdaFile.append("mappingId\tmapp");
+				obdaFile.append(mappingId);
+				mappingId++;
+				obdaFile.append("\n");
+				obdaFile.append("target\t");
+				obdaFile.append("<{s}> ");
+				obdaFile.append("<" + property + ">");
+				obdaFile.append(" {o}^^xsd:dateTime .\n");
+				obdaFile.append("source\t");
+				obdaFile.append("select s, o from ");
+				obdaFile.append(predDictionary.get(property));
+				obdaFile.append("\n");
+				obdaFile.append("\n");
+			} else {
 				obdaFile.append("mappingId\tmapp");
 				obdaFile.append(mappingId);
 				mappingId++;
@@ -295,10 +352,7 @@ public class LocalQueryTranslator {
 
 		}
 		obdaFile.append("]]");
-		return existsGeometryTable;
-
 	}
-
 	public static Map<String, String> readPredicates(String filename) {
 		Map<String, String> result = new HashMap<String, String>();
 		try {
@@ -331,12 +385,12 @@ public class LocalQueryTranslator {
 
 	public static String readFile(String filename) throws Exception {
 		String file = "";
-	
-			BufferedReader reader = new BufferedReader(new FileReader(filename));
-			String line = null;
-			while ((line = reader.readLine()) != null) {
-				file += line + "\n";
-			}
+
+		BufferedReader reader = new BufferedReader(new FileReader(filename));
+		String line = null;
+		while ((line = reader.readLine()) != null) {
+			file += line + "\n";
+		}
 		return file;
 	}
 

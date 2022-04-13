@@ -65,14 +65,7 @@
 		<module>quest-owlapi3</module>
 		<module>quest-distribution</module>
 		<module>distributed-strabon</module>
-		<module>quest-sesame2</module>
-		<module>quest-sesame-livy</module>
-    		<module>endpoint</module>
-		<module>endpoint-livy</module>
-    		<module>endpoint2-client</module>
-    		<module>endpoint2-exec</module>
-        	<!-- <module>resultio-spatial</module> -->
-    	</modules>
+    </modules>
 
 	<profiles>
 		<profile>

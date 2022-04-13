@@ -46,7 +46,7 @@ public interface SQLQueryGenerator extends Serializable {
 	 * @return the source query
 	 * @throws Exception
 	 */
-	public SQLResult generateSourceQuery(DatalogProgram query, List<String> signature, boolean useSpatialCache) throws OBDAException;
+	public SQLResult generateSourceQuery(DatalogProgram query, List<String> signature) throws OBDAException;
 
 	public boolean hasDistinctResultSet() ;
 

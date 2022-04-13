@@ -1,4 +1,0 @@
-#!/bin/bash
-
-java -jar /usr/share/jdeb/lib/strabon-endpoint-executable-*.jar "$@"
-

@@ -307,8 +307,8 @@ public class DBMetadataExtractor {
 			// TODO change for numerics
 			currentRelation.addAttribute(attributeId2, dataType, typeName, isNullable);
 			
-			if(seedId.getTableName().equals(StrabonParameters.GEOMETRIES_TABLE)) {
-				QuotedID attributeId3 = QuotedID.createIdFromDatabaseRecord("entity");
+			if(seedId.getTableName().startsWith(StrabonParameters.GEOMETRIES_TABLE)) {
+				QuotedID attributeId3 = QuotedID.createIdFromDatabaseRecord(StrabonParameters.GEOMETRIES_FIRST_COLUMN);
 				if (printouts)
 					System.out.println("         " + relationId + "." + attributeId3);
 
@@ -319,7 +319,7 @@ public class DBMetadataExtractor {
 				// TODO change for numerics
 				currentRelation.addAttribute(attributeId3, dataType, typeName, isNullable);
 
-				QuotedID attributeId4 = QuotedID.createIdFromDatabaseRecord("geom");
+				QuotedID attributeId4 = QuotedID.createIdFromDatabaseRecord(StrabonParameters.GEOMETRIES_SECOND_COLUMN);
 				if (printouts)
 					System.out.println("         " + relationId + "." + attributeId4);
 
@@ -330,7 +330,7 @@ public class DBMetadataExtractor {
 				// TODO change for numerics
 				currentRelation.addAttribute(attributeId4, dataType, typeName, isNullable);
 
-				QuotedID attributeId5 = QuotedID.createIdFromDatabaseRecord("wkt");
+				QuotedID attributeId5 = QuotedID.createIdFromDatabaseRecord(StrabonParameters.GEOMETRIES_THIRD_COLUMN);
 				if (printouts)
 					System.out.println("         " + relationId + "." + attributeId5);
 
