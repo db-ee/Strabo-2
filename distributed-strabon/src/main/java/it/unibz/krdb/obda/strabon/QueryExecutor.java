@@ -257,11 +257,11 @@ public class QueryExecutor {
 					log.debug("preloading hasGeometry - asWKT subproperty tables");
 					Dataset<Row> geoms = spark
 							.sql("Select geom.s as " +StrabonParameters.GEOMETRIES_FIRST_COLUMN 
-									+ "geom.o as " + StrabonParameters.GEOMETRIES_SECOND_COLUMN 
+									+ ", ifnull(wkt.s, geom.o) as " + StrabonParameters.GEOMETRIES_SECOND_COLUMN 
 									+ ", ST_GeomFromWKT(wkt.o) as " + StrabonParameters.GEOMETRIES_THIRD_COLUMN
-									+ " FROM " + predDictionary.get(asWKTsubprop.getAsWKTSubpropertyIRI()) + " as wkt "
-									+ predDictionary.get(asWKTsubprop.getHasGeometrySubpropertyIRI()) + " as geom "
-									+ " WHERE geom.o=wkt.s");
+									+ " FROM " + predDictionary.get(asWKTsubprop.getAsWKTSubpropertyIRI()) + " wkt full outer join "
+									+ predDictionary.get(asWKTsubprop.getHasGeometrySubpropertyIRI()) + " geom "
+									+ " ON geom.o=wkt.s");
 					if (cacheSpatialIndex) {
 						long start = System.currentTimeMillis();
 						SpatialRDD<Geometry> spatialRDD = Adapter.toSpatialRdd(geoms, StrabonParameters.GEOMETRIES_THIRD_COLUMN);
