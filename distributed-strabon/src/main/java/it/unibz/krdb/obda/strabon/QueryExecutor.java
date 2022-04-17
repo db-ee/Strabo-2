@@ -137,15 +137,17 @@ public class QueryExecutor {
 			geometryTables = new HashSet<GeometryTable>();
 			asWKTproperties = new HashSet<String>();
 			analyze = false;
+			
+			cacheSpatialIndex = false;
+			if (args.length > 6) {
+				cacheSpatialIndex = args[6].equals("true");
+			}
 
 			shufflePartitions = 200;
-			if (args.length > 6) {
+			if (args.length > 7) {
 				shufflePartitions = Integer.parseInt(args[7]);
 			}
-			cacheSpatialIndex = false;
-			if (args.length > 7) {
-				cacheSpatialIndex = args[8].equals("true");
-			}
+			
 
 			List<String> tempTables = new ArrayList<String>();
 			try {
@@ -257,16 +259,17 @@ public class QueryExecutor {
 					log.debug("preloading hasGeometry - asWKT subproperty tables");
 					Dataset<Row> geoms = spark
 							.sql("Select geom.s as " +StrabonParameters.GEOMETRIES_FIRST_COLUMN 
-									+ ", ifnull(wkt.s, geom.o) as " + StrabonParameters.GEOMETRIES_SECOND_COLUMN 
+									+ ", wkt.s as " + StrabonParameters.GEOMETRIES_SECOND_COLUMN 
 									+ ", ST_GeomFromWKT(wkt.o) as " + StrabonParameters.GEOMETRIES_THIRD_COLUMN
-									+ " FROM " + predDictionary.get(asWKTsubprop.getAsWKTSubpropertyIRI()) + " wkt full outer join "
+									+ " FROM (SELECT * FROM " + predDictionary.get(asWKTsubprop.getAsWKTSubpropertyIRI()) 
+									+ " WHERE o IS NOT NULL AND ST_WKTIsSyntacticallyCorrect(o) ) wkt left outer join "
 									+ predDictionary.get(asWKTsubprop.getHasGeometrySubpropertyIRI()) + " geom "
-									+ " ON geom.o=wkt.s");
+									+ " ON geom.o=wkt.s ");
 					if (cacheSpatialIndex) {
 						long start = System.currentTimeMillis();
 						SpatialRDD<Geometry> spatialRDD = Adapter.toSpatialRdd(geoms, StrabonParameters.GEOMETRIES_THIRD_COLUMN);
 						spatialRDD.buildIndex(IndexType.QUADTREE, false);
-						spatialRDD.indexedRawRDD.persist(StorageLevel.MEMORY_ONLY());
+						spatialRDD.indexedRawRDD.persist(StorageLevel.MEMORY_AND_DISK());
 						spatialRDD.indexedRawRDD.cache();
 						spatialRDD.indexedRawRDD.count();// force caching
 						// spatialRDD.analyze();
@@ -275,7 +278,8 @@ public class QueryExecutor {
 								+ (System.currentTimeMillis() - start) + " milliseconds");
 					}
 					geoms.createOrReplaceGlobalTempView(tblName);
-					geoms.cache();
+					geoms.persist(StorageLevel.MEMORY_AND_DISK());
+					//geoms..cache();
 					long count = geoms.count();
 					// analyze is not suported in views...
 					// spark.sql(" ANALYZE TABLE " + tblName + " COMPUTE STATISTICS NOSCAN");
@@ -399,7 +403,7 @@ public class QueryExecutor {
 							log.debug("creating temp table " + sql.getTempName(k) + " with query: " + temp);
 							Dataset<Row> tempDataset = spark.sql(temp);
 							tempDataset.createOrReplaceGlobalTempView(sql.getTempName(k));
-							tempDataset.cache();
+							tempDataset.persist(StorageLevel.MEMORY_AND_DISK());
 							if (tempDataset.isEmpty()) {
 								log.debug("empty temp query: " + sql.getTempName(k));
 								// return empty result
