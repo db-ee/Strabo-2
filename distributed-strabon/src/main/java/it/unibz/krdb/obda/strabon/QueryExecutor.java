@@ -57,6 +57,7 @@ public class QueryExecutor {
 	private static Set<String> asWKTproperties;
 	private static boolean analyze;
 	private static int shufflePartitions;
+	private static int printResults = 10;
 
 	// the following contain properties that have literls as object for each kind of
 	// literal
@@ -166,7 +167,7 @@ public class QueryExecutor {
 						.config("spark.sql.inMemoryColumnarStorage.compressed", true)
 						.config("hive.exec.dynamic.partition", true).config("spark.sql.parquet.filterPushdown", true)
 						.config("spark.sql.inMemoryColumnarStorage.batchSize", 20000).enableHiveSupport().getOrCreate();
-
+				//spark.sql("SET spark.sql.autoBroadcastJoinThreshold = 50971520");
 				spark.sql("SET spark.sql.cbo.enabled = true");
 				spark.sql("SET spark.sql.cbo.joinReorder.enabled = true");
 				spark.sql("SET hive.exec.dynamic.partition = true");
@@ -270,7 +271,7 @@ public class QueryExecutor {
 						SpatialRDD<Geometry> spatialRDD = Adapter.toSpatialRdd(geoms, StrabonParameters.GEOMETRIES_THIRD_COLUMN);
 						spatialRDD.buildIndex(IndexType.QUADTREE, false);
 						spatialRDD.indexedRawRDD.persist(StorageLevel.MEMORY_AND_DISK());
-						spatialRDD.indexedRawRDD.cache();
+						//spatialRDD.indexedRawRDD.cache();
 						spatialRDD.indexedRawRDD.count();// force caching
 						// spatialRDD.analyze();
 						cachedIndexes.put(tblName, spatialRDD);
@@ -441,8 +442,8 @@ public class QueryExecutor {
 							// gf.createGeometry(g);
 							SpatialRDD mySpatialRDD = new SpatialRDD();
 							List<String> fieldNames = new ArrayList<String>(1);
-							// fieldNames.add("o");
-							fieldNames.add("s");
+							fieldNames.add(StrabonParameters.GEOMETRIES_FIRST_COLUMN);
+							fieldNames.add(StrabonParameters.GEOMETRIES_SECOND_COLUMN);
 							mySpatialRDD.rawSpatialRDD = rdd;
 							log.debug("previous field names: " + mySpatialRDD.fieldNames);
 							mySpatialRDD.fieldNames = fieldNames;
@@ -472,6 +473,9 @@ public class QueryExecutor {
 								+ resultSize + " results.");
 						exec += "Execution finished in " + (System.currentTimeMillis() - start) + " with " + resultSize
 								+ " results. \n";
+						if(printResults > 0) {
+							result.show(printResults, false);
+						}
 						// result.show(false);
 						for (int k = 0; k < sql.getTempQueries().size(); k++) {
 							// spark.sql("DROP VIEW globaltemp."+sql.getTempName(k));
