@@ -1,7 +1,6 @@
 package it.unibz.krdb.obda.strabon;
 
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.io.WKTReader;
+
 import it.unibz.krdb.obda.io.ModelIOManager;
 import it.unibz.krdb.obda.model.OBDADataFactory;
 import it.unibz.krdb.obda.model.OBDAModel;
@@ -19,18 +18,20 @@ import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.sedona.core.enums.IndexType;
+import org.apache.sedona.core.spatialOperator.RangeQuery;
+import org.apache.sedona.core.spatialRDD.SpatialRDD;
+import org.apache.sedona.sql.utils.SedonaSQLRegistrator;
+import org.apache.sedona.sql.utils.Adapter;
+import org.apache.sedona.viz.core.Serde.SedonaVizKryoRegistrator;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.serializer.KryoSerializer;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.storage.StorageLevel;
-import org.datasyslab.geospark.enums.IndexType;
-import org.datasyslab.geospark.spatialOperator.RangeQuery;
-import org.datasyslab.geospark.spatialRDD.SpatialRDD;
-import org.datasyslab.geosparksql.utils.Adapter;
-import org.datasyslab.geosparksql.utils.GeoSparkSQLRegistrator;
-import org.datasyslab.geosparkviz.core.Serde.GeoSparkVizKryoRegistrator;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.io.WKTReader;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
@@ -156,13 +157,13 @@ public class QueryExecutor {
 				final SparkSession spark = SparkSession.builder()
 						// .master("local[*]") // Delete this if run in cluster mode
 						.appName("strabonQuery")
-						// Enable GeoSpark custom Kryo serializer
+						// Enable Sedona custom Kryo serializer
 						.config("spark.serializer", KryoSerializer.class.getName())
-						.config("spark.kryo.registrator", GeoSparkVizKryoRegistrator.class.getName())
+						.config("spark.kryo.registrator", SedonaVizKryoRegistrator.class.getName())
 						// .config("geospark.join.numpartition",2000)
 						// .config("spark.default.parallelism", "800")
 						// .config("spark.sql.shuffle.partitions", "800")
-						.config("geospark.join.spatitionside", "none").config("spark.sql.cbo.enabled", true)
+						.config("sedona.join.spatitionside", "none").config("spark.sql.cbo.enabled", true)
 						.config("spark.sql.cbo.joinReorder.enabled", true)
 						.config("spark.sql.inMemoryColumnarStorage.compressed", true)
 						.config("hive.exec.dynamic.partition", true).config("spark.sql.parquet.filterPushdown", true)
@@ -179,7 +180,7 @@ public class QueryExecutor {
 				spark.sql("SET spark.sql.parquet.filterPushdown = true");
 				spark.sql("SET spark.sql.shuffle.partitions = " + shufflePartitions);
 				spark.sql("USE " + database);
-				GeoSparkSQLRegistrator.registerAll(spark);
+				SedonaSQLRegistrator.registerAll(spark);
 
 				FileSystem fs = FileSystem.get(spark.sparkContext().hadoopConfiguration());
 
