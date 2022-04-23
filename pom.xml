@@ -366,6 +366,12 @@
                                 </exclusions>
                         </dependency>
 
+			<dependency>
+    				<groupId>org.datasyslab</groupId>
+    				<artifactId>geotools-wrapper</artifactId>
+    				<version>1.1.0-25.2</version>
+			</dependency>
+
 			<!-- <dependency> <groupId>net.sf.jgrapht</groupId> <artifactId>jgrapht</artifactId> 
 				<version>0.8.3</version> </dependency> <dependency> <groupId>jgraph</groupId> 
 				<artifactId>jgraph</artifactId> <version>5.13.0.0</version> </dependency> -->
