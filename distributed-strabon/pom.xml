@@ -73,7 +73,11 @@
             <groupId>net.sourceforge.owlapi</groupId>
             <artifactId>owlapi-apibinding</artifactId>
         </dependency>
-
+        
+        <dependency>
+            	<groupId>org.wololo</groupId>
+            	<artifactId>jts2geojson</artifactId>
+	</dependency>
 
         <!-- spark and geospark -->
         <dependency>

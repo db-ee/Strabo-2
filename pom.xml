@@ -124,6 +124,7 @@
 		<owlapi.version>4.5.19</owlapi.version>
 		<geotools.version>22.2</geotools.version>
 		<spring.version>2.5.6</spring.version>
+		<jts2geojson.version>0.16.1</jts2geojson.version>
 	</properties>
 
 	<build>
@@ -542,11 +543,23 @@
 				<version>16.0</version>
 			</dependency>
 
-            <dependency>
-                 <groupId>com.github.rvesse</groupId>
-                 <artifactId>airline</artifactId>
-                 <version>2.1.0</version>
-             </dependency>
+            		<dependency>
+                 		<groupId>com.github.rvesse</groupId>
+                 		<artifactId>airline</artifactId>
+                 		<version>2.1.0</version>
+             		</dependency>
+             		<dependency>
+            			<groupId>org.wololo</groupId>
+            			<artifactId>jts2geojson</artifactId>
+            			<version>${jts2geojson.version}</version>
+            			<exclusions>
+                			<exclusion>
+                    				<groupId>org.locationtech.jts</groupId>
+                    				<artifactId>jts-core</artifactId>
+                			</exclusion>	
+            			</exclusions>
+            			<scope>compile</scope>
+        		</dependency>
 
 			<!-- OWL API -->
 			<dependency>
