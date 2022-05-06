@@ -135,10 +135,10 @@
             <version>2.6.7.1</version>
         </dependency>
 
-	<!-- <dependency>
+	<dependency>
     		<groupId>org.datasyslab</groupId>
     		<artifactId>geotools-wrapper</artifactId>
-	</dependency> -->
+	</dependency>
 
 
     </dependencies>
