@@ -53,6 +53,15 @@
             <id>elemguzel</id>
             <name>Elem Güzel</name>
         </developer>
+	<developer>
+	    <id>dbilidas</id>
+	    <name>Dimitris Bilidas</name>
+	</developer>
+	<developer>
+	    <id>tioannid</id>
+	    <name>Theofilos Ioannidis</name>
+	    <email>tioannid@yahoo.com</email>
+	</developer>
     </developers>
 
     <modules>
