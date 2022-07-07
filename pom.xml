@@ -135,6 +135,10 @@
 	<maven-site-plugin.version>3.7.1</maven-site-plugin.version>
 	<maven-deploy-plugin.version>2.8.2</maven-deploy-plugin.version>
 	<maven-javadoc-plugin.version>2.10.4</maven-javadoc-plugin.version>
+	<maven-source-plugin.version>3.2.0</maven-source-plugin.version>
+	<maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
+	<maven-bundle-plugin.version>4.2.0</maven-bundle-plugin.version>
+	<maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
     </properties>
 
     <build>
@@ -150,16 +154,33 @@
                     <artifactId>maven-site-plugin</artifactId>
                     <version>${maven-site-plugin.version}</version>
                 </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-deploy-plugin</artifactId>
-                    <version>${maven-deploy-plugin.version}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>${maven-javadoc-plugin.version}</version>
-                </plugin>
+		<plugin>
+		    <groupId>org.apache.maven.plugins</groupId>
+		    <artifactId>maven-deploy-plugin</artifactId>
+		    <version>${maven-deploy-plugin.version}</version>
+		    <executions>
+			<execution>
+			    <id>deploy</id>
+			    <phase>deploy</phase>
+			    <goals>
+				<goal>deploy</goal>
+			    </goals>
+			</execution>
+		    </executions>
+		</plugin>
+		<plugin>
+		    <groupId>org.apache.maven.plugins</groupId>
+		    <artifactId>maven-javadoc-plugin</artifactId>
+		    <version>${maven-javadoc-plugin.version}</version>
+		    <executions>
+			<execution>
+			    <id>attach-javadocs</id>
+			    <goals>
+				<goal>jar</goal>
+			    </goals>
+			</execution>
+		    </executions>
+		</plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
@@ -169,66 +190,36 @@
                         <target>1.8</target>
                     </configuration>
                 </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-source-plugin</artifactId>
-                    <version>2.2.1</version>
-                </plugin>
+		<plugin>
+		    <groupId>org.apache.maven.plugins</groupId>
+		    <artifactId>maven-source-plugin</artifactId>
+		    <version>${maven-source-plugin.version}</version>
+		    <executions>
+			<execution>
+			    <id>attach-sources</id>
+			    <goals>
+				<goal>jar</goal>
+			    </goals>
+			</execution>
+		    </executions>
+		</plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>2.16</version>
+                    <version>${maven-surefire-plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.felix</groupId>
                     <artifactId>maven-bundle-plugin</artifactId>
-                    <version>2.4.0</version>
+                    <version>${maven-bundle-plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-gpg-plugin</artifactId>
-                    <version>1.5</version>
+                    <version>${maven-gpg-plugin.version}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
-        <plugins>
-            <plugin>
-                <artifactId>maven-source-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <!-- explicitly define maven-deploy-plugin after other to force exec 
-                        order -->
-                <artifactId>maven-deploy-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>deploy</id>
-                        <phase>deploy</phase>
-                        <goals>
-                            <goal>deploy</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
     </build>
 
     <dependencyManagement>
