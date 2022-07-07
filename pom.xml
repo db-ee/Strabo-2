@@ -823,7 +823,7 @@
  <repository>
        <id>geomajas</id>
        <name>Geomajas Maven Repository</name>
-       <url>http://maven.geomajas.org/(http://maven.geomajas.org/)</url>
+       <url>http://maven.geomajas.org/</url>
  </repository>
 
    
