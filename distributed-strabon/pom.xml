@@ -8,9 +8,14 @@
 	<version>1.16.1</version>
 	<relativePath>..</relativePath>
     </parent>
-
     <artifactId>distributed-strabon</artifactId>
     <name>distributed-strabon</name>
+    <description>Strabo2 module</description>
+    <url>http://ontop.inf.unibz.it/</url>
+    <organization>
+	<name>KRDB Research Centre. Free University of Bozen Bolzano.</name>
+	<url>http://www.inf.unibz.it/krdb/</url>
+    </organization>
 
     <dependencies>
 	<dependency>
@@ -18,12 +23,8 @@
 	    <artifactId>ontop-obdalib-core</artifactId>
 	    <version>${project.version}</version>
 	</dependency>
-
-
 	<!--Dependencies from the OBDA projects to include in the jar -->
-
 	<!-- Reasoner libraries -->
-
 	<dependency>
 	    <groupId>${project.groupId}</groupId>
 	    <artifactId>ontop-reformulation-core</artifactId>
@@ -38,29 +39,8 @@
 		    <groupId>net.sourceforge.owlapi</groupId>
 		    <artifactId>owlapi-api</artifactId>
 		</exclusion>
-		<!-- 				<exclusion> -->
-		<!-- 					<groupId>net.sourceforge.owlapi</groupId> -->
-		<!-- 					<artifactId>owlapi-apibinding</artifactId> -->
-		<!-- 				</exclusion> -->
 	    </exclusions>
 	</dependency>
-
-	<!-- 		<dependency> -->
-	<!-- 			<groupId>${project.groupId}</groupId> -->
-	<!-- 			<artifactId>ontop-quest-sesame</artifactId> -->
-	<!-- 			<version>${project.version}</version> -->
-	<!-- 			<exclusions> -->
-	<!-- 				<exclusion> -->
-	<!-- 					<groupId>net.sourceforge.owlapi</groupId> -->
-	<!-- 					<artifactId>owlapi-api</artifactId> -->
-	<!-- 				</exclusion> -->
-	<!-- 				<exclusion> -->
-	<!-- 					<groupId>net.sourceforge.owlapi</groupId> -->
-	<!-- 					<artifactId>owlapi-apibinding</artifactId> -->
-	<!-- 				</exclusion> -->
-	<!-- 			</exclusions> -->
-	<!-- 		</dependency> -->
-
 	<dependency>
 	    <groupId>org.slf4j</groupId>
 	    <artifactId>slf4j-api</artifactId>
@@ -79,7 +59,7 @@
 	    <artifactId>jts2geojson</artifactId>
 	</dependency>
 
-	<!-- spark and geospark -->
+	<!-- spark and hive -->
 	<dependency>
 	    <groupId>org.apache.spark</groupId>
 	    <artifactId>spark-core_2.11</artifactId>
@@ -92,57 +72,47 @@
 	    <version>2.4.5</version>
 	    <scope>provided</scope>
 	</dependency>
-
-	<dependency>
-	    <!--<groupId>org.datasyslab</groupId>-->
-	    <groupId>sedona-local</groupId>
-	    <artifactId>sedona-sql_3.0</artifactId>
-	    <!--<version>3.0</version>-->
-	</dependency>
-	<dependency>
-	    <groupId>org.locationtech.jts</groupId>
-	    <artifactId>jts-core</artifactId>
-	</dependency>
 	<dependency>
 	    <groupId>org.apache.spark</groupId>
 	    <artifactId>spark-hive_2.11</artifactId>
 	    <version>2.4.5</version>
 	    <scope>provided</scope>
 	</dependency>
+	<!-- geospark or sedona -->
+	<dependency>
+	    <!--<groupId>org.datasyslab</groupId>-->
+	    <groupId>sedona-local</groupId>
+	    <artifactId>sedona-sql_3.0</artifactId>
+	</dependency>
+	<dependency>
+	    <groupId>org.locationtech.jts</groupId>
+	    <artifactId>jts-core</artifactId>
+	</dependency>
 	<dependency>
 	    <!--<groupId>org.datasyslab</groupId>-->
 	    <groupId>sedona-local</groupId>
 	    <artifactId>sedona</artifactId>
-	    <!--<version>3.0</version>-->
 	</dependency>
-
 	<dependency>
 	    <!--<groupId>org.datasyslab</groupId>-->
 	    <groupId>sedona-local</groupId>
 	    <artifactId>sedona-viz_3.0</artifactId>
-	    <!--<version>3.0</version>-->
 	</dependency>
 	<!-- transitive dependencies -->
-
 	<dependency>
 	    <groupId>org.openrdf.sesame</groupId>
 	    <artifactId>sesame-runtime-osgi</artifactId>
 	</dependency>
-
 	<dependency>
 	    <groupId>com.fasterxml.jackson.core</groupId>
 	    <artifactId>jackson-databind</artifactId>
 	    <version>2.6.7.1</version>
 	</dependency>
-
 	<dependency>
 	    <groupId>org.datasyslab</groupId>
 	    <artifactId>geotools-wrapper</artifactId>
 	</dependency>
-
-
     </dependencies>
-
 
     <build>
 	<finalName>it.unibz.inf.obda.distributedstrabon-${project.version}</finalName>
@@ -303,16 +273,7 @@
 		    </instructions>
 		</configuration>
 	    </plugin>
-
-	    <!-- <plugin> <groupId>org.codehaus.mojo</groupId> <artifactId>buildnumber-maven-plugin</artifactId>
-	    <executions> <execution> <phase>validate</phase> <goals> <goal>create</goal>
-	    </goals> </execution> </executions> </plugin> -->
-
-	    <!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-deploy-plugin</artifactId>
-	    <configuration> <skip>false</skip> </configuration> </plugin> -->
-
 	</plugins>
-
     </build>
     <repositories>
 	<repository>
@@ -324,10 +285,4 @@
 	    <url>file://${project.basedir}/../sedona-local</url>
 	</repository>
     </repositories>
-    <url>http://ontop.inf.unibz.it/</url>
-    <description>Strabo2 module</description>
-    <organization>
-	<name>KRDB Research Centre. Free University of Bozen Bolzano.</name>
-	<url>http://www.inf.unibz.it/krdb/</url>
-    </organization>
 </project>
