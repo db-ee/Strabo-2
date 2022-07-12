@@ -1,374 +1,289 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <artifactId>ontop</artifactId>
-        <groupId>it.unibz.inf.ontop</groupId>
-        <version>1.16.1</version>
-        <relativePath>..</relativePath>
+	<artifactId>ontop</artifactId>
+	<groupId>it.unibz.inf.ontop</groupId>
+	<version>1.16.1</version>
+	<relativePath>..</relativePath>
     </parent>
-
     <artifactId>distributed-strabon</artifactId>
     <name>distributed-strabon</name>
+    <description>Strabo2 module</description>
+    <url>http://ontop.inf.unibz.it/</url>
+    <organization>
+	<name>KRDB Research Centre. Free University of Bozen Bolzano.</name>
+	<url>http://www.inf.unibz.it/krdb/</url>
+    </organization>
 
     <dependencies>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>ontop-obdalib-core</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-
-        <!--Dependencies from the OBDA projects to include in the jar -->
-
-        <!-- Reasoner libraries -->
-
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>ontop-reformulation-core</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>ontop-quest-owlapi3</artifactId>
-            <version>${project.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>net.sourceforge.owlapi</groupId>
-                    <artifactId>owlapi-api</artifactId>
-                </exclusion>
-                <!-- 				<exclusion> -->
-                <!-- 					<groupId>net.sourceforge.owlapi</groupId> -->
-                <!-- 					<artifactId>owlapi-apibinding</artifactId> -->
-                <!-- 				</exclusion> -->
-            </exclusions>
-        </dependency>
-
-        <!-- 		<dependency> -->
-        <!-- 			<groupId>${project.groupId}</groupId> -->
-        <!-- 			<artifactId>ontop-quest-sesame</artifactId> -->
-        <!-- 			<version>${project.version}</version> -->
-        <!-- 			<exclusions> -->
-        <!-- 				<exclusion> -->
-        <!-- 					<groupId>net.sourceforge.owlapi</groupId> -->
-        <!-- 					<artifactId>owlapi-api</artifactId> -->
-        <!-- 				</exclusion> -->
-        <!-- 				<exclusion> -->
-        <!-- 					<groupId>net.sourceforge.owlapi</groupId> -->
-        <!-- 					<artifactId>owlapi-apibinding</artifactId> -->
-        <!-- 				</exclusion> -->
-        <!-- 			</exclusions> -->
-        <!-- 		</dependency> -->
-
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>net.sourceforge.owlapi</groupId>
-            <artifactId>owlapi-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>net.sourceforge.owlapi</groupId>
-            <artifactId>owlapi-apibinding</artifactId>
-        </dependency>
-        
-        <dependency>
-            	<groupId>org.wololo</groupId>
-            	<artifactId>jts2geojson</artifactId>
-	</dependency>
-
-        <!-- spark and geospark -->
-        <dependency>
-            <groupId>org.apache.spark</groupId>
-            <artifactId>spark-core_2.11</artifactId>
-            <version>2.4.5</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.spark</groupId>
-            <artifactId>spark-sql_2.11</artifactId>
-            <version>2.4.5</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <!--<groupId>org.datasyslab</groupId>-->
-            <groupId>sedona-local</groupId>
-            <artifactId>sedona-sql_3.0</artifactId>
-            <!--<version>3.0</version>-->
-        </dependency>
-		<dependency>
-    		<groupId>org.locationtech.jts</groupId>
-    		<artifactId>jts-core</artifactId>
-		</dependency>
-        <dependency>
-            <groupId>org.apache.spark</groupId>
-            <artifactId>spark-hive_2.11</artifactId>
-            <version>2.4.5</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <!--<groupId>org.datasyslab</groupId>-->
-            <groupId>sedona-local</groupId>
-            <artifactId>sedona</artifactId>
-            <!--<version>3.0</version>-->
-        </dependency>
-
-        <dependency>
-            <!--<groupId>org.datasyslab</groupId>-->
-            <groupId>sedona-local</groupId>
-            <artifactId>sedona-viz_3.0</artifactId>
-            <!--<version>3.0</version>-->
-        </dependency>
-        <!-- transitive dependencies -->
-
-        <dependency>
-            <groupId>org.openrdf.sesame</groupId>
-            <artifactId>sesame-runtime-osgi</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>2.6.7.1</version>
-        </dependency>
-
 	<dependency>
-    		<groupId>org.datasyslab</groupId>
-    		<artifactId>geotools-wrapper</artifactId>
+	    <groupId>${project.groupId}</groupId>
+	    <artifactId>ontop-obdalib-core</artifactId>
+	    <version>${project.version}</version>
+	</dependency>
+	<!--Dependencies from the OBDA projects to include in the jar -->
+	<!-- Reasoner libraries -->
+	<dependency>
+	    <groupId>${project.groupId}</groupId>
+	    <artifactId>ontop-reformulation-core</artifactId>
+	    <version>${project.version}</version>
+	</dependency>
+	<dependency>
+	    <groupId>${project.groupId}</groupId>
+	    <artifactId>ontop-quest-owlapi3</artifactId>
+	    <version>${project.version}</version>
+	    <exclusions>
+		<exclusion>
+		    <groupId>net.sourceforge.owlapi</groupId>
+		    <artifactId>owlapi-api</artifactId>
+		</exclusion>
+	    </exclusions>
+	</dependency>
+	<dependency>
+	    <groupId>org.slf4j</groupId>
+	    <artifactId>slf4j-api</artifactId>
+	</dependency>
+	<dependency>
+	    <groupId>net.sourceforge.owlapi</groupId>
+	    <artifactId>owlapi-api</artifactId>
+	</dependency>
+	<dependency>
+	    <groupId>net.sourceforge.owlapi</groupId>
+	    <artifactId>owlapi-apibinding</artifactId>
+	</dependency>
+        
+	<dependency>
+	    <groupId>org.wololo</groupId>
+	    <artifactId>jts2geojson</artifactId>
 	</dependency>
 
-
+	<!-- spark and hive -->
+	<dependency>
+	    <groupId>org.apache.spark</groupId>
+	    <artifactId>spark-core_2.11</artifactId>
+	    <version>2.4.5</version>
+	    <scope>provided</scope>
+	</dependency>
+	<dependency>
+	    <groupId>org.apache.spark</groupId>
+	    <artifactId>spark-sql_2.11</artifactId>
+	    <version>2.4.5</version>
+	    <scope>provided</scope>
+	</dependency>
+	<dependency>
+	    <groupId>org.apache.spark</groupId>
+	    <artifactId>spark-hive_2.11</artifactId>
+	    <version>2.4.5</version>
+	    <scope>compile</scope>
+	</dependency>
+	<!-- geospark or sedona -->
+	<dependency>
+	    <!--<groupId>org.datasyslab</groupId>-->
+	    <groupId>sedona-local</groupId>
+	    <artifactId>sedona-sql_3.0</artifactId>
+	</dependency>
+	<dependency>
+	    <groupId>org.locationtech.jts</groupId>
+	    <artifactId>jts-core</artifactId>
+	</dependency>
+	<dependency>
+	    <!--<groupId>org.datasyslab</groupId>-->
+	    <groupId>sedona-local</groupId>
+	    <artifactId>sedona</artifactId>
+	</dependency>
+	<dependency>
+	    <!--<groupId>org.datasyslab</groupId>-->
+	    <groupId>sedona-local</groupId>
+	    <artifactId>sedona-viz_3.0</artifactId>
+	</dependency>
+	<!-- transitive dependencies -->
+	<dependency>
+	    <groupId>org.openrdf.sesame</groupId>
+	    <artifactId>sesame-runtime-osgi</artifactId>
+	</dependency>
+	<dependency>
+	    <groupId>com.fasterxml.jackson.core</groupId>
+	    <artifactId>jackson-databind</artifactId>
+	    <version>2.6.7.1</version>
+	</dependency>
+	<dependency>
+	    <groupId>org.datasyslab</groupId>
+	    <artifactId>geotools-wrapper</artifactId>
+	</dependency>
     </dependencies>
 
-
     <build>
-        <finalName>it.unibz.inf.obda.distributedstrabon-${project.version}</finalName>
-        <plugins>
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <addClasspath>true</addClasspath>
-                            <mainClass>it.unibz.inf.ontop.sesame.QueryTester</mainClass>
-                        </manifest>
-                    </archive>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
+	<finalName>it.unibz.inf.obda.distributedstrabon-${project.version}</finalName>
+	<plugins>
+	    <plugin>
+		<artifactId>maven-assembly-plugin</artifactId>
+		<version>3.1.1</version>
+		<executions>
+		    <execution>
+			<phase>package</phase>
+			<goals>
+			    <goal>single</goal>
+			</goals>
+		    </execution>
+		</executions>
+		<configuration>
+		    <archive>
+			<manifest>
+			    <addClasspath>true</addClasspath>
+			    <mainClass>it.unibz.krdb.obda.strabon.QueryExecutor</mainClass>
+			</manifest>
+		    </archive>
+		    <descriptorRefs>
+			<descriptorRef>jar-with-dependencies</descriptorRef>
+		    </descriptorRefs>
+		</configuration>
+	    </plugin>
+	    <!-- <plugin> <artifactId>maven-jar-plugin</artifactId> <configuration>
+	    <archive> <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+	    </archive> </configuration> </plugin> -->
+	    <plugin>
+		<!-- This is the main plugin to build the bundle. Informattion about
+		this plugin can be found here: http://felix.apache.org/site/apache-felix-maven-bundle-plugin-bnd.html
+		Note the inline comments -->
 
+		<groupId>org.apache.felix</groupId>
+		<artifactId>maven-bundle-plugin</artifactId>
 
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
-                    <excludes>
+		<!-- <executions> <execution> <id>bundle-manifest</id> <phase>process-classes</phase>
+		<goals> <goal>manifest</goal> </goals> </execution> </executions> -->
 
-                        <exclude>**/TBoxDAGImpl.java</exclude>
-                        <exclude>**/dagjgrapht/*.java</exclude>
-                        <exclude>**/LUBM*.java</exclude>
+		<!-- <version>2.3.4</version> -->
+		<extensions>true</extensions>
+		<configuration>
 
-                        <exclude>*it/unibz/krdb/obda/owlrefplatform/core/reformulation/TreeWitness*</exclude>
-                        <exclude>**/TW*.java</exclude>
-                        <exclude>**/LUBM*.java</exclude>
-                        <exclude>**/directmapping/*.java</exclude>
-                        <exclude>**/views/QueryHistoryView.java</exclude>
-                        <exclude>**/views/RDBMSInspectorView.java</exclude>
-                    </excludes>
-                    <testExcludes>
-                        <exclude>**/MappingToRuleTester.java</exclude>
-                        <exclude>**/PartialEvaluationTest.java</exclude>
-                    </testExcludes>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <skipTests>true</skipTests>
-                </configuration>
-            </plugin>
-            <!-- <plugin> <artifactId>maven-jar-plugin</artifactId> <configuration>
-                <archive> <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
-                </archive> </configuration> </plugin> -->
-            <plugin>
-                <!-- This is the main plugin to build the bundle. Informattion about
-                    this plugin can be found here: http://felix.apache.org/site/apache-felix-maven-bundle-plugin-bnd.html
-                    Note the inline comments -->
+		    <!-- The follwing is the set of instructions of how pack the bundle
+		    and how to create the MANIFEST.MF for the bundle. The configuration does
+		    4 things. 1. It makes sure that the "tight" dependencies are not packed as
+		    jars, but as .class files (inline). It makes sure that all the runtime dependencies
+		    are packed as jars. 2. It makes sure all the protege plugin resources are
+		    packed (plugin.xml, tabs*.xml, etc). 3. It makes sure the META-INF/MANIFEST.MF
+		    for OSGi bundles is created with the correct imports, exports and classpath. -->
 
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
+		    <instructions>
 
-                <!-- <executions> <execution> <id>bundle-manifest</id> <phase>process-classes</phase>
-                    <goals> <goal>manifest</goal> </goals> </execution> </executions> -->
+			<!-- <Build-Jdk>1.6</Build-Jdk> -->
+			<Bundle-RequiredExecutionEnvironment>JavaSE-1.6</Bundle-RequiredExecutionEnvironment>
+			<!-- This makes sure any dependency in the obdalib <dependency> dependencies
+			are packed as .classes (uncompressed, no jars) and the rest is packed as
+			.jars -->
+			<!-- <Embed-Dependency>*;groupId=it.unibz.inf.ontop;inline=true,obdalib*;groupId=inf.unibz.it*;inline=true,*;groupId=!it.unibz.krdb;scope=compile|runtime</Embed-Dependency> -->
+			<Embed-Dependency>
+			    *;groupId=it.unibz.inf.ontop.*;inline=true,*;groupId=it.unibz.krdb.obda.protege4.*;inline=true,*;groupId=!it.unibz.inf.ontop;scope=compile|runtime
+			</Embed-Dependency>
 
-                <!-- <version>2.3.4</version> -->
-                <extensions>true</extensions>
-                <configuration>
+			<Bundle-Name>-ontopPro-</Bundle-Name>
+			<!-- necessary for protege 4 plugins -->
+			<Bundle-Category>protege</Bundle-Category>
 
-                    <!-- The follwing is the set of instructions of how pack the bundle
-                        and how to create the MANIFEST.MF for the bundle. The configuration does
-                        4 things. 1. It makes sure that the "tight" dependencies are not packed as
-                        jars, but as .class files (inline). It makes sure that all the runtime dependencies
-                        are packed as jars. 2. It makes sure all the protege plugin resources are
-                        packed (plugin.xml, tabs*.xml, etc). 3. It makes sure the META-INF/MANIFEST.MF
-                        for OSGi bundles is created with the correct imports, exports and classpath. -->
+			<!-- general information -->
+			<Bundle-ContactAddress>mariano.muro@gmail.com</Bundle-ContactAddress>
+			<Bundle-DocURL>http://ontop.inf.unibz.it</Bundle-DocURL>
+			<Bundle-Description>-ontopPro- Protege 4</Bundle-Description>
+			<Bundle-Vendor>Free University of Bozen-Bolzano. KRDB Research
+			    Centre
+			</Bundle-Vendor>
+			<Implementation-Version>${project.version}</Implementation-Version>
 
-                    <instructions>
+			<!-- Required. Remember to use the proper version for dependencies -->
+			<Bundle-Version>${project.version}</Bundle-Version>
+			<Build-Number>0</Build-Number>
+			<!-- <Private-Package>!osgi.wiring.package, !org.w3c.dom.ranges, !org.w3c.dom.traversal*</Private-Package> -->
+			<Export-Package>it.unibz.krdb.obda.protege4.*</Export-Package>
+			<Import-Package>it.unibz.krdb.obda.protege4.*,
+			    !org.json,
+			    !org.codehaus.*,
+			    !org.jruby.*,
+			    !net.sf.cglib.asm.*,
+			    !org.aspectj.weaver.*,
+			    !org.apache.*,
+			    !org.aopalliance.*,
+			    !oracle.classloader.*,
+			    !org.antlr.*,
+			    !groovy.*,
+			    !sun.*,
+			    !org.jvnet.hk2.*,
+			    !org.junit.*,
+			    !org.springframework.*,
+			    javax.swing.*,
+			    javax.xml.datatype,
+			    javax.sql.*,
+			    javax.accessibility,
+			    javax.naming.*,javax.management.*,javax.sql.*,
+			    javax.xml.parsers.*,org.xml.sax.*,
+			    !javax.*,
+			    it.unibz.krdb.obda.*,
+			    !org.objectweb.*,
+			    !org.glassfish.*,
+			    org.protege.osgi.jdbc,
+			    org.protege.osgi.*,
+			    uk.ac.manchester.*,
+			    org.protege.*,
+			    org.semanticweb.*,
+			    com.hp.hpl.jena.query.*,
+			    org.apache.tomcat.*,
+			    org.openrdf.sesame.*,
+			    org.openrdf.query*,
+			    org.openrdf.query.parser*,
+			    org.openrdf.query.algebra*,
+			    org.openrdf.query.resultio.*,
+			    org.openrdf.rio.n3*,
+			    !org.glassfish.api,*,
+			    !org.aopalliance.*,
+			    org.openrdf.repository.http.*,
+			    !info.aduna.*,
+			    info.aduna.commons.*,
+			    !au.com.bytecode.opencsv*,
+			    !com.touchgraph*,
+			    !org.codehaus.janino, org.codehaus.*
+			    !org.w3c.dom*,
+			    !org.xml.*,!jena.*, !junit.*, !org.antl*,
+			    !org.apache*,
+			    !org.ietf.*, !javax.*, !com.hp.*,
+			    !arq*, !antlr*,
+			    !EDU.oswego.cs.dl.util.concurrent,
+			    !osgi.wiring.package,
+			    !org.w3c.dom.ranges,!org.w3c.dom.traversal, *
+			</Import-Package>
+			<Eclipse-LazyStart>false</Eclipse-LazyStart>
 
-                        <!-- <Build-Jdk>1.6</Build-Jdk> -->
-                        <Bundle-RequiredExecutionEnvironment>JavaSE-1.6</Bundle-RequiredExecutionEnvironment>
-                        <!-- This makes sure any dependency in the obdalib <dependency> dependencies
-                            are packed as .classes (uncompressed, no jars) and the rest is packed as
-                            .jars -->
-                        <!-- <Embed-Dependency>*;groupId=it.unibz.inf.ontop;inline=true,obdalib*;groupId=inf.unibz.it*;inline=true,*;groupId=!it.unibz.krdb;scope=compile|runtime</Embed-Dependency> -->
-                        <Embed-Dependency>
-                            *;groupId=it.unibz.inf.ontop.*;inline=true,*;groupId=it.unibz.krdb.obda.protege4.*;inline=true,*;groupId=!it.unibz.inf.ontop;scope=compile|runtime
-                        </Embed-Dependency>
+			<!-- The name of the plugin for OSGi dependencies. It has to be singleton
+			or protege wont load it -->
+			<Bundle-SymbolicName>it.unibz.krdb.obda.protege4;singleton:=true</Bundle-SymbolicName>
 
-                        <Bundle-Name>-ontopPro-</Bundle-Name>
-                        <!-- necessary for protege 4 plugins -->
-                        <Bundle-Category>protege</Bundle-Category>
+			<!-- This makes sure ONLY the necessary dependencies are imported.
+			If this is not supplied, maven-bundle-plugin will attempt to import ALL classes
+			in the dependencies (even transitive ones) This will lead to class not found
+			exceptions. It's very important to assure only the needed depdencies are
+			imported. -->
+			<!-- <Import-Package>com.ibm.db2.jcc.licenses.*,com.hp.hpl.jena.iri.*,org.apache.commons.logging.*,com.hp.hpl.jena.query.*,org.apache.log4j.*,org.atlr.*,org.slf4j.*,org.protege.*,org.coode.*,org.semanticweb.*,uk.ac.manchester.*,!*,org.protege.osgi.jdbc</Import-Package> -->
+			<!-- <Import-Package>!osgi.wiring.package,!org.w3c.dom.ranges,javax.accessibility.*,org.apache.log4j,javax.swing.*,org.apache.commons.logging.*,org.apache.log4j.*,org.atlr.*,org.slf4j.*,org.protege.*,org.coode.*,org.semanticweb.*,uk.ac.manchester.*,org.protege.osgi.jdbc,org.xml.sax*,javax.xml*,javax.xml.parsers*,javax.naming*,ch.qos.logback.classic*,com.hp.hpl.jena.iri*,com.hp.hpl.jena.query*,!*</Import-Package> -->
 
-                        <!-- general information -->
-                        <Bundle-ContactAddress>mariano.muro@gmail.com</Bundle-ContactAddress>
-                        <Bundle-DocURL>http://ontop.inf.unibz.it</Bundle-DocURL>
-                        <Bundle-Description>-ontopPro- Protege 4</Bundle-Description>
-                        <Bundle-Vendor>Free University of Bozen-Bolzano. KRDB Research
-                            Centre
-                        </Bundle-Vendor>
-                        <Implementation-Version>${project.version}</Implementation-Version>
+			<!-- This makes sure all OBDA classes are exported and available in
+			dependent projects -->
+			<!-- <Export-Package>it.unibz.krdb.*</Export-Package> -->
 
-                        <!-- Required. Remember to use the proper version for dependencies -->
-                        <Bundle-Version>${project.version}</Bundle-Version>
-                        <Build-Number>0</Build-Number>
-                        <!-- <Private-Package>!osgi.wiring.package, !org.w3c.dom.ranges, !org.w3c.dom.traversal*</Private-Package> -->
-                        <Export-Package>it.unibz.krdb.obda.protege4.*</Export-Package>
-                        <Import-Package>it.unibz.krdb.obda.protege4.*,
-                            !org.json,
-                            !org.codehaus.*,
-                            !org.jruby.*,
-                            !net.sf.cglib.asm.*,
-                            !org.aspectj.weaver.*,
-                            !org.apache.*,
-                            !org.aopalliance.*,
-                            !oracle.classloader.*,
-                            !org.antlr.*,
-                            !groovy.*,
-                            !sun.*,
-                            !org.jvnet.hk2.*,
-                            !org.junit.*,
-                            !org.springframework.*,
-                            javax.swing.*,
-                            javax.xml.datatype,
-                            javax.sql.*,
-                            javax.accessibility,
-                            javax.naming.*,javax.management.*,javax.sql.*,
-                            javax.xml.parsers.*,org.xml.sax.*,
-                            !javax.*,
-                            it.unibz.krdb.obda.*,
-                            !org.objectweb.*,
-                            !org.glassfish.*,
-                            org.protege.osgi.jdbc,
-                            org.protege.osgi.*,
-                            uk.ac.manchester.*,
-                            org.protege.*,
-                            org.semanticweb.*,
-                            com.hp.hpl.jena.query.*,
-                            org.apache.tomcat.*,
-                            org.openrdf.sesame.*,
-                            org.openrdf.query*,
-                            org.openrdf.query.parser*,
-                            org.openrdf.query.algebra*,
-                            org.openrdf.query.resultio.*,
-                            org.openrdf.rio.n3*,
-                            !org.glassfish.api,*,
-                            !org.aopalliance.*,
-                            org.openrdf.repository.http.*,
-                            !info.aduna.*,
-                            info.aduna.commons.*,
-                            !au.com.bytecode.opencsv*,
-                            !com.touchgraph*,
-                            !org.codehaus.janino, org.codehaus.*
-                            !org.w3c.dom*,
-                            !org.xml.*,!jena.*, !junit.*, !org.antl*,
-                            !org.apache*,
-                            !org.ietf.*, !javax.*, !com.hp.*,
-                            !arq*, !antlr*,
-                            !EDU.oswego.cs.dl.util.concurrent,
-                            !osgi.wiring.package,
-                            !org.w3c.dom.ranges,!org.w3c.dom.traversal, *
-                        </Import-Package>
-                        <Eclipse-LazyStart>false</Eclipse-LazyStart>
-
-                        <!-- The name of the plugin for OSGi dependencies. It has to be singleton
-                            or protege wont load it -->
-                        <Bundle-SymbolicName>it.unibz.krdb.obda.protege4;singleton:=true</Bundle-SymbolicName>
-
-                        <!-- This makes sure ONLY the necessary dependencies are imported.
-                            If this is not supplied, maven-bundle-plugin will attempt to import ALL classes
-                            in the dependencies (even transitive ones) This will lead to class not found
-                            exceptions. It's very important to assure only the needed depdencies are
-                            imported. -->
-                        <!-- <Import-Package>com.ibm.db2.jcc.licenses.*,com.hp.hpl.jena.iri.*,org.apache.commons.logging.*,com.hp.hpl.jena.query.*,org.apache.log4j.*,org.atlr.*,org.slf4j.*,org.protege.*,org.coode.*,org.semanticweb.*,uk.ac.manchester.*,!*,org.protege.osgi.jdbc</Import-Package> -->
-                        <!-- <Import-Package>!osgi.wiring.package,!org.w3c.dom.ranges,javax.accessibility.*,org.apache.log4j,javax.swing.*,org.apache.commons.logging.*,org.apache.log4j.*,org.atlr.*,org.slf4j.*,org.protege.*,org.coode.*,org.semanticweb.*,uk.ac.manchester.*,org.protege.osgi.jdbc,org.xml.sax*,javax.xml*,javax.xml.parsers*,javax.naming*,ch.qos.logback.classic*,com.hp.hpl.jena.iri*,com.hp.hpl.jena.query*,!*</Import-Package> -->
-
-                        <!-- This makes sure all OBDA classes are exported and available in
-                            dependent projects -->
-                        <!-- <Export-Package>it.unibz.krdb.*</Export-Package> -->
-
-                        <!-- Not needed anymore, it was necessary when we were not using import-package
-                            <Require-Bundle>org.eclipse.equinox.registry,org.eclipse.equinox.common,org.protege.common,org.protege.editor.core.application,org.protege.editor.owl,org.semanticweb.owl.owlapi</Require-Bundle> -->
-                    </instructions>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>8</source>
-                    <target>8</target>
-                </configuration>
-            </plugin>
-
-            <!-- <plugin> <groupId>org.codehaus.mojo</groupId> <artifactId>buildnumber-maven-plugin</artifactId>
-                <executions> <execution> <phase>validate</phase> <goals> <goal>create</goal>
-                </goals> </execution> </executions> </plugin> -->
-
-            <!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-deploy-plugin</artifactId>
-                <configuration> <skip>false</skip> </configuration> </plugin> -->
-
-        </plugins>
-
+			<!-- Not needed anymore, it was necessary when we were not using import-package
+			<Require-Bundle>org.eclipse.equinox.registry,org.eclipse.equinox.common,org.protege.common,org.protege.editor.core.application,org.protege.editor.owl,org.semanticweb.owl.owlapi</Require-Bundle> -->
+		    </instructions>
+		</configuration>
+	    </plugin>
+	</plugins>
     </build>
     <repositories>
-        <repository>
-            <!-- this is a temporary solution for accessing a local build
-                of geospark due to issue 218:
-                https://github.com/DataSystemsLab/GeoSpark/issues/218 -->
-            <id>sedona-local</id>
-            <name>Local sedona repo</name>
-            <url>file://${project.basedir}/../sedona-local</url>
-        </repository>
+	<repository>
+	    <!-- this is a temporary solution for accessing a local build
+	    of geospark due to issue 218:
+	    https://github.com/DataSystemsLab/GeoSpark/issues/218 -->
+	    <id>sedona-local</id>
+	    <name>Local sedona repo</name>
+	    <url>file://${project.basedir}/../sedona-local</url>
+	</repository>
     </repositories>
-    <url>http://ontop.inf.unibz.it/</url>
-    <description>Strabo2 module</description>
-    <organization>
-        <name>KRDB Research Centre. Free University of Bozen Bolzano.</name>
-        <url>http://www.inf.unibz.it/krdb/</url>
-    </organization>
 </project>
