@@ -1,56 +1,34 @@
-[![Build Status](https://travis-ci.org/ontop/ontop.png?branch=develop)](https://travis-ci.org/ontop/ontop)
-[![Maven Central](https://img.shields.io/maven-central/v/it.unibz.inf.ontop/ontop.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22it.unibz.inf.ontop%22)
-Ontop-Spatial
-==================
+# Strabo 2
 
-Ontop-spatial is an extension of Ontop framework with geospatial 
-support. Ontop is a framework for ontology based data access (OBDA). 
-It supports SPARQL over
-virtual RDF graphs defined through mappings to RDBMS. Ontop-spatial
-extends ontop with the following geospatial capabilities: 
-* Geospatial virtual RDF graphs can be created on top of geospatial databases
-(i.e., PostgreSQL with PostGIS extension enabled). 
-* Geometry columns in geospatial databases can be mapped to  GeoSPARQL
-WKT literals using R2RML or OBDA mappings 
-* Geospatial topology functions as defined in GeoSPARQL can be used 
-in the filter clause of (Geo)SPARQL queries.  
+In order to run the Data Loader and Query executor, first modify the scope of spark-hive_2.11 dependency in distributed-strabon/pom.xml to "provided" in case the spark-hive libraries are available to the execution environment.
 
-Check also issues.txt for known issues and todo.txt for future 
-enchancements
+Then run: mvn clean install -DskipTests=true
 
-Licensing terms 
---------------------
-The -ontop- framework is available under the Apache License, Version 2.0
+You should use the jar that has been created in distributed-strabon/target/it.unibz.inf.obda.distributed-strabon-1.16.1-jar-with-dependencies.jar in the spark submit.
 
-All documentation is licensed under the 
-[Creative Commons](http://creativecommons.org/licenses/by/4.0/)
-(attribute)  license.
+For Data Loader:
 
+$SPARK_HOME/bin/spark-submit --class it.unibz.krdb.obda.geofb.DataLoader --executor-memory 116GB --total-executor-cores 31 --master spark://ip:7078 /home/user/it.unibz.inf.obda.distributed-strabon-1.16.1-jar-with-dependencies.jar -i hdfs://ip:9001/user/synthetic/all768/ -o synthetic768 -lp TT,VP -dp false -dropDuplicates false -drdb false -tblfrm Parquet -geom false -df dict -outTripleTable triples
 
-Compiling, packing, testing, etc.
---------------------
-The project is a [Maven](http://maven.apache.org/) project. Compiling, running the unit tests, building the release binaries all can be done using maven. To make it more practical we created several .sh scripts that you can run on any unix environment that has maven installed. The scripts are located in the folder 'scripts', look at that folder for more information.
+where, -i is the input HDFS directory that contains the NTriples files, -o is the HIVE database name which must have been created prior to execution. The rest of the parameters should be left unchanged.
 
-Currently we use Maven 3 and Java 7 to build the project.
+For Query Executor:
 
+$SPARK_HOME/bin/spark-submit --class it.unibz.krdb.obda.geofb.QueryExecutor --executor-memory 116GB --total-executor-cores 32 --master spark://ip:7078 /home/user/it.unibz.inf.obda.distributed-strabon-1.16.1-jar-with-dependencies.jar hdfs://ip:9001/user/synthetic/queries768/ synthetic768 hdfs://ip:9001/user/synthetic/asWKTTables.txt true true 384
 
-Links
---------------------
+The arguments for Query Executor are as follows:
+- Directory in HDFS that contains the queries (e.g. hdfs://ip:9001/user/synthetic/queries768/)
+- Hive DB name (e.g. synthetic768)
+- Text file in HDFS that contains the nessecary pairs of properties for the geometry linking tables (e.g. hdfs://ip:9001/user/synthetic/asWKTTables.txt)
+- Option to push thematic processing before spatial join (e.g. true)
+- Option to use spatial index (e.g. true)
+- number of Spark repartition setting. In experiments it was set to 5 x number of virtual cores
 
-official website and documentations: http://ontop.inf.unibz.it/
+For Synthetic benchmark, the contents of the asWKTTables.txt are:
+> http://geographica.di.uoa.gr/generator/landOwnership/hasGeometry,http://geographica.di.uoa.gr/generator/landOwnership/asWKT
+> http://geographica.di.uoa.gr/generator/road/hasGeometry,http://geographica.di.uoa.gr/generator/road/asWKT
+> http://geographica.di.uoa.gr/generator/pointOfInterest/hasGeometry,http://geographica.di.uoa.gr/generator/pointOfInterest/asWKT
+> http://geographica.di.uoa.gr/generator/state/hasGeometry,http://geographica.di.uoa.gr/generator/state/asWKT
 
-Google Group: https://groups.google.com/forum/#!forum/ontop4obda
-
-Source Code: https://github.com/ontop/ontop
-
-Issue Tracker: https://github.com/ontop/ontop/issues
-
-Wiki: https://github.com/ontop/ontop/wiki
-
-Facebook: https://www.facebook.com/obdaontop/
-
-Twitter: https://twitter.com/ontop4obda
-
-
-
-
+For Scalability benchmark, the contents of the asWKTTables.txt are:
+> http://www.opengis.net/ont/geosparql#hasGeometry,http://www.opengis.net/ont/geosparql#asWKT
