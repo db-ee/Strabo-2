@@ -23,9 +23,9 @@ For Query Executor:
 $SPARK_HOME/bin/spark-submit --class it.unibz.krdb.obda.geofb.QueryExecutor --executor-memory 116GB --total-executor-cores 32 --master spark://$SPARK_HOST:$SPARK_PORT /home/user/it.unibz.inf.obda.distributed-strabon-1.16.1-jar-with-dependencies.jar hdfs://$SPARK_HOST:$HDFS_PORT/user/synthetic/queries768/ synthetic768 hdfs://$SPARK_HOST:$HDFS_PORT/user/synthetic/asWKTTables.txt true true 384
 
 The arguments for Query Executor are as follows:
-- Directory in HDFS that contains the queries (e.g. hdfs://ip:9001/user/synthetic/queries768/)
+- Directory in HDFS that contains the queries (e.g. hdfs://$SPARK_HOST:$HDFS_PORT/user/synthetic/queries768/)
 - Hive DB name (e.g. synthetic768)
-- Text file in HDFS that contains the nessecary pairs of properties for the geometry linking tables (e.g. hdfs://ip:9001/user/synthetic/asWKTTables.txt)
+- Text file in HDFS that contains the nessecary pairs of properties for the geometry linking tables (e.g. hdfs://$SPARK_HOST:$HDFS_PORT/user/synthetic/asWKTTables.txt)
 - Option to push thematic processing before spatial join (e.g. true)
 - Option to use spatial index (e.g. true)
 - number of Spark repartition setting. In experiments it was set to 5 x number of virtual cores
